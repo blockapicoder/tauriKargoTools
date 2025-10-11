@@ -1,0 +1,22 @@
+{
+  "name": "tauri-kargo-tools",
+  "version": "0.1.0",
+  "description": "",
+   "files": ["dist"],
+  "exports": { "./*": "./dist/*" },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blockapicoder/tauriKargoTools.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/blockapicoder/tauriKargoTools/issues"
+  },
+  "homepage": "https://github.com/blockapicoder/tauriKargoTools#readme"
+}
