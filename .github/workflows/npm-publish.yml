@@ -1,0 +1,47 @@
+name: Manual Publish to npm
+
+on:
+  workflow_dispatch: {}   # déclenchement manuel depuis l’onglet Actions
+
+permissions:
+  id-token: write         # requis pour OIDC (Trusted Publishing)
+  contents: read
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    # Sécurité: n'autorise l'exécution que si la ref est la branche main
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (main)
+        uses: actions/checkout@v4
+
+      - name: Verify on main
+        run: |
+          if [ "${GITHUB_REF}" != "refs/heads/main" ]; then
+            echo "Ce workflow doit être exécuté sur la branche main. Ref: ${GITHUB_REF}"
+            exit 1
+          fi
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install deps
+        run: |
+          npm ci --ignore-scripts || npm i --ignore-scripts
+
+      - name: Build
+        run: npm run build
+
+      - name: Dry run (optional)
+        if: ${{ inputs.dry_run == 'true' }}
+        run: npm publish --provenance --access public --dry-run
+
+      - name: Publish to npm (Trusted Publishing)
+        run: npm publish --provenance --access public
