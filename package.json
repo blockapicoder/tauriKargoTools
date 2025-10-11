@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "description": "",
    "files": ["dist"],
-  "exports": { "./*": "./dist/*" },
-  "scripts": { "build": "…", "prepublishOnly": "npm run build" },
+ "exports": { "./*": "./dist/*" },
+  "publishConfig": { "access": "public" },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/blockapicoder/tauriKargoTools.git"
