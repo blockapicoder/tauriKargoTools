@@ -1,0 +1,199 @@
+
+/* Sexy UI Theme for #app
+   Scope all styles under #app to avoid leaking globally.
+   Works with the UI class generating <label>, <input>, <select>, <button>, and <div> containers.
+*/
+
+#app {
+  --ui-font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  --ui-fg: #0f1220;
+  --ui-fg-muted: #3a3f5a;
+  --ui-bg: #ffffff;
+  --ui-panel: rgba(17, 20, 45, 0.04);
+  --ui-border: rgba(17, 20, 45, 0.12);
+  --ui-input-bg: rgba(17, 20, 45, 0.035);
+  --ui-focus: #6e8ef5;
+  --ui-ok: #21c07a;
+  --ui-warn: #ffb020;
+  --ui-radius: 14px;
+  --ui-padding-y: 0.65rem;
+  --ui-padding-x: 0.95rem;
+  --ui-shadow: 0 8px 24px rgba(17, 20, 45, 0.08);
+  --ui-shadow-strong: 0 12px 32px rgba(17, 20, 45, 0.18);
+  --ui-accent-a: #6E8EF5;
+  --ui-accent-b: #A777E3;
+  color-scheme: light dark;
+  font-family: var(--ui-font);
+}
+
+@media (prefers-color-scheme: dark) {
+  #app {
+    --ui-fg: #e6e8ee;
+    --ui-fg-muted: #a1a6c7;
+    --ui-bg: #0b0e1a;
+    --ui-panel: rgba(255, 255, 255, 0.06);
+    --ui-border: rgba(255, 255, 255, 0.12);
+    --ui-input-bg: rgba(255, 255, 255, 0.06);
+    --ui-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+    --ui-shadow-strong: 0 18px 44px rgba(0, 0, 0, 0.55);
+  }
+}
+
+#app, #app * { box-sizing: border-box; }
+#app { background: var(--ui-bg); color: var(--ui-fg); }
+
+/* Layout helpers (your JS already sets flex via flow, this just polishes) */
+#app div {
+  /* Smooth corners for panel-like rows/columns if desired */
+  border-radius: calc(var(--ui-radius) - 4px);
+}
+#app select[multiple] option:hover {
+  outline: 2px solid color-mix(in oklab, var(--ui-focus) 60%, transparent);
+  outline-offset: -2px;
+}
+
+/* Labels */
+#app label {
+  color: var(--ui-fg-muted);
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  margin: 6px 2px;
+}
+
+/* Form controls base */
+#app input, #app select, #app button {
+  font: inherit;
+  border-radius: var(--ui-radius);
+  transition: transform 120ms ease, box-shadow 160ms ease, border-color 160ms ease, background 160ms ease, color 160ms ease, opacity 160ms ease;
+  will-change: transform, box-shadow;
+}
+#app select[multiple] option:hover {
+  outline: 2px solid color-mix(in oklab, var(--ui-focus) 60%, transparent);
+  outline-offset: -2px;
+}
+
+/* Inputs & selects */
+#app input, #app select {
+  width: max(180px, 12ch);
+  padding: var(--ui-padding-y) var(--ui-padding-x);
+  background: var(--ui-input-bg);
+  border: 1px solid var(--ui-border);
+  color: var(--ui-fg);
+  box-shadow: var(--ui-shadow);
+  outline: none;
+  backdrop-filter: saturate(140%) blur(6px);
+}
+
+/* Number inputs alignment */
+#app input[type="number"] { text-align: right; width: 120px; }
+
+/* Checkbox gets its own size and reset */
+#app input[type="checkbox"] {
+  width: 1.15rem;
+  height: 1.15rem;
+  padding: 0;
+  border-radius: 8px;
+  display: inline-grid;
+  place-items: center;
+}
+
+/* Checkbox custom check (pure CSS) */
+#app input[type="checkbox"]::before {
+  content: "";
+  width: 0.65rem;
+  height: 0.65rem;
+  transform: scale(0);
+  transition: 120ms transform ease-in-out;
+  box-shadow: inset 1rem 1rem var(--ui-focus);
+  border-radius: 4px;
+}
+#app input[type="checkbox"]:checked::before { transform: scale(1); }
+
+/* Select custom arrow (not for multiple) */
+#app select:not([multiple]) {
+  -webkit-appearance: none;
+  appearance: none;
+  padding-right: calc(var(--ui-padding-x) * 2 + 12px);
+  background-image:
+    linear-gradient(to right, transparent, transparent),
+    url("data:image/svg+xml,%3Csvg width='22' height='22' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5' stroke='%23aeb5ff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat, no-repeat;
+  background-position: right 12px center, right 10px center;
+  background-size: 22px, 22px;
+}
+
+/* Multi-select look */
+#app select[multiple] {
+  min-width: 260px;
+  min-height: 160px;
+  padding: 8px;
+}
+#app select[multiple] option {
+  padding: 8px 10px;
+  border-radius: 10px;
+  margin: 2px;
+}
+#app select[multiple] option:checked {
+  background: linear-gradient(135deg, var(--ui-accent-a), var(--ui-accent-b));
+  color: white;
+}
+
+/* Hover / focus states */
+#app input:hover, #app select:hover {
+  border-color: color-mix(in oklab, var(--ui-focus) 60%, var(--ui-border));
+  box-shadow: var(--ui-shadow-strong);
+  transform: translateY(-1px);
+}
+
+#app input:focus-visible, #app select:focus-visible, #app button:focus-visible {
+  outline: 2px solid color-mix(in oklab, var(--ui-focus) 80%, transparent);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 6px color-mix(in oklab, var(--ui-focus) 18%, transparent), var(--ui-shadow-strong);
+}
+
+/* Buttons */
+#app button {
+  cursor: pointer;
+  padding: calc(var(--ui-padding-y) + 2px) calc(var(--ui-padding-x) + 2px);
+  border: 0;
+  color: white;
+  background: linear-gradient(135deg, var(--ui-accent-a), var(--ui-accent-b));
+  box-shadow: var(--ui-shadow);
+  letter-spacing: 0.3px;
+  font-weight: 700;
+  text-shadow: 0 1px 0 rgba(0,0,0,0.1);
+}
+#app button:hover { transform: translateY(-1px); box-shadow: var(--ui-shadow-strong); filter: brightness(1.04); }
+#app button:active { transform: translateY(0); filter: brightness(0.98); }
+#app button:disabled { opacity: 0.55; cursor: not-allowed; filter: saturate(70%); }
+
+/* Subtle card backgrounds for grouped rows/columns if you wrap things */
+#app .panel {
+  background: var(--ui-panel);
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-radius);
+  padding: 12px;
+  box-shadow: var(--ui-shadow);
+}
+
+/* Spacing utilities (optional if you want to apply classes manually) */
+#app .gap-8  > * + * { margin-top: 8px; }
+#app .gap-12 > * + * { margin-top: 12px; }
+#app .gap-16 > * + * { margin-top: 16px; }
+
+/* Scrollbar polish (WebKit-based browsers) */
+#app ::-webkit-scrollbar { width: 10px; height: 10px; }
+#app ::-webkit-scrollbar-thumb {
+  background: color-mix(in oklab, var(--ui-accent-a) 40%, var(--ui-fg-muted));
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+#app ::-webkit-scrollbar-track { background: transparent; }
+
+/* Reduce motion respect */
+@media (prefers-reduced-motion: reduce) {
+  #app input, #app select, #app button {
+    transition: none;
+  }
+}
