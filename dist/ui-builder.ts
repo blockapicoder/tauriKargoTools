@@ -1,6 +1,6 @@
 /* builder.ts
- * - Construit réellement l’UI (DOM) à partir d’une UI<T> déclarative (ui.ts).
- * - Gère les listeners, visible/enable, sous-UI, dialogs, etc.
+ * - Construit le DOM à partir de l'UI déclarative (ui.ts).
+ * - Gère listeners, visible/enable, sous-UI, listes et dialogs.
  */
 
 import { Listener, Unlisten } from "./listener";
@@ -9,7 +9,6 @@ import {
   UI, UINode,
   InputNode, ButtonNode, SelectNode, LabelNode, FlowNode,
   SingleUINode, ListUINode, DialogNode,
-  ElementOf, MethodNames0
 } from "./ui-model";
 
 /* ===================== Runtime result ===================== */
@@ -72,8 +71,9 @@ export class Builder<T extends object> {
       listener,
       elements,
       stop: () => {
-        try { /* listener.stop(); // si vous devez libérer les descriptors */ } catch {}
-        for (const u of domUnsubs) { try { u(); } catch {} }
+        try { /* listener.stop(); // à activer si vous souhaitez restaurer les descriptors */ } catch {}
+        for (const u of domUnsubs)  { try { u(); } catch {} }
+        for (const u of dataUnsubs) { try { u(); } catch {} }
       }
     };
   }
@@ -82,20 +82,20 @@ export class Builder<T extends object> {
   private buildNodes(nodes: ReadonlyArray<UINode<T>>, ctx: Ctx<T>) {
     for (const node of nodes) {
       switch (node.kind) {
-        case 'input':     this.buildInput(node as InputNode<T>, ctx); break;
+        case 'input':     this.buildInput(node as InputNode<T, any>, ctx); break;
         case 'button':    this.buildButton(node as ButtonNode<T>, ctx); break;
-        case 'select':    this.buildSelect(node as SelectNode<T>, ctx); break;
-        case 'label':     this.buildLabel(node as LabelNode<T>, ctx); break;
+        case 'select':    this.buildSelect(node as SelectNode<T, any, any, any, any>, ctx); break;
+        case 'label':     this.buildLabel(node as LabelNode<T, any>, ctx); break;
         case 'flow':      this.buildFlow(node as FlowNode<T>, ctx); break;
-        case 'singleUI':  this.buildSingleUI(node as SingleUINode<T>, ctx); break;
-        case 'listUI':    this.buildListUI(node as ListUINode<T>, ctx); break;
-        case 'dialog':    this.buildDialog(node as DialogNode<T>, ctx); break;
+        case 'singleUI':  this.buildSingleUI(node as SingleUINode<T, any, any>, ctx); break;
+        case 'listUI':    this.buildListUI(node as ListUINode<T, any, any>, ctx); break;
+        case 'dialog':    this.buildDialog(node as DialogNode<T, any, any>, ctx); break;
       }
     }
   }
 
   /* ----------- Input ----------- */
-  private buildInput(node: InputNode<T>, ctx: Ctx<T>) {
+  private buildInput(node: InputNode<T, any>, ctx: Ctx<T>) {
     const wrapper = document.createElement('label');
     wrapper.style.display = 'block';
     if (node.label) wrapper.append(document.createTextNode(node.label + ' '));
@@ -211,7 +211,7 @@ export class Builder<T extends object> {
   }
 
   /* ----------- Select ----------- */
-  private buildSelect(node: SelectNode<T>, ctx: Ctx<T>) {
+  private buildSelect(node: SelectNode<T, any, any, any, any>, ctx: Ctx<T>) {
     const sel = document.createElement('select');
     sel.multiple = (node.mode ?? 'list') === 'list';
     applySize(sel, node.width, node.height);
@@ -291,7 +291,7 @@ export class Builder<T extends object> {
   }
 
   /* ----------- Label ----------- */
-  private buildLabel(node: LabelNode<T>, ctx: Ctx<T>) {
+  private buildLabel(node: LabelNode<T, any>, ctx: Ctx<T>) {
     const span = document.createElement('span');
     applySize(span, node.width, node.height);
     span.textContent = String((ctx.obj as any)[node.name] ?? '');
@@ -349,7 +349,7 @@ export class Builder<T extends object> {
   }
 
   /* ----------- Single UI (champ objet) ----------- */
-  private buildSingleUI(node: SingleUINode<T>, ctx: Ctx<T>) {
+  private buildSingleUI(node: SingleUINode<T, any, any>, ctx: Ctx<T>) {
     const host = document.createElement('div');
     applySize(host, node.width, node.height);
     ctx.add(host);
@@ -364,7 +364,8 @@ export class Builder<T extends object> {
     const mountFor = (value: any) => {
       clearHost();
       if (!value || typeof value !== 'object') return;
-      const ui = node.listUI.find(u => value instanceof u.getTargetClass());
+      type ChildUI = (typeof node.listUI)[number];
+      const ui = node.listUI.find((u: ChildUI) => value instanceof u.getTargetClass());
       if (!ui) return;
       const inner = document.createElement('div');
       host.appendChild(inner);
@@ -379,7 +380,7 @@ export class Builder<T extends object> {
   }
 
   /* ----------- List UI (liste d'objets) ----------- */
-  private buildListUI(node: ListUINode<T>, ctx: Ctx<T>) {
+  private buildListUI(node: ListUINode<T, any, any>, ctx: Ctx<T>) {
     const div = document.createElement('div');
     div.style.display = 'flex';
     div.style.flexDirection = (node.orientation ?? 'column') === 'row' ? 'row' : 'column';
@@ -412,8 +413,9 @@ export class Builder<T extends object> {
     const render = () => {
       clear();
       const arr = ((ctx.obj as any)[node.list] ?? []) as any[];
+      type ChildUI = (typeof node.listUI)[number];
       for (const item of arr) {
-        const ui = node.listUI.find(u => item instanceof u.getTargetClass());
+        const ui = node.listUI.find((u: ChildUI) => item instanceof u.getTargetClass());
         if (!ui) continue;
         const host = document.createElement('div');
         div.appendChild(host);
@@ -431,7 +433,7 @@ export class Builder<T extends object> {
   }
 
   /* ----------- Dialog ----------- */
-  private buildDialog(node: DialogNode<T>, ctx: Ctx<T>) {
+  private buildDialog(node: DialogNode<T, any, any>, ctx: Ctx<T>) {
     // Bouton
     const btn = document.createElement('button');
     btn.type = 'button';
@@ -455,7 +457,8 @@ export class Builder<T extends object> {
     const mountFor = (value: any) => {
       clearChild();
       if (!value || typeof value !== 'object') return false;
-      const ui = node.listUI.find(u => value instanceof u.getTargetClass());
+      type ChildUI = (typeof node.listUI)[number];
+      const ui = node.listUI.find((u: ChildUI) => value instanceof u.getTargetClass());
       if (!ui) return false;
       const wrap = document.createElement('div');
       host.appendChild(wrap);
@@ -523,13 +526,14 @@ export class Builder<T extends object> {
     btn.addEventListener('click', open);
     ctx.domUnsubs.push(() => btn.removeEventListener('click', open));
 
-    // monter le dialog à côté du bouton
+    // Monter le dialog à côté du bouton
     ctx.add(dlg);
     ctx.domUnsubs.push(() => { try { dlg.close(); } catch {} });
   }
 }
+
 /** Démarre l'UI `ui` sur le modèle `model` dans le conteneur `id`. */
-export function boot<T extends object>(ui: UI<T>, model: T, id: string): UIRuntime<T> {
+export function boot<T extends object>(ui: UI<T>, model: T, id: string): UIRuntime<object> {
   const builder = new Builder(ui);
   return builder.boot(model, id);
 }

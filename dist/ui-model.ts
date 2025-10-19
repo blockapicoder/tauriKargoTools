@@ -13,10 +13,19 @@ export type InputType = 'auto' | 'text' | 'number' | 'checkbox';
 export type MethodNames0<T> = { [K in keyof T]-?: T[K] extends (() => any) ? K : never }[keyof T];
 export type Objectish = object;
 
+/** Clés dont la valeur est un tableau (mutable ou readonly) — évite les casts fragiles */
+export type ArrayKeys<T> = {
+  [K in keyof T]-?: T[K] extends ReadonlyArray<any> | any[] ? K : never
+}[keyof T];
+
 /* ===================== Noeuds de l'AST ===================== */
-export interface InputNode<T extends object> {
+/** Input: clé limitée à string | number | boolean */
+export interface InputNode<
+  T extends object,
+  NK extends KeysOfType<T, string | number | boolean> = KeysOfType<T, string | number | boolean>
+> {
   kind: 'input';
-  name: keyof T;
+  name: NK;
   update: MethodNames0<T>;
   label?: string;
   inputType?: InputType;
@@ -38,12 +47,19 @@ export interface ButtonNode<T extends object> {
   enable?: KeysOfType<T, boolean>;
 }
 
-export interface SelectNode<T extends object> {
+/** Select: typé par list (clé de tableau), displayMethod et selection */
+export interface SelectNode<
+  T extends object,
+  LK extends ArrayKeys<T> = ArrayKeys<T>,
+  DM extends KeysOfType<T, (a: ElementOf<T[LK]>) => string> = KeysOfType<T, (a: ElementOf<T[LK]>) => string>,
+  SK extends KeysOfType<T, number[]> = KeysOfType<T, number[]>,
+  UM extends MethodNames0<T> = MethodNames0<T>
+> {
   kind: 'select';
-  list: keyof T;
-  displayMethod: keyof T;  // (elem) => string
-  selection: keyof T;      // number[]
-  update: MethodNames0<T>;
+  list: LK;
+  displayMethod: DM;   // (elem) => string
+  selection: SK;       // number[]
+  update: UM;
   muted?: boolean;
   mode?: 'dropdown' | 'list';
   width?: number | string;
@@ -52,9 +68,13 @@ export interface SelectNode<T extends object> {
   enable?: KeysOfType<T, boolean>;
 }
 
-export interface LabelNode<T extends object> {
+/** Label: clé limitée à string */
+export interface LabelNode<
+  T extends object,
+  NK extends KeysOfType<T, string> = KeysOfType<T, string>
+> {
   kind: 'label';
-  name: keyof T; // string
+  name: NK;
   width?: number | string;
   height?: number | string;
   visible?: KeysOfType<T, boolean>;
@@ -75,18 +95,29 @@ export interface FlowNode<T extends object> {
   children: UINode<T>[];
 }
 
-export interface SingleUINode<T extends object> {
+/** SINGLE UI — clé NK telle quelle + Base (classe commune)
+ *  listUI accepte des UI de sous-classes de Base (Dog, Cat) */
+export interface SingleUINode<
+  T extends object,
+  NK extends KeysOfType<T, Objectish | null | undefined>,
+  Base extends Objectish
+> {
   kind: 'singleUI';
-  name: keyof T;                  // champ objet
-  listUI: Array<UI<any>>;         // dispatch par instanceof
+  name: NK;
+  listUI: Array<UI<any> & { getTargetClass(): new (...args: any[]) => Base }>;
   width?: number | string;
   height?: number | string;
 }
 
-export interface ListUINode<T extends object> {
+/** LIST UI — clé LK telle quelle + Base (classe commune des éléments) */
+export interface ListUINode<
+  T extends object,
+  LK extends ArrayKeys<T>,
+  Base extends Objectish
+> {
   kind: 'listUI';
-  list: keyof T;                  // champ array d'objets
-  listUI: Array<UI<any>>;         // dispatch par instanceof
+  list: LK;
+  listUI: Array<UI<any> & { getTargetClass(): new (...args: any[]) => Base }>;
   orientation?: 'row' | 'column';
   gap?: number | string;
   align?: 'start' | 'center' | 'end' | 'stretch';
@@ -98,55 +129,62 @@ export interface ListUINode<T extends object> {
   height?: number | string;
 }
 
-export interface DialogNode<T extends object> {
+/** DIALOG — clé NK telle quelle + Base */
+export interface DialogNode<
+  T extends object,
+  NK extends KeysOfType<T, Objectish | null | undefined>,
+  Base extends Objectish
+> {
   kind: 'dialog';
-  name: keyof T;                  // champ objet à éditer/visualiser
-  listUI: Array<UI<any>>;
-  label: string;                  // texte du bouton
+  name: NK;
+  listUI: Array<UI<Base> & { getTargetClass(): new (...args: any[]) => Base }>;
+  label: string;
   buttonWidth?: number | string;
   buttonHeight?: number | string;
-  width?: number | string;        // taille du <dialog>
+  width?: number | string;
   height?: number | string;
-  closeOnBackdrop?: boolean;      // défaut false
-  closeOnEsc?: boolean;           // défaut false
-  modal?: boolean;                // défaut true
+  closeOnBackdrop?: boolean;
+  closeOnEsc?: boolean;
+  modal?: boolean;
   visible?: KeysOfType<T, boolean>;
   enable?: KeysOfType<T, boolean>;
-  action?: KeysOfType<T, () => void>; // exécutée avant ouverture
+  action?: KeysOfType<T, () => void>;
 }
 
 export type UINode<T extends object> =
-  | InputNode<T>
+  | InputNode<T, any>
   | ButtonNode<T>
-  | SelectNode<T>
-  | LabelNode<T>
+  | SelectNode<T, any, any, any, any>
+  | LabelNode<T, any>
   | FlowNode<T>
-  | SingleUINode<T>
-  | ListUINode<T>
-  | DialogNode<T>;
+  | SingleUINode<T, any, any>
+  | ListUINode<T, any, any>
+  | DialogNode<T, any, any>;
 
 /* ===================== UI (déclaratif uniquement) ===================== */
 export class UI<T extends object> {
   private readonly targetClass: new (...args: any[]) => T;
   private readonly root: UINode<T>[] = [];
-  private cursor: UINode<T>[] = this.root;            // pointeur de conteneur courant
-  private stack: UINode<T>[][] = [];                  // pile de conteneurs (pour flow)
+  private cursor: UINode<T>[] = this.root;   // conteneur courant
+  private stack: UINode<T>[][] = [];         // pile pour flow
 
   constructor(targetClass: new (...args: any[]) => T) {
     this.targetClass = targetClass;
   }
 
   getTargetClass(): new (...args: any[]) => T { return this.targetClass; }
-  /** Renvoie l’AST (lecture seule) */
   getTree(): ReadonlyArray<UINode<T>> { return this.root; }
 
   /* ------------ Input ------------ */
-  input<K extends keyof T, M extends MethodNames0<T>>(opts: {
-    name: K; update: M; label?: string; inputType?: InputType; muted?: boolean;
+  input<
+    NK extends KeysOfType<T, string | number | boolean>,
+    M extends MethodNames0<T>
+  >(opts: {
+    name: NK; update: M; label?: string; inputType?: InputType; muted?: boolean;
     width?: number | string; height?: number | string;
     visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
   }): this {
-    this.cursor.push({
+    const node: InputNode<T, NK> = {
       kind: 'input',
       name: opts.name,
       update: opts.update,
@@ -157,7 +195,8 @@ export class UI<T extends object> {
       height: opts.height,
       visible: opts.visible,
       enable: opts.enable
-    } as InputNode<T>);
+    };
+    this.cursor.push(node as unknown as UINode<T>);
     return this;
   }
 
@@ -167,7 +206,7 @@ export class UI<T extends object> {
     width?: number | string; height?: number | string;
     visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
   }): this {
-    this.cursor.push({
+    const node: ButtonNode<T> = {
       kind: 'button',
       label: opts.label,
       action: opts.action,
@@ -176,18 +215,24 @@ export class UI<T extends object> {
       height: opts.height,
       visible: opts.visible,
       enable: opts.enable
-    } as ButtonNode<T>);
+    };
+    this.cursor.push(node as unknown as UINode<T>);
     return this;
   }
 
   /* ------------ Select ------------ */
-  select<LK extends keyof T, UM extends MethodNames0<T>>(opts: {
-    list: LK; displayMethod: keyof T; selection: keyof T; update: UM;
+  select<
+    LK extends ArrayKeys<T>,
+    DM extends KeysOfType<T, (a: ElementOf<T[LK]>) => string>,
+    SK extends KeysOfType<T, number[]>,
+    UM extends MethodNames0<T>
+  >(opts: {
+    list: LK; displayMethod: DM; selection: SK; update: UM;
     muted?: boolean; mode?: 'dropdown' | 'list';
     width?: number | string; height?: number | string;
     visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
   }): this {
-    this.cursor.push({
+    const node: SelectNode<T, LK, DM, SK, UM> = {
       kind: 'select',
       list: opts.list,
       displayMethod: opts.displayMethod,
@@ -199,23 +244,27 @@ export class UI<T extends object> {
       height: opts.height,
       visible: opts.visible,
       enable: opts.enable
-    } as SelectNode<T>);
+    };
+    this.cursor.push(node as unknown as UINode<T>);
     return this;
   }
 
   /* ------------ Label ------------ */
-  label<K extends keyof T>(name: K, opt?: {
+  label<
+    NK extends KeysOfType<T, string>
+  >(name: NK, opt?: {
     width?: number | string; height?: number | string;
     visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
   }): this {
-    this.cursor.push({
+    const node: LabelNode<T, NK> = {
       kind: 'label',
       name,
       width: opt?.width,
       height: opt?.height,
       visible: opt?.visible,
       enable: opt?.enable
-    } as LabelNode<T>);
+    };
+    this.cursor.push(node as unknown as UINode<T>);
     return this;
   }
 
@@ -253,25 +302,32 @@ export class UI<T extends object> {
   }
 
   /* ------------ Single UI (champ objet) ------------ */
-  ui(opt: {
-    name: keyof T;
-    listUI: Array<UI<any>>;
+  ui<
+    NK extends KeysOfType<T, Objectish | null | undefined>,
+    Base extends Objectish = Extract<NonNullable<T[NK]>, Objectish>
+  >(opt: {
+    name: NK;
+    listUI: Array<UI<any> & { getTargetClass(): new (...args: any[]) => Base }>;
     width?: number | string; height?: number | string;
   }): this {
-    this.cursor.push({
+    const node: SingleUINode<T, NK, Base> = {
       kind: 'singleUI',
       name: opt.name,
       listUI: opt.listUI,
       width: opt.width,
       height: opt.height
-    } as SingleUINode<T>);
+    };
+    this.cursor.push(node as unknown as UINode<T>);
     return this;
   }
 
   /* ------------ List UI (liste d’objets) ------------ */
-  listUI(opt: {
-    list: keyof T;
-    listUI: Array<UI<any>>;
+  listUI<
+    LK extends ArrayKeys<T>,
+    Base extends Objectish = Extract<ElementOf<NonNullable<T[LK]>>, Objectish>
+  >(opt: {
+    list: LK;
+    listUI: Array<UI<any> & { getTargetClass(): new (...args: any[]) => Base }>;
     orientation?: 'row' | 'column';
     gap?: number | string;
     align?: 'start' | 'center' | 'end' | 'stretch';
@@ -281,7 +337,7 @@ export class UI<T extends object> {
     panel?: boolean;
     width?: number | string; height?: number | string;
   }): this {
-    this.cursor.push({
+    const node: ListUINode<T, LK, Base> = {
       kind: 'listUI',
       list: opt.list,
       listUI: opt.listUI,
@@ -294,14 +350,18 @@ export class UI<T extends object> {
       panel: opt.panel,
       width: opt.width,
       height: opt.height
-    } as ListUINode<T>);
+    };
+    this.cursor.push(node as unknown as UINode<T>);
     return this;
   }
 
   /* ------------ Dialog ------------ */
-  dialog(opt: {
-    name: keyof T;
-    listUI: Array<UI<any>>;
+  dialog<
+    NK extends KeysOfType<T, Objectish | null | undefined>,
+    Base extends Objectish = Extract<NonNullable<T[NK]>, Objectish>
+  >(opt: {
+    name: NK;
+    listUI: Array<UI<Base> >;
     label: string;
     buttonWidth?: number | string; buttonHeight?: number | string;
     width?: number | string; height?: number | string;
@@ -309,7 +369,7 @@ export class UI<T extends object> {
     visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
     action?: KeysOfType<T, () => void>;
   }): this {
-    this.cursor.push({
+    const node: DialogNode<T, NK, Base> = {
       kind: 'dialog',
       name: opt.name,
       listUI: opt.listUI,
@@ -324,7 +384,11 @@ export class UI<T extends object> {
       visible: opt.visible,
       enable: opt.enable,
       action: opt.action
-    } as DialogNode<T>);
+    };
+    this.cursor.push(node as unknown as UINode<T>);
     return this;
   }
 }
+
+/* Optionnel : classe de base commune si besoin */
+export class UIBase {}
