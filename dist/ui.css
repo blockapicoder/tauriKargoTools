@@ -1,10 +1,9 @@
-
-/* Sexy UI Theme for #app
-   Scope all styles under #app to avoid leaking globally.
-   Works with the UI class generating <label>, <input>, <select>, <button>, and <div> containers.
+/* Sexy UI Theme for .app
+   Scope all styles under .app to avoid leaking globally.
+   Works with the UI class generating <label>, <input>, <select>, <button>, <div>, and <dialog>.
 */
 
-#app {
+.app {
   --ui-font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
   --ui-fg: #0f1220;
   --ui-fg-muted: #3a3f5a;
@@ -22,12 +21,19 @@
   --ui-shadow-strong: 0 12px 32px rgba(17, 20, 45, 0.18);
   --ui-accent-a: #6E8EF5;
   --ui-accent-b: #A777E3;
+
+  /* Dialog extras */
+  --ui-backdrop: color-mix(in oklab, #0b0e1a 55%, transparent);
+  --ui-dialog-bg: color-mix(in oklab, var(--ui-bg) 92%, transparent);
+  --ui-dialog-border: color-mix(in oklab, var(--ui-accent-a) 38%, var(--ui-border));
+  --ui-dialog-shadow: 0 24px 64px rgba(10,12,20,0.45);
+
   color-scheme: light dark;
   font-family: var(--ui-font);
 }
 
 @media (prefers-color-scheme: dark) {
-  #app {
+  .app {
     --ui-fg: #e6e8ee;
     --ui-fg-muted: #a1a6c7;
     --ui-bg: #0b0e1a;
@@ -36,24 +42,24 @@
     --ui-input-bg: rgba(255, 255, 255, 0.06);
     --ui-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
     --ui-shadow-strong: 0 18px 44px rgba(0, 0, 0, 0.55);
+
+    --ui-backdrop: color-mix(in oklab, #000 65%, transparent);
+    --ui-dialog-bg: color-mix(in oklab, #0e1324 86%, transparent);
+    --ui-dialog-border: color-mix(in oklab, var(--ui-accent-b) 28%, var(--ui-border));
+    --ui-dialog-shadow: 0 26px 68px rgba(0,0,0,0.65);
   }
 }
 
-#app, #app * { box-sizing: border-box; }
-#app { background: var(--ui-bg); color: var(--ui-fg); }
+.app, .app * { box-sizing: border-box; }
+.app { background: var(--ui-bg); color: var(--ui-fg); }
 
-/* Layout helpers (your JS already sets flex via flow, this just polishes) */
-#app div {
-  /* Smooth corners for panel-like rows/columns if desired */
+/* Layout helpers */
+.app div {
   border-radius: calc(var(--ui-radius) - 4px);
-}
-#app select[multiple] option:hover {
-  outline: 2px solid color-mix(in oklab, var(--ui-focus) 60%, transparent);
-  outline-offset: -2px;
 }
 
 /* Labels */
-#app label {
+.app label {
   color: var(--ui-fg-muted);
   font-weight: 600;
   letter-spacing: 0.2px;
@@ -61,19 +67,15 @@
 }
 
 /* Form controls base */
-#app input, #app select, #app button {
+.app input, .app select, .app button {
   font: inherit;
   border-radius: var(--ui-radius);
   transition: transform 120ms ease, box-shadow 160ms ease, border-color 160ms ease, background 160ms ease, color 160ms ease, opacity 160ms ease;
   will-change: transform, box-shadow;
 }
-#app select[multiple] option:hover {
-  outline: 2px solid color-mix(in oklab, var(--ui-focus) 60%, transparent);
-  outline-offset: -2px;
-}
 
 /* Inputs & selects */
-#app input, #app select {
+.app input, .app select {
   width: max(180px, 12ch);
   padding: var(--ui-padding-y) var(--ui-padding-x);
   background: var(--ui-input-bg);
@@ -85,10 +87,10 @@
 }
 
 /* Number inputs alignment */
-#app input[type="number"] { text-align: right; width: 120px; }
+.app input[type="number"] { text-align: right; width: 120px; }
 
-/* Checkbox gets its own size and reset */
-#app input[type="checkbox"] {
+/* Checkbox size & custom check */
+.app input[type="checkbox"] {
   width: 1.15rem;
   height: 1.15rem;
   padding: 0;
@@ -96,9 +98,7 @@
   display: inline-grid;
   place-items: center;
 }
-
-/* Checkbox custom check (pure CSS) */
-#app input[type="checkbox"]::before {
+.app input[type="checkbox"]::before {
   content: "";
   width: 0.65rem;
   height: 0.65rem;
@@ -107,10 +107,10 @@
   box-shadow: inset 1rem 1rem var(--ui-focus);
   border-radius: 4px;
 }
-#app input[type="checkbox"]:checked::before { transform: scale(1); }
+.app input[type="checkbox"]:checked::before { transform: scale(1); }
 
 /* Select custom arrow (not for multiple) */
-#app select:not([multiple]) {
+.app select:not([multiple]) {
   -webkit-appearance: none;
   appearance: none;
   padding-right: calc(var(--ui-padding-x) * 2 + 12px);
@@ -123,36 +123,40 @@
 }
 
 /* Multi-select look */
-#app select[multiple] {
+.app select[multiple] {
   min-width: 260px;
   min-height: 160px;
   padding: 8px;
 }
-#app select[multiple] option {
+.app select[multiple] option {
   padding: 8px 10px;
   border-radius: 10px;
   margin: 2px;
+  cursor: pointer;
 }
-#app select[multiple] option:checked {
+.app select[multiple] option:hover {
+  outline: 2px solid color-mix(in oklab, var(--ui-focus) 60%, transparent);
+  outline-offset: -2px;
+}
+.app select[multiple] option:checked {
   background: linear-gradient(135deg, var(--ui-accent-a), var(--ui-accent-b));
   color: white;
 }
 
 /* Hover / focus states */
-#app input:hover, #app select:hover {
+.app input:hover, .app select:hover {
   border-color: color-mix(in oklab, var(--ui-focus) 60%, var(--ui-border));
   box-shadow: var(--ui-shadow-strong);
   transform: translateY(-1px);
 }
-
-#app input:focus-visible, #app select:focus-visible, #app button:focus-visible {
+.app input:focus-visible, .app select:focus-visible, .app button:focus-visible {
   outline: 2px solid color-mix(in oklab, var(--ui-focus) 80%, transparent);
   outline-offset: 2px;
   box-shadow: 0 0 0 6px color-mix(in oklab, var(--ui-focus) 18%, transparent), var(--ui-shadow-strong);
 }
 
 /* Buttons */
-#app button {
+.app button {
   cursor: pointer;
   padding: calc(var(--ui-padding-y) + 2px) calc(var(--ui-padding-x) + 2px);
   border: 0;
@@ -163,12 +167,12 @@
   font-weight: 700;
   text-shadow: 0 1px 0 rgba(0,0,0,0.1);
 }
-#app button:hover { transform: translateY(-1px); box-shadow: var(--ui-shadow-strong); filter: brightness(1.04); }
-#app button:active { transform: translateY(0); filter: brightness(0.98); }
-#app button:disabled { opacity: 0.55; cursor: not-allowed; filter: saturate(70%); }
+.app button:hover { transform: translateY(-1px); box-shadow: var(--ui-shadow-strong); filter: brightness(1.04); }
+.app button:active { transform: translateY(0); filter: brightness(0.98); }
+.app button:disabled { opacity: 0.55; cursor: not-allowed; filter: saturate(70%); }
 
-/* Subtle card backgrounds for grouped rows/columns if you wrap things */
-#app .panel {
+/* Panel */
+.app .panel {
   background: var(--ui-panel);
   border: 1px solid var(--ui-border);
   border-radius: var(--ui-radius);
@@ -176,24 +180,124 @@
   box-shadow: var(--ui-shadow);
 }
 
-/* Spacing utilities (optional if you want to apply classes manually) */
-#app .gap-8  > * + * { margin-top: 8px; }
-#app .gap-12 > * + * { margin-top: 12px; }
-#app .gap-16 > * + * { margin-top: 16px; }
+/* Spacing utilities */
+.app .gap-8  > * + * { margin-top: 8px; }
+.app .gap-12 > * + * { margin-top: 12px; }
+.app .gap-16 > * + * { margin-top: 16px; }
 
-/* Scrollbar polish (WebKit-based browsers) */
-#app ::-webkit-scrollbar { width: 10px; height: 10px; }
-#app ::-webkit-scrollbar-thumb {
+/* Scrollbar polish */
+.app ::-webkit-scrollbar { width: 10px; height: 10px; }
+.app ::-webkit-scrollbar-thumb {
   background: color-mix(in oklab, var(--ui-accent-a) 40%, var(--ui-fg-muted));
   border-radius: 999px;
   border: 2px solid transparent;
   background-clip: padding-box;
 }
-#app ::-webkit-scrollbar-track { background: transparent; }
+.app ::-webkit-scrollbar-track { background: transparent; }
+
+/* =========================================
+   ✨ Sexy Dialog Styles
+   ========================================= */
+.app dialog {
+  border: none;
+  padding: 0;
+  color: var(--ui-fg);
+  background:
+    linear-gradient(var(--ui-dialog-bg), var(--ui-dialog-bg)) padding-box,
+    linear-gradient(135deg, color-mix(in oklab, var(--ui-accent-a) 55%, transparent), color-mix(in oklab, var(--ui-accent-b) 45%, transparent)) border-box;
+  border: 1px solid transparent;
+  border-radius: calc(var(--ui-radius) + 8px);
+  width: clamp(360px, 60vw, 720px);
+  max-width: 92vw;
+  max-height: 82vh;
+  box-shadow: var(--ui-dialog-shadow);
+  overflow: hidden;
+  backdrop-filter: saturate(140%) blur(10px);
+  animation: dlg-pop 200ms cubic-bezier(.17,.84,.44,1) both;
+}
+
+/* Decorative handle */
+.app dialog::before {
+  content: "";
+  display: block;
+  width: 56px;
+  height: 4px;
+  margin: 12px auto -2px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--ui-fg-muted) 55%, transparent);
+  opacity: .65;
+}
+
+/* Backdrop */
+.app dialog::backdrop {
+  background: var(--ui-backdrop);
+  backdrop-filter: blur(6px) saturate(120%);
+  animation: backdrop-fade 180ms ease both;
+}
+
+/* Dialog content host (UI.dialog ajoute un <div> interne) */
+.app dialog > div {
+  padding: 20px 22px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow: auto;
+  max-height: calc(82vh - 12px);
+}
+
+/* Make controls stretch nicely inside dialog */
+.app dialog input,
+.app dialog select,
+.app dialog .panel {
+  width: 100%;
+}
+
+/* Optional footer area if you add a container with data-actions */
+.app dialog [data-actions] {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 6px;
+}
+
+/* Focus ring on dialog itself */
+.app dialog:focus-visible {
+  outline: 2px solid color-mix(in oklab, var(--ui-focus) 75%, transparent);
+  outline-offset: 0;
+  box-shadow: 0 0 0 6px color-mix(in oklab, var(--ui-focus) 18%, transparent), var(--ui-dialog-shadow);
+}
+
+/* Prevent .app container from scrolling when a dialog is open */
+.app:has(dialog[open]) {
+  overflow: hidden;
+}
+
+/* Animations */
+@keyframes dlg-pop {
+  from { transform: translateY(10px) scale(.98); opacity: 0; }
+  to   { transform: translateY(0)    scale(1);   opacity: 1; }
+}
+@keyframes backdrop-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Responsive polish */
+@media (max-width: 560px) {
+  .app dialog {
+    width: 94vw;
+    max-height: 86vh;
+  }
+  .app dialog > div {
+    padding: 16px;
+    gap: 12px;
+  }
+}
 
 /* Reduce motion respect */
 @media (prefers-reduced-motion: reduce) {
-  #app input, #app select, #app button {
+  .app input, .app select, .app button, .app dialog, .app dialog::backdrop {
     transition: none;
+    animation: none;
   }
 }

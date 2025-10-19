@@ -1,6 +1,8 @@
-import { App, AppPersonMoral, AppPersonPhysique } from "./test-model"
-import { UI } from "./dist/ui";
-
+import { App, AppPersonMoral, AppPersonPhysique, DialogOwner } from "./test-model"
+import { UI } from "./dist/ui-model";
+import { boot } from "./dist/ui-builder"
+import { AppUI } from "./test-table"
+ 
 // ---- Montage UI ----
 
 const uiPerson = new UI(AppPersonPhysique);
@@ -66,7 +68,7 @@ uiPersonMoral.flow({ orientation: "column", gap: 16 }, () => {
 
 
 const uiApp = new UI(App)
-uiApp.flow({ orientation: "column" }, () => {
+uiApp.flow({ orientation: "column" ,gap:10}, () => {
     uiApp.select({
         list: "applis",
         selection: "idxApp",
@@ -74,7 +76,17 @@ uiApp.flow({ orientation: "column" }, () => {
         update: "changeApp",
         mode: "dropdown"
     })
-    uiApp.ui({ listUI: [uiPersonMoral, uiPerson], name: "appli" })
+    uiApp.ui({ listUI: [uiPersonMoral, uiPerson], name: "appli" }),
+    uiApp.button( { action:"close" , label:"Close"})
+})
+
+
+const uiDialog = new UI(DialogOwner)
+uiDialog.flow( { orientation:"row", gap:20 ,  align:"center",justify:"center"},()=> {
+    uiDialog.dialog( { name:"app" , listUI:[uiApp] , label:'Open', action:"initDialogue",buttonWidth:"50%",width:"50%"})
+    uiDialog.dialog( { name:"appTable" , listUI:[AppUI] , label:'Open', action:"initDialogueAppTable" , buttonWidth:"50%",width:"50%"})
 })
 const app = new App();
-uiApp.boot(app, "#app"); // <div id="app"></div>
+const dialog = new DialogOwner()
+boot(uiDialog,dialog,"#app")
+//uiApp.boot(app, "#app"); // <div id="app"></div>

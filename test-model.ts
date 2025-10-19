@@ -1,9 +1,54 @@
 
+
 type Sexe = "Homme" | "Femme";
 type Person = { nom: string; prenom: string; age: number; sexe: Sexe };
 type PersonMoral = { nom: string; age: number; };
 class AppPerson {
 
+}
+
+// --- Modèle ---
+export class AppTable {
+    persons: Personne[] = [];
+    colNom = "Nom"
+    colPrenom = "Prenom"
+    colAge = "Age"
+    dialogOwner!: DialogOwner
+    constructor() {
+        // une ligne de départ
+        this.addPerson();
+    }
+
+    addPerson() {
+        this.persons = [...this.persons, new Personne(this)];
+    }
+
+    removePerson(p: Personne) {
+        this.persons = this.persons.filter(x => x !== p);
+    }
+    close() {
+        if (this.dialogOwner) {
+            this.dialogOwner.appTable = undefined
+        }
+    }
+}
+
+export class Personne {
+    selected = false;
+    nom = "";
+    prenom = "";
+    age = 0;
+
+
+    constructor(public app: AppTable) { }
+
+    // Appelée par les inputs (peut rester vide)
+    update() { }
+
+    // Appelée par le bouton supprimer (sur la ligne)
+    deleteSelf() {
+        this.app.removePerson(this);
+    }
 }
 export class AppPersonMoral extends AppPerson {
     // Données
@@ -172,6 +217,7 @@ export class App {
     applis: AppPerson[] = []
     appli: AppPerson | undefined
     idxApp: number[] = []
+    dialogOwner!: DialogOwner
     constructor() {
         this.applis = []
         this.applis.push(new AppPersonMoral())
@@ -196,5 +242,27 @@ export class App {
             this.appli = this.applis[this.idxApp[0]]
         }
     }
+    close() {
+        if (this.dialogOwner) {
+            this.dialogOwner.app = undefined
+        }
+    }
 
+}
+
+export class DialogOwner {
+    app: App | undefined
+    appTable: AppTable | undefined
+
+    constructor() {
+
+    }
+    initDialogue() {
+        this.app = new App()
+        this.app.dialogOwner = this
+    }
+    initDialogueAppTable() {
+        this.appTable = new AppTable()
+        this.appTable.dialogOwner = this
+    }
 }

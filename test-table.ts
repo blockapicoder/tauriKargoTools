@@ -1,42 +1,7 @@
-import { UI } from "./dist/ui";
+import { UI } from "./dist/ui-model";
+import { boot } from "./dist/ui-builder"
+import { AppTable, Personne } from "./test-model";
 
-// --- Modèle ---
-class App {
-    persons: Personne[] = [];
-    colNom = "Nom"
-    colPrenom = "Prenom"
-    colAge = "Age"
-    constructor() {
-        // une ligne de départ
-        this.addPerson();
-    }
-
-    addPerson() {
-        this.persons = [...this.persons, new Personne(this)];
-    }
-
-    removePerson(p: Personne) {
-        this.persons = this.persons.filter(x => x !== p);
-    }
-}
-
-class Personne {
-    selected = false;
-    nom = "";
-    prenom = "";
-    age = 0;
-
-
-    constructor(public app: App) { }
-
-    // Appelée par les inputs (peut rester vide)
-    update() { }
-
-    // Appelée par le bouton supprimer (sur la ligne)
-    deleteSelf() {
-        this.app.removePerson(this);
-    }
-}
 
 // --- UIs (en t’appuyant sur ta classe UI avec .flow/.listUI/.input/.button) ---
 
@@ -47,25 +12,25 @@ PersonRowUI.flow({ orientation: "row", gap: 12, align: "center", justify: "start
     // PersonRowUI.input({ name: "selected", update: "update", inputType: "checkbox" });
 
     // Colonnes éditables
-    PersonRowUI.input({ name: "nom", update: "update",  width:200});
-    PersonRowUI.input({ name: "prenom", update: "update",  width:200 });
-    PersonRowUI.input({ name: "age", update: "update", width:200, inputType: "number" });
+    PersonRowUI.input({ name: "nom", update: "update", width: 200 });
+    PersonRowUI.input({ name: "prenom", update: "update", width: 200 });
+    PersonRowUI.input({ name: "age", update: "update", width: 200, inputType: "number" });
 
     // Action supprimer (sur la ligne)
     PersonRowUI.button({ label: "Supprimer", action: "deleteSelf" });
 });
 
 // UI principale (liste + bouton ajouter)
-const AppUI = new UI(App);
+export const AppUI = new UI(AppTable);
 AppUI.flow({ orientation: "column", gap: 16, align: "center", justify: "start" }, () => {
     // Ligne d'actions (bouton Ajouter)
     AppUI.flow({ orientation: "row", gap: 8, align: "center" }, () => {
         AppUI.button({ label: "Ajouter", action: "addPerson" });
     });
-    AppUI.flow({ orientation: "row", gap: 12,  align: "center", justify: "start" }, () => {
-        AppUI.label("colNom",{ width:200})
-        AppUI.label("colPrenom",{ width:200})
-        AppUI.label("colAge",{ width:200})
+    AppUI.flow({ orientation: "row", gap: 12, align: "center", justify: "start" }, () => {
+        AppUI.label("colNom", { width: 200 })
+        AppUI.label("colPrenom", { width: 200 })
+        AppUI.label("colAge", { width: 200 })
     });
     // Liste des personnes : une sous-UI PersonRowUI par élément
     AppUI.listUI({
@@ -76,11 +41,12 @@ AppUI.flow({ orientation: "column", gap: 16, align: "center", justify: "start" }
         align: "stretch",
         justify: "start",
     });
+    AppUI.button({ label: "Close", action: "close" })
 });
 
 // --- Montage ---
-const app = new App();
-AppUI.boot(app, "#app");
+const app = new AppTable();
+//boot(AppUI,app, "#app");
 /*
 HTML:
 <div id="app"></div>
