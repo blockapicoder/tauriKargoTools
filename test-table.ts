@@ -6,7 +6,7 @@ import { AppTable, Personne } from "./test-model";
 // --- UIs (en t’appuyant sur ta classe UI avec .flow/.listUI/.input/.button) ---
 
 // UI d'une ligne Personne (une "row" = une personne)
-const PersonRowUI = new UI(Personne);
+export const PersonRowUI = new UI(Personne);
 PersonRowUI.flow({ orientation: "row", gap: 12, align: "center", justify: "start" }, () => {
     // Case à cocher
     // PersonRowUI.input({ name: "selected", update: "update", inputType: "checkbox" });
@@ -35,7 +35,6 @@ AppUI.flow({ orientation: "column", gap: 16, align: "center", justify: "start" }
     // Liste des personnes : une sous-UI PersonRowUI par élément
     AppUI.listUI({
         list: "persons",
-        listUI: [PersonRowUI],
         orientation: "column",
         gap: 10,
         align: "stretch",

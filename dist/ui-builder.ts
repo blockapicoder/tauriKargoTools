@@ -41,16 +41,19 @@ type Ctx<T extends object> = {
 };
 
 /* ===================== Builder principal ===================== */
-export class Builder<T extends object> {
-  constructor(private readonly ui: UI<T>) {}
+/** Le Builder détient un *registry* d’UIs disponibles pour le dispatch dynamique. */
+export class Builder {
+  constructor(private readonly registry: ReadonlyArray<UI<any>>) {}
 
-  boot(a: T, selector: string): UIRuntime<T> {
+  /** Monte `ui` dans `selector`. */
+  boot<T extends object>(a: T, selector: string): UIRuntime<T> {
     const container = document.querySelector(selector) as HTMLElement | null;
     if (!container) throw new Error('Conteneur introuvable : ' + selector);
-    return this.bootInto(a, container);
+    return this.bootInto(this.findUIFor(a)!, a, container);
   }
 
-  bootInto(a: T, container: HTMLElement): UIRuntime<T> {
+  /** Monte `ui` dans un conteneur DOM donné. */
+  bootInto<T extends object>(ui: UI<T>, a: T, container: HTMLElement): UIRuntime<T> {
     const listener = getListener(a);
     const elements: HTMLElement[] = [];
     const domUnsubs: Array<() => void> = [];
@@ -64,14 +67,14 @@ export class Builder<T extends object> {
       dataUnsubs
     };
 
-    this.buildNodes(this.ui.getTree(), ctx);
+    this.buildNodes(ui.getTree(), ctx);
     for (const el of elements) container.appendChild(el);
 
     return {
       listener,
       elements,
       stop: () => {
-        try { /* listener.stop(); // à activer si vous souhaitez restaurer les descriptors */ } catch {}
+        try { /* listener.stop(); // à activer si besoin */ } catch {}
         for (const u of domUnsubs)  { try { u(); } catch {} }
         for (const u of dataUnsubs) { try { u(); } catch {} }
       }
@@ -79,7 +82,7 @@ export class Builder<T extends object> {
   }
 
   /* ----------- Dispatch des nœuds ----------- */
-  private buildNodes(nodes: ReadonlyArray<UINode<T>>, ctx: Ctx<T>) {
+  private buildNodes<T extends object>(nodes: ReadonlyArray<UINode<T>>, ctx: Ctx<T>) {
     for (const node of nodes) {
       switch (node.kind) {
         case 'input':     this.buildInput(node as InputNode<T, any>, ctx); break;
@@ -87,15 +90,22 @@ export class Builder<T extends object> {
         case 'select':    this.buildSelect(node as SelectNode<T, any, any, any, any>, ctx); break;
         case 'label':     this.buildLabel(node as LabelNode<T, any>, ctx); break;
         case 'flow':      this.buildFlow(node as FlowNode<T>, ctx); break;
-        case 'singleUI':  this.buildSingleUI(node as SingleUINode<T, any, any>, ctx); break;
-        case 'listUI':    this.buildListUI(node as ListUINode<T, any, any>, ctx); break;
-        case 'dialog':    this.buildDialog(node as DialogNode<T, any, any>, ctx); break;
+        case 'singleUI':  this.buildSingleUI(node as SingleUINode<T>, ctx); break;
+        case 'listUI':    this.buildListUI(node as ListUINode<T>, ctx); break;
+        case 'dialog':    this.buildDialog(node as DialogNode<T>, ctx); break;
       }
     }
   }
 
+  /* ===================== Sous-UI lookup via registry ===================== */
+  /** Trouve l'UI du registry dont la targetClass correspond à la valeur donnée. */
+  private findUIFor<T extends object>(value: any): UI<T> | undefined {
+    if (!value || typeof value !== "object") return undefined;
+    return this.registry.find((u: UI<any>) => value instanceof u.getTargetClass());
+  }
+
   /* ----------- Input ----------- */
-  private buildInput(node: InputNode<T, any>, ctx: Ctx<T>) {
+  private buildInput<T extends object>(node: InputNode<T, any>, ctx: Ctx<T>) {
     const wrapper = document.createElement('label');
     wrapper.style.display = 'block';
     if (node.label) wrapper.append(document.createTextNode(node.label + ' '));
@@ -179,7 +189,7 @@ export class Builder<T extends object> {
   }
 
   /* ----------- Button ----------- */
-  private buildButton(node: ButtonNode<T>, ctx: Ctx<T>) {
+  private buildButton<T extends object>(node: ButtonNode<T>, ctx: Ctx<T>) {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.textContent = node.label;
@@ -211,7 +221,7 @@ export class Builder<T extends object> {
   }
 
   /* ----------- Select ----------- */
-  private buildSelect(node: SelectNode<T, any, any, any, any>, ctx: Ctx<T>) {
+  private buildSelect<T extends object>(node: SelectNode<T, any, any, any, any>, ctx: Ctx<T>) {
     const sel = document.createElement('select');
     sel.multiple = (node.mode ?? 'list') === 'list';
     applySize(sel, node.width, node.height);
@@ -291,7 +301,7 @@ export class Builder<T extends object> {
   }
 
   /* ----------- Label ----------- */
-  private buildLabel(node: LabelNode<T, any>, ctx: Ctx<T>) {
+  private buildLabel<T extends object>(node: LabelNode<T, any>, ctx: Ctx<T>) {
     const span = document.createElement('span');
     applySize(span, node.width, node.height);
     span.textContent = String((ctx.obj as any)[node.name] ?? '');
@@ -318,7 +328,7 @@ export class Builder<T extends object> {
   }
 
   /* ----------- Flow ----------- */
-  private buildFlow(node: FlowNode<T>, ctx: Ctx<T>) {
+  private buildFlow<T extends object>(node: FlowNode<T>, ctx: Ctx<T>) {
     const div = document.createElement('div');
     div.style.display = 'flex';
     div.style.flexDirection = node.orientation === 'row' ? 'row' : 'column';
@@ -349,7 +359,7 @@ export class Builder<T extends object> {
   }
 
   /* ----------- Single UI (champ objet) ----------- */
-  private buildSingleUI(node: SingleUINode<T, any, any>, ctx: Ctx<T>) {
+  private buildSingleUI<T extends object>(node: SingleUINode<T>, ctx: Ctx<T>) {
     const host = document.createElement('div');
     applySize(host, node.width, node.height);
     ctx.add(host);
@@ -363,14 +373,11 @@ export class Builder<T extends object> {
 
     const mountFor = (value: any) => {
       clearHost();
-      if (!value || typeof value !== 'object') return;
-      type ChildUI = (typeof node.listUI)[number];
-      const ui = node.listUI.find((u: ChildUI) => value instanceof u.getTargetClass());
+      const ui = this.findUIFor(value);
       if (!ui) return;
       const inner = document.createElement('div');
       host.appendChild(inner);
-      const runtime = new Builder(ui).bootInto(value, inner);
-      child = runtime;
+      child = this.bootInto(ui as UI<any>, value, inner);
     };
 
     mountFor((ctx.obj as any)[node.name]);
@@ -380,7 +387,7 @@ export class Builder<T extends object> {
   }
 
   /* ----------- List UI (liste d'objets) ----------- */
-  private buildListUI(node: ListUINode<T, any, any>, ctx: Ctx<T>) {
+  private buildListUI<T extends object>(node: ListUINode<T>, ctx: Ctx<T>) {
     const div = document.createElement('div');
     div.style.display = 'flex';
     div.style.flexDirection = (node.orientation ?? 'column') === 'row' ? 'row' : 'column';
@@ -413,13 +420,12 @@ export class Builder<T extends object> {
     const render = () => {
       clear();
       const arr = ((ctx.obj as any)[node.list] ?? []) as any[];
-      type ChildUI = (typeof node.listUI)[number];
       for (const item of arr) {
-        const ui = node.listUI.find((u: ChildUI) => item instanceof u.getTargetClass());
+        const ui = this.findUIFor(item);
         if (!ui) continue;
         const host = document.createElement('div');
         div.appendChild(host);
-        const runtime = new Builder(ui).bootInto(item, host);
+        const runtime = this.bootInto(ui as UI<any>, item, host);
         children.push(runtime);
       }
     };
@@ -433,7 +439,7 @@ export class Builder<T extends object> {
   }
 
   /* ----------- Dialog ----------- */
-  private buildDialog(node: DialogNode<T, any, any>, ctx: Ctx<T>) {
+  private buildDialog<T extends object>(node: DialogNode<T>, ctx: Ctx<T>) {
     // Bouton
     const btn = document.createElement('button');
     btn.type = 'button';
@@ -456,18 +462,16 @@ export class Builder<T extends object> {
 
     const mountFor = (value: any) => {
       clearChild();
-      if (!value || typeof value !== 'object') return false;
-      type ChildUI = (typeof node.listUI)[number];
-      const ui = node.listUI.find((u: ChildUI) => value instanceof u.getTargetClass());
+      const ui = this.findUIFor(value);
       if (!ui) return false;
       const wrap = document.createElement('div');
       host.appendChild(wrap);
-      child = new Builder(ui).bootInto(value, wrap);
+      child = this.bootInto(ui as UI<any>, value, wrap);
       return true;
     };
 
     const open = () => {
-      // action préalable
+      // action préalable éventuelle
       if (node.action) {
         try { (ctx.obj as any)[node.action](); } catch {}
       }
@@ -532,8 +536,14 @@ export class Builder<T extends object> {
   }
 }
 
-/** Démarre l'UI `ui` sur le modèle `model` dans le conteneur `id`. */
-export function boot<T extends object>(ui: UI<T>, model: T, id: string): UIRuntime<object> {
-  const builder = new Builder(ui);
+/** Helper: démarre `ui` sur `model` dans `id`, avec un *registry* optionnel.
+ *  Par défaut, le registry est simplement `[ui]`.
+ */
+export function boot<T extends object>(
+  listUI: UI<any>[],
+  model: T,
+  id: string
+): UIRuntime<T> {
+  const builder = new Builder(listUI);
   return builder.boot(model, id);
 }

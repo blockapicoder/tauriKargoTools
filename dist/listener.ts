@@ -1,16 +1,16 @@
 export type Unlisten = () => void;
 export type Handler<T, K extends keyof T> = (value: T[K], old: T[K]) => void;
+
 export class Listener<T extends object> {
   protected obj: T;
+
+  /** État par propriété instrumentée. La valeur courante est toujours `value`. */
   protected fields = new Map<PropertyKey, {
-    desc?: PropertyDescriptor;
-    handlers: Set<(v: any, o: any) => void>;
-    prevGetter?: PropertyDescriptor['get'];
-    prevSetter?: PropertyDescriptor['set'];
-    enumerable: boolean;
-    useInternal: boolean;
-    internal: any;
-    muted: number; // compteur de mute (réentrant)
+    prevDesc?: PropertyDescriptor;              // descripteur propre d'origine (si existait sur l'instance)
+    handlers: Set<(v: any, o: any) => void>;    // callbacks
+    enumerable: boolean;                        // pour restaurer proprement
+    value: any;                                 // valeur source-de-vérité tant que c'est instrumenté
+    muted: number;                              // compteur de mute (réentrant)
   }>();
 
   constructor(obj: T) { this.obj = obj; }
@@ -20,53 +20,50 @@ export class Listener<T extends object> {
     let st = this.fields.get(prop);
 
     if (!st) {
+      // Descripteur propre s'il existe (sur l'instance)
       const own = Object.getOwnPropertyDescriptor(this.obj, prop as any);
-      const proto = own ? undefined :
-        Object.getOwnPropertyDescriptor(Object.getPrototypeOf(this.obj) ?? {}, prop as any);
-      const desc = own ?? proto;
 
-      if (desc && desc.configurable === false) {
+      if (own && own.configurable === false) {
         throw new Error(`Le champ "${String(prop)}" est non configurable.`);
       }
 
-      const hasAccessor = !!(desc && (desc.get || desc.set));
-      const prevGetter = desc?.get;
-      const prevSetter = desc?.set;
+      const enumerable = own?.enumerable ?? true;
 
-      const useInternal = !hasAccessor;
-      let internal: any = useInternal ? (this.obj as any)[prop] : undefined;
-      if (!useInternal && !prevSetter) {
-        throw new Error(`Le champ "${String(prop)}" est en lecture seule (accessor sans setter).`);
+      // Valeur initiale à capturer AVANT de remplacer par notre accessor
+      let current: any;
+      if (own) {
+        // data property
+        if ("value" in own) current = own.value;
+        // accessor property
+        else current = own.get ? own.get.call(this.obj) : undefined;
+      } else {
+        // rien sur l'instance → on lit (prototype/valeur courante)
+        current = (this.obj as any)[prop];
       }
 
-      const enumerable = desc?.enumerable ?? true;
-      // Crée le descriptor *sur l'instance*
+      st = {
+        prevDesc: own,
+        handlers: new Set<(v: any, o: any) => void>(),
+        enumerable,
+        value: current,
+        muted: 0,
+      };
+
+      // On pose NOTRE accessor sur l'instance : get/set utilisent toujours st.value
       Object.defineProperty(this.obj, prop, {
         configurable: true,
         enumerable,
-        get() {
-          return useInternal ? internal : prevGetter!.call(this);
-        },
-        set(newVal: any) {
-          const holder = (this as any); // l'instance réelle
-          const state: typeof st = holder === (this as any) ? st! : st!; // même ref
-          const oldVal = useInternal ? internal : prevGetter!.call(this);
-          if (useInternal) internal = newVal; else prevSetter!.call(this, newVal);
-          const curr = useInternal ? internal : prevGetter!.call(this);
-
-          // Pas de notification si muet ou inchangé
-          if (state.muted > 0 || curr === oldVal) return;
-
-          for (const h of state.handlers) {
-            try { h(curr, oldVal); } catch { /* ignore */ }
+        get: () => st!.value,
+        set: (newVal: any) => {
+          const oldVal = st!.value;
+          st!.value = newVal;
+          if (st!.muted > 0 || Object.is(oldVal, newVal)) return;
+          for (const h of st!.handlers) {
+            try { h(newVal, oldVal); } catch { /* ignore handler errors */ }
           }
         }
       });
 
-      st = {
-        desc, handlers: new Set(), prevGetter, prevSetter,
-        enumerable, useInternal, internal, muted: 0
-      };
       this.fields.set(prop, st);
     }
 
@@ -92,19 +89,19 @@ export class Listener<T extends object> {
     this.fields.clear();
   }
 
-  /** Modifie une propriété sans déclencher les écouteurs */
+  /** Écrit sans notifier */
   setSilently<K extends keyof T>(key: K, value: T[K]) {
     this.withMuted(key, () => { (this.obj as any)[key] = value; });
   }
 
-  /** Exécute fn en désactivant les notifications sur *une* propriété */
+  /** Mute une propriété (si instrumentée) pendant l'exécution de `fn` */
   protected withMuted<K extends keyof T>(key: K, fn: () => void) {
     const st = this.fields.get(key as PropertyKey);
-    if (!st) { fn(); return; } // pas instrumenté -> pas besoin
+    if (!st) { fn(); return; } // pas instrumentée → exécuter sans mute
     try { st.muted++; fn(); } finally { st.muted--; }
   }
 
-  /** Exécute fn en désactivant les notifications sur *toutes* les propriétés instrumentées */
+  /** Mute toutes les propriétés instrumentées pendant l'exécution de `fn` */
   protected withAllMuted(fn: () => void) {
     try {
       for (const st of this.fields.values()) st.muted++;
@@ -114,13 +111,24 @@ export class Listener<T extends object> {
     }
   }
 
+  /** Restaure la propriété sur l'instance et tente de conserver la dernière valeur */
   private restore(prop: PropertyKey, st: NonNullable<ReturnType<typeof this.fields.get>>) {
-    if (st.desc) {
-      Object.defineProperty(this.obj, prop, st.desc);
+    const last = st.value;
+
+    if (st.prevDesc) {
+      // Remet le descripteur d’origine sur l'instance
+      Object.defineProperty(this.obj, prop, st.prevDesc);
+      // Essaye d’y réinjecter la dernière valeur (si setter/data writable)
+      try { (this.obj as any)[prop] = last; } catch { /* readonly d'origine, on ignore */ }
     } else {
-      const curr = st.useInternal ? st.internal : st.prevGetter!.call(this.obj);
+      // Aucune prop propre avant : on remet une data property standard avec la dernière valeur
       delete (this.obj as any)[prop];
-      (this.obj as any)[prop] = curr;
+      Object.defineProperty(this.obj, prop, {
+        configurable: true,
+        enumerable: st.enumerable,
+        writable: true,
+        value: last
+      });
     }
   }
 }

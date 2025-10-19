@@ -1,7 +1,7 @@
 import { App, AppPersonMoral, AppPersonPhysique, DialogOwner } from "./test-model"
 import { UI } from "./dist/ui-model";
 import { boot } from "./dist/ui-builder"
-import { AppUI } from "./test-table"
+import { AppUI, PersonRowUI } from "./test-table"
  
 // ---- Montage UI ----
 
@@ -76,17 +76,17 @@ uiApp.flow({ orientation: "column" ,gap:10}, () => {
         update: "changeApp",
         mode: "dropdown"
     })
-    uiApp.ui({ listUI: [uiPersonMoral, uiPerson], name: "appli" }),
+    uiApp.ui({  name: "appli" }),
     uiApp.button( { action:"close" , label:"Close"})
 })
 
 
 const uiDialog = new UI(DialogOwner)
 uiDialog.flow( { orientation:"row", gap:20 ,  align:"center",justify:"center"},()=> {
-    uiDialog.dialog( { name:"app" , listUI:[uiApp] , label:'Open', action:"initDialogue",buttonWidth:"50%",width:"50%"})
-    uiDialog.dialog( { name:"appTable" , listUI:[AppUI] , label:'Open', action:"initDialogueAppTable" , buttonWidth:"50%",width:"50%"})
+    uiDialog.dialog( { name:"app" ,  label:'Open', action:"initDialogue",buttonWidth:"50%",width:"50%"})
+    uiDialog.dialog( { name:"appTable" , label:'Open', action:"initDialogueAppTable" , buttonWidth:"50%",width:"50%"})
 })
 const app = new App();
 const dialog = new DialogOwner()
-boot(uiDialog,dialog,"#app")
+boot([uiDialog,uiPerson,uiPersonMoral,uiApp,AppUI,PersonRowUI],dialog,"#app")
 //uiApp.boot(app, "#app"); // <div id="app"></div>
