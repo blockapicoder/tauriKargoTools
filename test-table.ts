@@ -1,5 +1,4 @@
 import { UI } from "./dist/ui-model";
-import { boot } from "./dist/ui-builder"
 import { AppTable, Personne } from "./test-model";
 import { defineUI } from "./dist/ui";
 
@@ -9,7 +8,7 @@ import { defineUI } from "./dist/ui";
 
 
 defineUI(Personne, (PersonRowUI) => {
-    PersonRowUI.flow({ orientation: "row", gap: 12, align: "center", justify: "start" }, () => {
+    PersonRowUI.flow({ orientation: "row", gap: 12, align: "center", justify: "start" ,class:"marge"}, () => {
         // Case à cocher
         // PersonRowUI.input({ name: "selected", update: "update", inputType: "checkbox" });
 
@@ -40,8 +39,9 @@ defineUI(AppTable, (AppUI) => {
             list: "persons",
             orientation: "column",
             gap: 10,
-            align: "stretch",
+           // align: "stretch",
             justify: "start",
+            class:"cadre"
         });
         AppUI.button({ label: "Close", action: "close" })
     });

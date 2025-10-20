@@ -25,6 +25,10 @@ export interface InputNode<
     NK extends KeysOfType<T, string | number | boolean> = KeysOfType<T, string | number | boolean>
 > {
     kind: 'input';
+    /** Identifiants CSS/DOM */
+    id?: string;
+    class?: string | string[];
+
     name: NK;
     update: MethodNames0<T>;
     label?: string;
@@ -38,6 +42,10 @@ export interface InputNode<
 
 export interface ButtonNode<T extends object> {
     kind: 'button';
+    /** Identifiants CSS/DOM */
+    id?: string;
+    class?: string | string[];
+
     label: string;
     action: MethodNames0<T>;
     muted?: boolean;
@@ -56,6 +64,10 @@ export interface SelectNode<
     UM extends MethodNames0<T> = MethodNames0<T>
 > {
     kind: 'select';
+    /** Identifiants CSS/DOM */
+    id?: string;
+    class?: string | string[];
+
     list: LK;
     displayMethod: DM;   // (elem) => string
     selection: SK;       // number[]
@@ -74,6 +86,10 @@ export interface LabelNode<
     NK extends KeysOfType<T, string> = KeysOfType<T, string>
 > {
     kind: 'label';
+    /** Identifiants CSS/DOM */
+    id?: string;
+    class?: string | string[];
+
     name: NK;
     width?: number | string;
     height?: number | string;
@@ -83,6 +99,10 @@ export interface LabelNode<
 
 export interface FlowNode<T extends object> {
     kind: 'flow';
+    /** Identifiants CSS/DOM */
+    id?: string;
+    class?: string | string[];
+
     orientation: 'column' | 'row';
     gap?: number | string;
     align?: 'start' | 'center' | 'end' | 'stretch';
@@ -98,6 +118,10 @@ export interface FlowNode<T extends object> {
 /** SINGLE UI — plus de listUI */
 export interface SingleUINode<T extends object> {
     kind: 'singleUI';
+    /** Identifiants CSS/DOM */
+    id?: string;
+    class?: string | string[];
+
     name: KeysOfType<T, Objectish | null | undefined>;
     width?: number | string;
     height?: number | string;
@@ -106,6 +130,10 @@ export interface SingleUINode<T extends object> {
 /** LIST UI — plus de listUI */
 export interface ListUINode<T extends object> {
     kind: 'listUI';
+    /** Identifiants CSS/DOM */
+    id?: string;
+    class?: string | string[];
+
     list: ArrayKeys<T>;
     orientation?: 'row' | 'column';
     gap?: number | string;
@@ -121,6 +149,10 @@ export interface ListUINode<T extends object> {
 /** DIALOG — plus de listUI */
 export interface DialogNode<T extends object> {
     kind: 'dialog';
+    /** Identifiants CSS/DOM */
+    id?: string;
+    class?: string | string[];
+
     name: KeysOfType<T, Objectish | null | undefined>;
     label: string;
     buttonWidth?: number | string;
@@ -164,13 +196,15 @@ export class UI<T extends object> {
         NK extends KeysOfType<T, string | number | boolean>,
         M extends MethodNames0<T>
     >(opts: {
+        /** Identifiants CSS/DOM */
+        id?: string; class?: string | string[];
         name: NK; update: M; label?: string; inputType?: InputType; muted?: boolean;
         width?: number | string; height?: number | string;
         visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
     }): this {
         const node: InputNode<T, NK> = {
             kind: 'input',
-           ...opts
+            ...opts
         };
         this.cursor.push(node as unknown as UINode<T>);
         return this;
@@ -178,6 +212,8 @@ export class UI<T extends object> {
 
     /* ------------ Button ------------ */
     button<MN extends MethodNames0<T>>(opts: {
+        /** Identifiants CSS/DOM */
+        id?: string; class?: string | string[];
         label: string; action: MN; muted?: boolean;
         width?: number | string; height?: number | string;
         visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
@@ -197,6 +233,8 @@ export class UI<T extends object> {
         SK extends KeysOfType<T, number[]>,
         UM extends MethodNames0<T>
     >(opts: {
+        /** Identifiants CSS/DOM */
+        id?: string; class?: string | string[];
         list: LK; displayMethod: DM; selection: SK; update: UM;
         muted?: boolean; mode?: 'dropdown' | 'list';
         width?: number | string; height?: number | string;
@@ -212,6 +250,8 @@ export class UI<T extends object> {
 
     /* ------------ Label ------------ */
     label<NK extends KeysOfType<T, string>>(name: NK, opt?: {
+        /** Identifiants CSS/DOM */
+        id?: string; class?: string | string[];
         width?: number | string; height?: number | string;
         visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
     }): this {
@@ -226,6 +266,8 @@ export class UI<T extends object> {
 
     /* ------------ Flow (row|column) ------------ */
     flow(opt: {
+        /** Identifiants CSS/DOM */
+        id?: string; class?: string | string[];
         orientation: 'column' | 'row';
         gap?: number | string;
         align?: 'start' | 'center' | 'end' | 'stretch';
@@ -251,6 +293,8 @@ export class UI<T extends object> {
 
     /* ------------ Single UI (champ objet) — plus de listUI ------------ */
     ui<NK extends KeysOfType<T, Objectish | null | undefined>>(opt: {
+        /** Identifiants CSS/DOM */
+        id?: string; class?: string | string[];
         name: NK;
         width?: number | string; height?: number | string;
     }): this {
@@ -264,6 +308,8 @@ export class UI<T extends object> {
 
     /* ------------ List UI (liste d’objets) — plus de listUI ------------ */
     listUI<LK extends ArrayKeys<T>>(opt: {
+        /** Identifiants CSS/DOM */
+        id?: string; class?: string | string[];
         list: LK;
         orientation?: 'row' | 'column';
         gap?: number | string;
@@ -284,6 +330,8 @@ export class UI<T extends object> {
 
     /* ------------ Dialog — plus de listUI ------------ */
     dialog<NK extends KeysOfType<T, Objectish | null | undefined>>(opt: {
+        /** Identifiants CSS/DOM */
+        id?: string; class?: string | string[];
         name: NK;
         label: string;
         buttonWidth?: number | string; buttonHeight?: number | string;

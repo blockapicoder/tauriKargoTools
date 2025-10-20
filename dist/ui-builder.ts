@@ -30,6 +30,18 @@ function setEnabled(el: HTMLElement, enabled: boolean) {
     if ("disabled" in el) (el as HTMLButtonElement | HTMLInputElement | HTMLSelectElement).disabled = !enabled;
     else el.setAttribute("aria-disabled", String(!enabled));
 }
+/** Applique id + class si fournis par le node */
+function applyIdAndClass(el: HTMLElement, node: { id?: string; class?: string | string[] }) {
+    if (node.id) el.id = node.id;
+    if (node.class) {
+        if (Array.isArray(node.class)) {
+            el.classList.add(...node.class.filter(Boolean) as string[]);
+        } else {
+            const parts = node.class.split(/\s+/).filter(Boolean);
+            if (parts.length) el.classList.add(...parts);
+        }
+    }
+}
 
 /* ===================== Contexte de build ===================== */
 type Ctx<T extends object> = {
@@ -43,10 +55,10 @@ type Ctx<T extends object> = {
 /* ===================== Builder principal ===================== */
 /** Le Builder détient un *registry* d’UIs disponibles pour le dispatch dynamique. */
 export class Builder {
-    registry: UI<any>[] = []
+    registry: UI<any>[] = [];
     constructor() { }
     addUI(ui: UI<any>) {
-        this.registry.push(ui)
+        this.registry.push(ui);
     }
 
     /** Monte `ui` dans `selector`. */
@@ -111,6 +123,7 @@ export class Builder {
     /* ----------- Input ----------- */
     private buildInput<T extends object>(node: InputNode<T, any>, ctx: Ctx<T>) {
         const wrapper = document.createElement('label');
+        applyIdAndClass(wrapper, node); // <-- id/class
         wrapper.style.display = 'block';
         if (node.label) wrapper.append(document.createTextNode(node.label + ' '));
 
@@ -195,6 +208,7 @@ export class Builder {
     /* ----------- Button ----------- */
     private buildButton<T extends object>(node: ButtonNode<T>, ctx: Ctx<T>) {
         const btn = document.createElement('button');
+        applyIdAndClass(btn, node); // <-- id/class
         btn.type = 'button';
         btn.textContent = node.label;
         applySize(btn, node.width, node.height);
@@ -227,6 +241,7 @@ export class Builder {
     /* ----------- Select ----------- */
     private buildSelect<T extends object>(node: SelectNode<T, any, any, any, any>, ctx: Ctx<T>) {
         const sel = document.createElement('select');
+        applyIdAndClass(sel, node); // <-- id/class
         sel.multiple = (node.mode ?? 'list') === 'list';
         applySize(sel, node.width, node.height);
         ctx.add(sel);
@@ -307,6 +322,7 @@ export class Builder {
     /* ----------- Label ----------- */
     private buildLabel<T extends object>(node: LabelNode<T, any>, ctx: Ctx<T>) {
         const span = document.createElement('span');
+        applyIdAndClass(span, node); // <-- id/class
         applySize(span, node.width, node.height);
         span.textContent = String((ctx.obj as any)[node.name] ?? '');
         ctx.add(span);
@@ -334,6 +350,7 @@ export class Builder {
     /* ----------- Flow ----------- */
     private buildFlow<T extends object>(node: FlowNode<T>, ctx: Ctx<T>) {
         const div = document.createElement('div');
+        applyIdAndClass(div, node); // <-- id/class
         div.style.display = 'flex';
         div.style.flexDirection = node.orientation === 'row' ? 'row' : 'column';
         applySize(div, node.width, node.height);
@@ -365,6 +382,7 @@ export class Builder {
     /* ----------- Single UI (champ objet) ----------- */
     private buildSingleUI<T extends object>(node: SingleUINode<T>, ctx: Ctx<T>) {
         const host = document.createElement('div');
+        applyIdAndClass(host, node); // <-- id/class
         applySize(host, node.width, node.height);
         ctx.add(host);
 
@@ -393,6 +411,7 @@ export class Builder {
     /* ----------- List UI (liste d'objets) ----------- */
     private buildListUI<T extends object>(node: ListUINode<T>, ctx: Ctx<T>) {
         const div = document.createElement('div');
+        applyIdAndClass(div, node); // <-- id/class
         div.style.display = 'flex';
         div.style.flexDirection = (node.orientation ?? 'column') === 'row' ? 'row' : 'column';
         applySize(div, node.width, node.height);
@@ -444,15 +463,16 @@ export class Builder {
 
     /* ----------- Dialog ----------- */
     private buildDialog<T extends object>(node: DialogNode<T>, ctx: Ctx<T>) {
-        // Bouton
+        // Bouton (trigger)
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.textContent = node.label;
         applySize(btn, node.buttonWidth, node.buttonHeight);
         ctx.add(btn);
 
-        // Dialog + host
+        // Dialog + host (id/class appliqués sur le <dialog> lui-même)
         const dlg = document.createElement('dialog') as HTMLDialogElement;
+        applyIdAndClass(dlg, node); // <-- id/class
         applySize(dlg, node.width, node.height);
         const host = document.createElement('div');
         host.style.minWidth = '100%';
@@ -540,14 +560,3 @@ export class Builder {
     }
 }
 
-/** Helper: démarre `ui` sur `model` dans `id`, avec un *registry* optionnel.
- *  Par défaut, le registry est simplement `[ui]`.
- */
-export function boot<T extends object>(
-    listUI: UI<any>[],
-    model: T,
-    id: string
-): UIRuntime<T> {
-    const builder = new Builder();
-    return builder.boot(model, id);
-}
