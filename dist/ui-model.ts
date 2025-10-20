@@ -18,6 +18,11 @@ export type ArrayKeys<T> = {
     [K in keyof T]-?: T[K] extends ReadonlyArray<any> | any[] ? K : never
 }[keyof T];
 
+/** Nom d'une méthode 0-arg de T qui retourne un HTMLElement */
+export type HTMLElementFactoryName<T extends object> = KeysOfType<T, () => HTMLElement>;
+/** Nom d'une méthode 0-arg de T qui retourne void (pour init) */
+export type VoidMethodName<T extends object> = KeysOfType<T, () => void>;
+
 /* ===================== Noeuds de l'AST ===================== */
 /** Input: clé limitée à string | number | boolean */
 export interface InputNode<
@@ -167,6 +172,31 @@ export interface DialogNode<T extends object> {
     action?: KeysOfType<T, () => void>;
 }
 
+/** CUSTOM — créé via une méthode de T (sans argument) qui retourne un HTMLElement
+ *  + une méthode d'init optionnelle (() => void) exécutée par le builder.
+ */
+export interface CustomNode<
+  T extends object,
+  FK extends HTMLElementFactoryName<T> = HTMLElementFactoryName<T>,
+  IK extends VoidMethodName<T> = VoidMethodName<T>
+> {
+  kind: 'custom';
+  /** Identifiants CSS/DOM */
+  id?: string;
+  class?: string | string[];
+
+  width?: number | string;
+  height?: number | string;
+  visible?: KeysOfType<T, boolean>;
+  enable?: KeysOfType<T, boolean>;
+
+  /** Nom de la méthode sur T: () => HTMLElement */
+  factory: FK;
+
+  /** Nom d'une méthode sur T: () => void (appelée après création/insert du DOM) */
+  init?: IK;
+}
+
 export type UINode<T extends object> =
     | InputNode<T, any>
     | ButtonNode<T>
@@ -175,7 +205,8 @@ export type UINode<T extends object> =
     | FlowNode<T>
     | SingleUINode<T>
     | ListUINode<T>
-    | DialogNode<T>;
+    | DialogNode<T>
+    | CustomNode<T>;
 
 /* ===================== UI (déclaratif uniquement) ===================== */
 export class UI<T extends object> {
@@ -342,6 +373,25 @@ export class UI<T extends object> {
     }): this {
         const node: DialogNode<T> = {
             kind: 'dialog',
+            ...opt
+        };
+        this.cursor.push(node as unknown as UINode<T>);
+        return this;
+    }
+
+    /* ------------ Custom (HTMLElement via méthode de T) ------------ */
+    custom<FK extends HTMLElementFactoryName<T>, IK extends VoidMethodName<T>>(opt: {
+        /** Identifiants CSS/DOM */
+        id?: string; class?: string | string[];
+        width?: number | string; height?: number | string;
+        visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
+        /** Nom de la méthode de T: () => HTMLElement */
+        factory: FK;
+        /** Nom de la méthode d'init: () => void (optionnelle) */
+        init?: IK;
+    }): this {
+        const node: CustomNode<T, FK, IK> = {
+            kind: 'custom',
             ...opt
         };
         this.cursor.push(node as unknown as UINode<T>);

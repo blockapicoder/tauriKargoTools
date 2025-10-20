@@ -8,7 +8,7 @@ import { getListener } from "./listener-factory";
 import {
     UI, UINode,
     InputNode, ButtonNode, SelectNode, LabelNode, FlowNode,
-    SingleUINode, ListUINode, DialogNode,
+    SingleUINode, ListUINode, DialogNode, CustomNode,
 } from "./ui-model";
 
 /* ===================== Runtime result ===================== */
@@ -109,6 +109,7 @@ export class Builder {
                 case 'singleUI': this.buildSingleUI(node as SingleUINode<T>, ctx); break;
                 case 'listUI': this.buildListUI(node as ListUINode<T>, ctx); break;
                 case 'dialog': this.buildDialog(node as DialogNode<T>, ctx); break;
+                case 'custom': this.buildCustom(node as CustomNode<T, any>, ctx); break;
             }
         }
     }
@@ -558,5 +559,38 @@ export class Builder {
         ctx.add(dlg);
         ctx.domUnsubs.push(() => { try { dlg.close(); } catch { } });
     }
-}
 
+    /* ----------- Custom (HTMLElement via méthode de T) ----------- */
+    private buildCustom<T extends object>(node: CustomNode<T, any>, ctx: Ctx<T>) {
+        // Appel direct en tant que méthode de l'instance pour préserver `this`
+        let el: HTMLElement | null = null;
+        try {
+            el = (ctx.obj as any)[node.factory]();
+        } catch (e) {
+            console.warn('[custom] factory call failed:', e);
+            return;
+        }
+        if (!(el instanceof HTMLElement)) {
+            console.warn('[custom] factory did not return an HTMLElement');
+            return;
+        }
+
+        applyIdAndClass(el, node);
+        applySize(el, node.width, node.height);
+        ctx.add(el);
+
+        // visible / enable réactifs
+        if (node.visible) {
+            const k = node.visible as keyof T;
+            setVisible(el, !!(ctx.obj as any)[k]);
+            const off = ctx.listener.listen(k, (v: any) => setVisible(el!, !!v));
+            ctx.dataUnsubs.push(off);
+        }
+        if (node.enable) {
+            const k = node.enable as keyof T;
+            setEnabled(el, !!(ctx.obj as any)[k]);
+            const off = ctx.listener.listen(k, (v: any) => setEnabled(el!, !!v));
+            ctx.dataUnsubs.push(off);
+        }
+    }
+}

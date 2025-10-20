@@ -265,4 +265,16 @@ export class DialogOwner {
         this.appTable = new AppTable()
         this.appTable.dialogOwner = this
     }
+    initCanvas(): HTMLElement {
+        const c: HTMLCanvasElement = document.createElement("canvas")
+        const ctx = c.getContext("2d")
+        if (ctx) {
+            ctx.fillStyle = "white"
+            ctx.clearRect(0, 0, 800, 800)
+            ctx.fillStyle = "red"
+         
+            ctx.fillRect(0, 0, 800, 800)
+        }
+        return c
+    }
 }
