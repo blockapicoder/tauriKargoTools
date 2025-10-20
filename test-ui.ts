@@ -82,8 +82,8 @@ defineUI(App, (uiApp) => {
 
 defineUI(DialogOwner, (uiDialog) => {
     uiDialog.flow({ orientation: "row", gap: 20, align: "center", justify: "center" }, () => {
-        uiDialog.dialog({ name: "app", label: 'Open', action: "initDialogue", buttonWidth: "50%", width: "50%" })
-        uiDialog.dialog({ name: "appTable", label: 'Open', action: "initDialogueAppTable", buttonWidth: "50%", width: "50%" })
+        uiDialog.dialog({ name: "app", label: 'Personne', action: "initDialogue", buttonWidth: "50%", width: "50%" })
+        uiDialog.dialog({ name: "appTable", label: 'Table', action: "initDialogueAppTable", buttonWidth: "50%", width: "50%" })
     })
 })
 const app = new App();

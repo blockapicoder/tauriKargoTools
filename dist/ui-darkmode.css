@@ -1,0 +1,250 @@
+/* ===== Sexy Darkmode for Builder UI =====
+   - Compatible avec les nœuds créés par builder.ts
+   - Couvre: body, .panel, button, input, select, label/span, dialog
+   - Gère :disabled et [aria-disabled="true"], focus-visible, animations légères
+*/
+
+/* ---------- Thème & reset léger ---------- */
+:root {
+  --bg: #0d0f14;
+  --bg-elev: #121620;
+  --surface: #161b26;
+  --surface-2: #1a2030;
+  --text: #e6eaf3;
+  --muted: #9aa4b2;
+  --border: #232a3a;
+  --ring: #7aa2ff;
+  --accent: #7aa2ff;
+  --accent-2: #9b7aff;
+  --danger: #ff5c7a;
+  --ok: #4dd4a8;
+  --shadow: 0 8px 30px rgba(0,0,0,.45);
+  --radius: 14px;
+  --radius-sm: 10px;
+  --radius-xs: 8px;
+  --pad: 12px;
+  --pad-lg: 18px;
+  --transition: 160ms cubic-bezier(.2,.7,.2,1);
+  --focus-ring: 0 0 0 2px var(--ring), 0 0 0 6px rgba(122,162,255,.18);
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  padding: 0;
+  background: radial-gradient(1200px 700px at 20% -10%, #121725 0%, #0d0f14 55%) fixed;
+  color: var(--text);
+  font: 14px/1.45 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Apple Color Emoji","Segoe UI Emoji";
+}
+
+/* Scrollbar (WebKit + Firefox) */
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-thumb { background: #2a3146; border-radius: 999px; border: 2px solid transparent; background-clip: padding-box; }
+*::-webkit-scrollbar-track { background: transparent; }
+* { scrollbar-color: #2a3146 transparent; scrollbar-width: thin; }
+
+/* Liens par défaut (si présents) */
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ---------- Conteneurs & “panel” ---------- */
+.panel {
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--pad-lg);
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+.panel::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background:
+    radial-gradient(600px 200px at -10% -20%, rgba(122,162,255,.08), transparent 40%),
+    radial-gradient(500px 180px at 120% -10%, rgba(155,122,255,.08), transparent 45%);
+  pointer-events: none;
+}
+
+/* ---------- Typo inline (labels, spans) ---------- */
+label, span {
+  color: var(--text);
+}
+
+/* Le builder met l'input dans un <label> block → ajout d’espacement */
+label {
+  display: block;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-weight: 500;
+  color: #d7dcef;
+}
+
+/* ---------- Champs (input, select) ---------- */
+input[type="text"],
+input[type="number"],
+select {
+  width: 100%;
+  background: #0f1420;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  padding: 10px 12px;
+  outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition), background var(--transition), transform var(--transition);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+}
+
+/* Boîte à cocher */
+input[type="checkbox"] {
+  width: 18px; height: 18px;
+  accent-color: var(--accent);
+  vertical-align: middle;
+  transform: translateY(2px);
+}
+
+/* Focus ring harmonisé */
+input[type="text"]:focus-visible,
+input[type="number"]:focus-visible,
+select:focus-visible {
+  border-color: var(--ring);
+  box-shadow: var(--focus-ring);
+}
+
+/* Hover subtil */
+input[type="text"]:hover,
+input[type="number"]:hover,
+select:hover {
+  background: #10182a;
+  transform: translateY(-1px);
+}
+
+/* Select multiple */
+select[multiple] {
+  min-height: 120px;
+  padding: 8px;
+}
+
+/* Options */
+option {
+  background: #0f1420;
+  color: var(--text);
+}
+
+/* Synchronisation disabled */
+:where(input, select)[disabled],
+:where(input, select)[aria-disabled="true"] {
+  opacity: .55;
+  cursor: not-allowed;
+  filter: grayscale(.15);
+}
+
+/* ---------- Boutons ---------- */
+button {
+  appearance: none;
+  border: 1px solid var(--border);
+  background:
+    linear-gradient(180deg, #1b2335 0%, #141b2a 100%);
+  color: var(--text);
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  letter-spacing: .2px;
+  cursor: pointer;
+  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition), background var(--transition), filter var(--transition);
+  box-shadow: 0 4px 18px rgba(0,0,0,.35);
+}
+
+button:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in oklab, var(--accent) 40%, var(--border));
+  box-shadow: 0 8px 26px rgba(0,0,0,.45), 0 0 0 1px rgba(122,162,255,.15) inset;
+}
+
+button:active {
+  transform: translateY(0);
+  filter: brightness(.98);
+}
+
+button:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring), 0 4px 18px rgba(0,0,0,.35);
+}
+
+button[disabled],
+button[aria-disabled="true"] {
+  opacity: .55;
+  cursor: not-allowed;
+  filter: grayscale(.15);
+}
+
+/* Variantes utilitaires optionnelles (ajoute ces classes via node.class si besoin) */
+button.accent {
+  background: linear-gradient(180deg, color-mix(in oklab, var(--accent) 22%, #1b2335) 0%, #141b2a 100%);
+  border-color: color-mix(in oklab, var(--accent) 45%, var(--border));
+}
+button.ok {
+  background: linear-gradient(180deg, color-mix(in oklab, var(--ok) 30%, #17252c) 0%, #111a18 100%);
+  border-color: color-mix(in oklab, var(--ok) 45%, var(--border));
+}
+button.danger {
+  background: linear-gradient(180deg, color-mix(in oklab, var(--danger) 30%, #2a1620) 0%, #1a0f12 100%);
+  border-color: color-mix(in oklab, var(--danger) 45%, var(--border));
+}
+
+/* ---------- Dialog ---------- */
+dialog {
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 0;
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+  color: var(--text);
+  box-shadow: 0 20px 60px rgba(0,0,0,.6);
+  overflow: hidden;
+  animation: dlg-in .18s ease-out both;
+}
+
+dialog > div { /* host créé par le builder */
+  padding: 18px;
+  background:
+    radial-gradient(500px 200px at 120% -10%, rgba(155,122,255,.08), transparent 45%),
+    radial-gradient(400px 180px at -10% -20%, rgba(122,162,255,.08), transparent 40%);
+}
+
+@keyframes dlg-in {
+  from { opacity: 0; transform: translateY(8px) scale(.98); }
+  to   { opacity: 1; transform: translateY(0)   scale(1); }
+}
+
+dialog::backdrop {
+  background:
+    radial-gradient(1200px 800px at 50% 0%, rgba(122,162,255,.12), transparent 40%),
+    rgba(3,6,12,.62);
+  backdrop-filter: blur(2px);
+}
+
+/* ---------- Infos / états ---------- */
+[aria-disabled="true"] { cursor: not-allowed; }
+
+/* Labels “muted” ou infos secondaires (ajoute .muted via node.class si voulu) */
+.muted { color: var(--muted); }
+
+/* Petites chips (ajoute .chip via node.class) */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #0f1420;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+/* ---------- Préférence utilisateur ---------- */
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
