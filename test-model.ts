@@ -253,7 +253,8 @@ export class App {
 export class DialogOwner {
     app: App | undefined
     appTable: AppTable | undefined
-
+    sizeCanvas: string = ""
+    canvas!: HTMLCanvasElement
     constructor() {
 
     }
@@ -265,16 +266,25 @@ export class DialogOwner {
         this.appTable = new AppTable()
         this.appTable.dialogOwner = this
     }
-    initCanvas(): HTMLElement {
-        const c: HTMLCanvasElement = document.createElement("canvas")
-        const ctx = c.getContext("2d")
+    createCanvas(): HTMLElement {
+        this.canvas = document.createElement("canvas")
+        const ctx = this.canvas.getContext("2d")
         if (ctx) {
             ctx.fillStyle = "white"
             ctx.clearRect(0, 0, 800, 800)
             ctx.fillStyle = "red"
-         
+
             ctx.fillRect(0, 0, 800, 800)
         }
-        return c
+        return this.canvas
+    }
+    initCanvas() {
+        window.addEventListener('resize', () => {
+            const { width: cssW, height: cssH } = this.canvas.getBoundingClientRect();
+            this.sizeCanvas = `${cssW}*${cssH}`
+        });
+        const { width: cssW, height: cssH } = this.canvas.getBoundingClientRect();
+        this.sizeCanvas = `${cssW}*${cssH}`
+
     }
 }

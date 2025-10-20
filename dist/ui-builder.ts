@@ -1,6 +1,7 @@
 /* builder.ts
  * - Construit le DOM à partir de l'UI déclarative (ui.ts).
  * - Gère listeners, visible/enable, sous-UI, listes et dialogs.
+ * - Appelle Custom.init **après** reconstruction complète de l'interface concernée.
  */
 
 import { Listener, Unlisten } from "./listener";
@@ -50,6 +51,8 @@ type Ctx<T extends object> = {
     add: (el: HTMLElement) => void;
     domUnsubs: Array<() => void>;
     dataUnsubs: Array<Unlisten>;
+    /** File d'init à déclencher après append de toute l'UI concernée */
+    postInits: Array<() => void>;
 };
 
 /* ===================== Builder principal ===================== */
@@ -68,23 +71,38 @@ export class Builder {
         return this.bootInto(this.findUIFor(a)!, a, container);
     }
 
-    /** Monte `ui` dans un conteneur DOM donné. */
-    bootInto<T extends object>(ui: UI<T>, a: T, container: HTMLElement): UIRuntime<T> {
+    /**
+     * Monte `ui` dans un conteneur DOM donné.
+     * @param parentQueue Si fourni, les inits sont *déférées au parent* (aucun run ici).
+     */
+    bootInto<T extends object>(ui: UI<T>, a: T, container: HTMLElement, parentQueue?: Array<() => void>): UIRuntime<T> {
         const listener = getListener(a);
         const elements: HTMLElement[] = [];
         const domUnsubs: Array<() => void> = [];
         const dataUnsubs: Array<Unlisten> = [];
+        const postInits: Array<() => void> = parentQueue ?? [];
 
         const ctx: Ctx<T> = {
             obj: a,
             listener,
             add: (el) => elements.push(el),
             domUnsubs,
-            dataUnsubs
+            dataUnsubs,
+            postInits
         };
 
         this.buildNodes(ui.getTree(), ctx);
         for (const el of elements) container.appendChild(el);
+
+        // Si aucune parentQueue n'est fournie, nous sommes à la racine de CE montage :
+        // on exécute les inits maintenant que tout est dans le DOM.
+        if (!parentQueue) {
+            // S'exécute synchronement après append ; si vous préférez, remplacez par queueMicrotask(...)
+            for (const run of postInits) {
+                try { run(); } catch (e) { console.warn('[custom.init] failed:', e); }
+            }
+            postInits.length = 0;
+        }
 
         return {
             listener,
@@ -109,7 +127,7 @@ export class Builder {
                 case 'singleUI': this.buildSingleUI(node as SingleUINode<T>, ctx); break;
                 case 'listUI': this.buildListUI(node as ListUINode<T>, ctx); break;
                 case 'dialog': this.buildDialog(node as DialogNode<T>, ctx); break;
-                case 'custom': this.buildCustom(node as CustomNode<T, any>, ctx); break;
+                case 'custom': this.buildCustom(node as CustomNode<T, any, any>, ctx); break;
             }
         }
     }
@@ -394,17 +412,21 @@ export class Builder {
             while (host.firstChild) host.removeChild(host.firstChild);
         };
 
-        const mountFor = (value: any) => {
+        // duringBuild: true pour l'appel initial (avant append du parent), false ensuite.
+        const mountFor = (value: any, duringBuild: boolean) => {
             clearHost();
             const ui = this.findUIFor(value);
             if (!ui) return;
             const inner = document.createElement('div');
             host.appendChild(inner);
-            child = this.bootInto(ui as UI<any>, value, inner);
+            child = this.bootInto(ui as UI<any>, value, inner, duringBuild ? ctx.postInits : undefined);
         };
 
-        mountFor((ctx.obj as any)[node.name]);
-        const off = ctx.listener.listen(node.name as keyof T, (v) => mountFor(v));
+        // Appel initial pendant la construction (defer init au parent)
+        mountFor((ctx.obj as any)[node.name], true);
+
+        // Sur changement ultérieur, le host est déjà dans le DOM → exécuter inits immédiatement
+        const off = ctx.listener.listen(node.name as keyof T, (v) => mountFor(v, false));
         ctx.dataUnsubs.push(off);
         ctx.domUnsubs.push(() => clearHost());
     }
@@ -434,6 +456,7 @@ export class Builder {
         if (node.panel) div.classList.add('panel');
 
         const children: UIRuntime<any>[] = [];
+        let initial = true; // première construction : defer inits au parent
 
         const clear = () => {
             for (const r of children) { try { r.stop(); } catch { } }
@@ -449,9 +472,10 @@ export class Builder {
                 if (!ui) continue;
                 const host = document.createElement('div');
                 div.appendChild(host);
-                const runtime = this.bootInto(ui as UI<any>, item, host);
+                const runtime = this.bootInto(ui as UI<any>, item, host, initial ? ctx.postInits : undefined);
                 children.push(runtime);
             }
+            initial = false;
         };
 
         render();
@@ -491,7 +515,8 @@ export class Builder {
             if (!ui) return false;
             const wrap = document.createElement('div');
             host.appendChild(wrap);
-            child = this.bootInto(ui as UI<any>, value, wrap);
+            // Ici on est *après* le montage de l'UI parente : exécuter inits immédiatement
+            child = this.bootInto(ui as UI<any>, value, wrap /* no parentQueue */);
             return true;
         };
 
@@ -521,7 +546,7 @@ export class Builder {
             clearChild();
         };
 
-        // Fermer si name devient null/undefined, remonter sinon
+        // Fermer si name devient null/undefined, remonter sinon (si déjà ouvert)
         const offField = ctx.listener.listen(node.name as keyof T, (v) => {
             if (v == null) close();
             else if (dlg.open) mountFor(v);
@@ -561,7 +586,7 @@ export class Builder {
     }
 
     /* ----------- Custom (HTMLElement via méthode de T) ----------- */
-    private buildCustom<T extends object>(node: CustomNode<T, any>, ctx: Ctx<T>) {
+    private buildCustom<T extends object>(node: CustomNode<T, any, any>, ctx: Ctx<T>) {
         // Appel direct en tant que méthode de l'instance pour préserver `this`
         let el: HTMLElement | null = null;
         try {
@@ -591,6 +616,14 @@ export class Builder {
             setEnabled(el, !!(ctx.obj as any)[k]);
             const off = ctx.listener.listen(k, (v: any) => setEnabled(el!, !!v));
             ctx.dataUnsubs.push(off);
+        }
+
+        // Init différée : sera exécutée une fois *toute* l'UI (portée par ce bootInto) appendée au DOM.
+        if (node.init) {
+            ctx.postInits.push(() => {
+                try { (ctx.obj as any)[node.init](); }
+                catch (e) { console.warn('[custom.init] call failed:', e); }
+            });
         }
     }
 }

@@ -87,7 +87,8 @@ defineUI(DialogOwner, (uiDialog) => {
             uiDialog.dialog({ name: "app", label: 'Personne', action: "initDialogue", buttonWidth: "50%", width: "50%" })
             uiDialog.dialog({ name: "appTable", label: 'Table', action: "initDialogueAppTable", buttonWidth: "50%", width: "50%" })
         })
-        uiDialog.custom({ factory: "initCanvas", width: "100%" })
+        uiDialog.label("sizeCanvas", { width:"100%"})
+        uiDialog.custom({ factory: "createCanvas", init:"initCanvas" , width: "100%" ,height:"100%"})
 
     })
 
