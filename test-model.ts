@@ -253,10 +253,19 @@ export class App {
 export class DialogOwner {
     app: App | undefined
     appTable: AppTable | undefined
+    appImage: AfficherImage | undefined
     sizeCanvas: string = ""
     canvas!: HTMLCanvasElement
+    label: string = "X"
     constructor() {
 
+    }
+    actionLabel() {
+        this.label = this.label + "X"
+    }
+    initDialogueAfficherImage() {
+        this.appImage = new AfficherImage()
+        this.appImage.owner = this
     }
     initDialogue() {
         this.app = new App()
@@ -287,4 +296,22 @@ export class DialogOwner {
         this.sizeCanvas = `${cssW}*${cssH}`
 
     }
+}
+export class AfficherImage {
+    urlImage = "./chat.png"
+    owner!: DialogOwner
+
+    chat() {
+        this.urlImage = "./chat.png"
+
+    }
+    chien() {
+        this.urlImage = "./chien.png"
+    }
+    close() {
+        if (this.owner) {
+            this.owner.appImage = undefined
+        }
+    }
+
 }

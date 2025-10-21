@@ -10,6 +10,7 @@ import {
     UI, UINode,
     InputNode, ButtonNode, SelectNode, LabelNode, FlowNode,
     SingleUINode, ListUINode, DialogNode, CustomNode,
+    ButtonLabelNode, ImgNode,
 } from "./ui-model";
 
 /* ===================== Runtime result ===================== */
@@ -94,10 +95,8 @@ export class Builder {
         this.buildNodes(ui.getTree(), ctx);
         for (const el of elements) container.appendChild(el);
 
-        // Si aucune parentQueue n'est fournie, nous sommes à la racine de CE montage :
-        // on exécute les inits maintenant que tout est dans le DOM.
+        // Racine : exécuter les inits maintenant que tout est dans le DOM.
         if (!parentQueue) {
-            // S'exécute synchronement après append ; si vous préférez, remplacez par queueMicrotask(...)
             for (const run of postInits) {
                 try { run(); } catch (e) { console.warn('[custom.init] failed:', e); }
             }
@@ -108,7 +107,7 @@ export class Builder {
             listener,
             elements,
             stop: () => {
-                try { /* listener.stop(); // à activer si besoin */ } catch { }
+                try { /* listener.stop(); */ } catch { }
                 for (const u of domUnsubs) { try { u(); } catch { } }
                 for (const u of dataUnsubs) { try { u(); } catch { } }
             }
@@ -121,6 +120,8 @@ export class Builder {
             switch (node.kind) {
                 case 'input': this.buildInput(node as InputNode<T, any>, ctx); break;
                 case 'button': this.buildButton(node as ButtonNode<T>, ctx); break;
+                case 'buttonLabel': this.buildButtonLabel(node as ButtonLabelNode<T, any>, ctx); break;
+                case 'img': this.buildImg(node as ImgNode<T, any>, ctx); break;
                 case 'select': this.buildSelect(node as SelectNode<T, any, any, any, any>, ctx); break;
                 case 'label': this.buildLabel(node as LabelNode<T, any>, ctx); break;
                 case 'flow': this.buildFlow(node as FlowNode<T>, ctx); break;
@@ -133,7 +134,6 @@ export class Builder {
     }
 
     /* ===================== Sous-UI lookup via registry ===================== */
-    /** Trouve l'UI du registry dont la targetClass correspond à la valeur donnée. */
     private findUIFor<T extends object>(value: any): UI<T> | undefined {
         if (!value || typeof value !== "object") return undefined;
         return this.registry.find((u: UI<any>) => value instanceof u.getTargetClass());
@@ -142,7 +142,7 @@ export class Builder {
     /* ----------- Input ----------- */
     private buildInput<T extends object>(node: InputNode<T, any>, ctx: Ctx<T>) {
         const wrapper = document.createElement('label');
-        applyIdAndClass(wrapper, node); // <-- id/class
+        applyIdAndClass(wrapper, node);
         wrapper.style.display = 'block';
         if (node.label) wrapper.append(document.createTextNode(node.label + ' '));
 
@@ -227,7 +227,7 @@ export class Builder {
     /* ----------- Button ----------- */
     private buildButton<T extends object>(node: ButtonNode<T>, ctx: Ctx<T>) {
         const btn = document.createElement('button');
-        applyIdAndClass(btn, node); // <-- id/class
+        applyIdAndClass(btn, node);
         btn.type = 'button';
         btn.textContent = node.label;
         applySize(btn, node.width, node.height);
@@ -257,10 +257,88 @@ export class Builder {
         ctx.domUnsubs.push(() => btn.removeEventListener('click', onClick));
     }
 
+    /* ----------- ButtonLabel ----------- */
+    private buildButtonLabel<T extends object>(node: ButtonLabelNode<T, any>, ctx: Ctx<T>) {
+        const btn = document.createElement('button');
+        applyIdAndClass(btn, node);
+        btn.type = 'button';
+        btn.textContent = String((ctx.obj as any)[node.label] ?? '');
+        applySize(btn, node.width, node.height);
+        ctx.add(btn);
+
+        if (node.visible) {
+            const k = node.visible as keyof T;
+            setVisible(btn, !!(ctx.obj as any)[k]);
+            const off = ctx.listener.listen(k, (v: any) => setVisible(btn, !!v));
+            ctx.dataUnsubs.push(off);
+        }
+        if (node.enable) {
+            const k = node.enable as keyof T;
+            setEnabled(btn, !!(ctx.obj as any)[k]);
+            const off = ctx.listener.listen(k, (v: any) => setEnabled(btn, !!v));
+            ctx.dataUnsubs.push(off);
+        }
+
+        const offLabel = ctx.listener.listen(node.label as keyof T, (v) => {
+            const s = String(v ?? '');
+            if (btn.textContent !== s) btn.textContent = s;
+        });
+        ctx.dataUnsubs.push(offLabel);
+
+        const onClick = () => {
+            if (node.muted && (ctx.listener as any).withAllMuted) {
+                (ctx.listener as any).withAllMuted(() => { (ctx.obj as any)[node.action](); });
+            } else {
+                (ctx.obj as any)[node.action]();
+            }
+        };
+        btn.addEventListener('click', onClick);
+        ctx.domUnsubs.push(() => btn.removeEventListener('click', onClick));
+    }
+
+    /* ----------- Img ----------- */
+    private buildImg<T extends object>(node: ImgNode<T, any>, ctx: Ctx<T>) {
+        const img = document.createElement('img');
+        applyIdAndClass(img, node);
+        applySize(img, node.width, node.height);
+        if (node.alt != null) img.alt = node.alt;
+
+        // init src depuis le modèle (en évitant la normalisation .src absolue)
+        const initial = String((ctx.obj as any)[node.url] ?? '');
+        if (initial !== '') img.setAttribute('src', initial);
+
+        ctx.add(img);
+
+        // visible / enable
+        if (node.visible) {
+            const k = node.visible as keyof T;
+            setVisible(img, !!(ctx.obj as any)[k]);
+            const off = ctx.listener.listen(k, (v: any) => setVisible(img, !!v));
+            ctx.dataUnsubs.push(off);
+        }
+        if (node.enable) {
+            const k = node.enable as keyof T;
+            setEnabled(img, !!(ctx.obj as any)[k]);
+            const off = ctx.listener.listen(k, (v: any) => setEnabled(img, !!v));
+            ctx.dataUnsubs.push(off);
+        }
+
+        // réactivité sur l'URL
+        const offUrl = ctx.listener.listen(node.url as keyof T, (v) => {
+            const s = String(v ?? '');
+            const cur = img.getAttribute('src') ?? '';
+            if (cur !== s) {
+                if (s === '') img.removeAttribute('src');
+                else img.setAttribute('src', s);
+            }
+        });
+        ctx.dataUnsubs.push(offUrl);
+    }
+
     /* ----------- Select ----------- */
     private buildSelect<T extends object>(node: SelectNode<T, any, any, any, any>, ctx: Ctx<T>) {
         const sel = document.createElement('select');
-        applyIdAndClass(sel, node); // <-- id/class
+        applyIdAndClass(sel, node);
         sel.multiple = (node.mode ?? 'list') === 'list';
         applySize(sel, node.width, node.height);
         ctx.add(sel);
@@ -341,7 +419,7 @@ export class Builder {
     /* ----------- Label ----------- */
     private buildLabel<T extends object>(node: LabelNode<T, any>, ctx: Ctx<T>) {
         const span = document.createElement('span');
-        applyIdAndClass(span, node); // <-- id/class
+        applyIdAndClass(span, node);
         applySize(span, node.width, node.height);
         span.textContent = String((ctx.obj as any)[node.name] ?? '');
         ctx.add(span);
@@ -369,7 +447,7 @@ export class Builder {
     /* ----------- Flow ----------- */
     private buildFlow<T extends object>(node: FlowNode<T>, ctx: Ctx<T>) {
         const div = document.createElement('div');
-        applyIdAndClass(div, node); // <-- id/class
+        applyIdAndClass(div, node);
         div.style.display = 'flex';
         div.style.flexDirection = node.orientation === 'row' ? 'row' : 'column';
         applySize(div, node.width, node.height);
@@ -401,7 +479,7 @@ export class Builder {
     /* ----------- Single UI (champ objet) ----------- */
     private buildSingleUI<T extends object>(node: SingleUINode<T>, ctx: Ctx<T>) {
         const host = document.createElement('div');
-        applyIdAndClass(host, node); // <-- id/class
+        applyIdAndClass(host, node);
         applySize(host, node.width, node.height);
         ctx.add(host);
 
@@ -412,7 +490,6 @@ export class Builder {
             while (host.firstChild) host.removeChild(host.firstChild);
         };
 
-        // duringBuild: true pour l'appel initial (avant append du parent), false ensuite.
         const mountFor = (value: any, duringBuild: boolean) => {
             clearHost();
             const ui = this.findUIFor(value);
@@ -422,10 +499,10 @@ export class Builder {
             child = this.bootInto(ui as UI<any>, value, inner, duringBuild ? ctx.postInits : undefined);
         };
 
-        // Appel initial pendant la construction (defer init au parent)
+        // initial (defer init au parent)
         mountFor((ctx.obj as any)[node.name], true);
 
-        // Sur changement ultérieur, le host est déjà dans le DOM → exécuter inits immédiatement
+        // updates (exécuter inits immédiatement)
         const off = ctx.listener.listen(node.name as keyof T, (v) => mountFor(v, false));
         ctx.dataUnsubs.push(off);
         ctx.domUnsubs.push(() => clearHost());
@@ -434,7 +511,7 @@ export class Builder {
     /* ----------- List UI (liste d'objets) ----------- */
     private buildListUI<T extends object>(node: ListUINode<T>, ctx: Ctx<T>) {
         const div = document.createElement('div');
-        applyIdAndClass(div, node); // <-- id/class
+        applyIdAndClass(div, node);
         div.style.display = 'flex';
         div.style.flexDirection = (node.orientation ?? 'column') === 'row' ? 'row' : 'column';
         applySize(div, node.width, node.height);
@@ -456,7 +533,7 @@ export class Builder {
         if (node.panel) div.classList.add('panel');
 
         const children: UIRuntime<any>[] = [];
-        let initial = true; // première construction : defer inits au parent
+        let initial = true;
 
         const clear = () => {
             for (const r of children) { try { r.stop(); } catch { } }
@@ -488,16 +565,14 @@ export class Builder {
 
     /* ----------- Dialog ----------- */
     private buildDialog<T extends object>(node: DialogNode<T>, ctx: Ctx<T>) {
-        // Bouton (trigger)
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.textContent = node.label;
         applySize(btn, node.buttonWidth, node.buttonHeight);
         ctx.add(btn);
 
-        // Dialog + host (id/class appliqués sur le <dialog> lui-même)
         const dlg = document.createElement('dialog') as HTMLDialogElement;
-        applyIdAndClass(dlg, node); // <-- id/class
+        applyIdAndClass(dlg, node);
         applySize(dlg, node.width, node.height);
         const host = document.createElement('div');
         host.style.minWidth = '100%';
@@ -515,26 +590,20 @@ export class Builder {
             if (!ui) return false;
             const wrap = document.createElement('div');
             host.appendChild(wrap);
-            // Ici on est *après* le montage de l'UI parente : exécuter inits immédiatement
-            child = this.bootInto(ui as UI<any>, value, wrap /* no parentQueue */);
+            child = this.bootInto(ui as UI<any>, value, wrap);
             return true;
         };
 
         const open = () => {
-            // action préalable éventuelle
             if (node.action) {
                 try { (ctx.obj as any)[node.action](); } catch { }
             }
-
-            // si champ nul → fermer et ne pas ouvrir
             const value = (ctx.obj as any)[node.name];
             if (value == null) {
                 try { dlg.close(); } catch { }
                 clearChild();
                 return;
             }
-
-            // monter et ouvrir
             const ok = mountFor(value);
             if (!ok) return;
             const modal = node.modal ?? true;
@@ -546,28 +615,25 @@ export class Builder {
             clearChild();
         };
 
-        // Fermer si name devient null/undefined, remonter sinon (si déjà ouvert)
         const offField = ctx.listener.listen(node.name as keyof T, (v) => {
             if (v == null) close();
             else if (dlg.open) mountFor(v);
         });
         ctx.dataUnsubs.push(offField);
 
-        // visible / enable (bouton)
         if (node.visible) {
             const k = node.visible as keyof T;
             setVisible(btn, !!(ctx.obj as any)[k]);
-            const off = ctx.listener.listen(k, (v: any) => setVisible(btn, !!v));
+            const off = ctx.listener.listen(k, (vv: any) => setVisible(btn, !!vv));
             ctx.dataUnsubs.push(off);
         }
         if (node.enable) {
             const k = node.enable as keyof T;
             setEnabled(btn, !!(ctx.obj as any)[k]);
-            const off = ctx.listener.listen(k, (v: any) => setEnabled(btn, !!v));
+            const off = ctx.listener.listen(k, (vv: any) => setEnabled(btn, !!vv));
             ctx.dataUnsubs.push(off);
         }
 
-        // Backdrop / ESC
         if (node.closeOnBackdrop) {
             dlg.addEventListener('click', (e) => { if (e.target === dlg) close(); });
         }
@@ -576,18 +642,15 @@ export class Builder {
         }
         dlg.addEventListener('close', () => clearChild());
 
-        // Click bouton → ouvrir
         btn.addEventListener('click', open);
         ctx.domUnsubs.push(() => btn.removeEventListener('click', open));
 
-        // Monter le dialog à côté du bouton
         ctx.add(dlg);
         ctx.domUnsubs.push(() => { try { dlg.close(); } catch { } });
     }
 
-    /* ----------- Custom (HTMLElement via méthode de T) ----------- */
+    /* ----------- Custom ----------- */
     private buildCustom<T extends object>(node: CustomNode<T, any, any>, ctx: Ctx<T>) {
-        // Appel direct en tant que méthode de l'instance pour préserver `this`
         let el: HTMLElement | null = null;
         try {
             el = (ctx.obj as any)[node.factory]();
@@ -604,7 +667,6 @@ export class Builder {
         applySize(el, node.width, node.height);
         ctx.add(el);
 
-        // visible / enable réactifs
         if (node.visible) {
             const k = node.visible as keyof T;
             setVisible(el, !!(ctx.obj as any)[k]);
@@ -618,7 +680,6 @@ export class Builder {
             ctx.dataUnsubs.push(off);
         }
 
-        // Init différée : sera exécutée une fois *toute* l'UI (portée par ce bootInto) appendée au DOM.
         if (node.init) {
             ctx.postInits.push(() => {
                 try { (ctx.obj as any)[node.init](); }

@@ -60,6 +60,45 @@ export interface ButtonNode<T extends object> {
     enable?: KeysOfType<T, boolean>;
 }
 
+/** Nouveau: ButtonLabel — label typé comme une clé string de T */
+export interface ButtonLabelNode<
+  T extends object,
+  NK extends KeysOfType<T, string> = KeysOfType<T, string>
+> {
+  kind: 'buttonLabel';
+  /** Identifiants CSS/DOM */
+  id?: string;
+  class?: string | string[];
+
+  /** Clé d'un champ string de T utilisé comme libellé */
+  label: NK;
+  action: MethodNames0<T>;
+  muted?: boolean;
+  width?: number | string;
+  height?: number | string;
+  visible?: KeysOfType<T, boolean>;
+  enable?: KeysOfType<T, boolean>;
+}
+
+/** Nouveau: Img — URL typée comme une clé string de T */
+export interface ImgNode<
+  T extends object,
+  NK extends KeysOfType<T, string> = KeysOfType<T, string>
+> {
+  kind: 'img';
+  /** Identifiants CSS/DOM */
+  id?: string;
+  class?: string | string[];
+
+  /** Clé d'un champ string de T contenant l'URL de l'image */
+  url: NK;
+  alt?: string;
+  width?: number | string;
+  height?: number | string;
+  visible?: KeysOfType<T, boolean>;
+  enable?: KeysOfType<T, boolean>;
+}
+
 /** Select: typé par list (clé de tableau), displayMethod et selection */
 export interface SelectNode<
     T extends object,
@@ -200,6 +239,8 @@ export interface CustomNode<
 export type UINode<T extends object> =
     | InputNode<T, any>
     | ButtonNode<T>
+    | ButtonLabelNode<T, any>
+    | ImgNode<T, any>
     | SelectNode<T, any, any, any, any>
     | LabelNode<T, any>
     | FlowNode<T>
@@ -251,6 +292,41 @@ export class UI<T extends object> {
     }): this {
         const node: ButtonNode<T> = {
             kind: 'button',
+            ...opts
+        };
+        this.cursor.push(node as unknown as UINode<T>);
+        return this;
+    }
+
+    /* ------------ ButtonLabel (label lié à une clé string de T) ------------ */
+    buttonLabel<
+      NK extends KeysOfType<T, string>,
+      MN extends MethodNames0<T>
+    >(opts: {
+      /** Identifiants CSS/DOM */
+      id?: string; class?: string | string[];
+      label: NK; action: MN; muted?: boolean;
+      width?: number | string; height?: number | string;
+      visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
+    }): this {
+      const node: ButtonLabelNode<T, NK> = {
+        kind: 'buttonLabel',
+        ...opts
+      };
+      this.cursor.push(node as unknown as UINode<T>);
+      return this;
+    }
+
+    /* ------------ Img (url liée à une clé string de T) ------------ */
+    img<NK extends KeysOfType<T, string>>(opts: {
+        /** Identifiants CSS/DOM */
+        id?: string; class?: string | string[];
+        url: NK; alt?: string;
+        width?: number | string; height?: number | string;
+        visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
+    }): this {
+        const node: ImgNode<T, NK> = {
+            kind: 'img',
             ...opts
         };
         this.cursor.push(node as unknown as UINode<T>);

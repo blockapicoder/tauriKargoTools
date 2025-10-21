@@ -1,4 +1,4 @@
-import { App, AppPersonMoral, AppPersonPhysique, DialogOwner } from "./test-model"
+import { AfficherImage, App, AppPersonMoral, AppPersonPhysique, DialogOwner } from "./test-model"
 import { } from "./test-table"
 import { defineUI, boot } from "./dist/ui";
 
@@ -84,15 +84,30 @@ defineUI(DialogOwner, (uiDialog) => {
 
     uiDialog.flow({ orientation: "column" }, () => {
         uiDialog.flow({ orientation: "row", gap: 20, align: "center", justify: "center" }, () => {
-            uiDialog.dialog({ name: "app", label: 'Personne', action: "initDialogue", buttonWidth: "50%", width: "50%" })
-            uiDialog.dialog({ name: "appTable", label: 'Table', action: "initDialogueAppTable", buttonWidth: "50%", width: "50%" })
+            uiDialog.dialog({ name: "app", label: 'Personne', action: "initDialogue", buttonWidth: "25%", width: "50%" })
+            uiDialog.dialog({ name: "appTable", label: 'Table', action: "initDialogueAppTable", buttonWidth: "25%", width: "50%" })
+            uiDialog.dialog({ name: "appImage", label: 'Image', action: "initDialogueAfficherImage", buttonWidth: "25%", width: "50%" })
+          
+            uiDialog.buttonLabel({ label: "label", action: "actionLabel", width: "25%" })
         })
-        uiDialog.label("sizeCanvas", { width:"100%"})
-        uiDialog.custom({ factory: "createCanvas", init:"initCanvas" , width: "100%" ,height:"100%"})
+        uiDialog.label("sizeCanvas", { width: "100%" })
+        uiDialog.custom({ factory: "createCanvas", init: "initCanvas", width: "100%", height: "100%" })
 
     })
 
 })
+defineUI(AfficherImage, (ui) => {
+    ui.flow({ orientation: "column" ,gap:10}, () => {
+        ui.flow({ orientation: "row", gap: 5, style: { margin: "25" } }, () => {
+            ui.button({ action: "chat", label: "Chat", width: "50%" })
+            ui.button({ action: "chien", label: "Chien", width: "50%" })
+        })
+        ui.img({ url: "urlImage", width: "100%" })
+        ui.button({ action: "close", label: "Close", width: "100%" });
+
+    })
+})
+
 const app = new App();
 const dialog = new DialogOwner()
 boot(dialog, "#app")
