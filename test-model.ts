@@ -249,11 +249,82 @@ export class App {
     }
 
 }
+export class AppTree {
+    tree: Tree
+    owner: DialogOwner | undefined
 
+    constructor() {
+        this.tree = new Tree()
+    }
+    close() {
+        if (this.owner) {
+            this.owner.appTree = undefined
+        }
+    }
+}
+export class TreeMenu {
+    tree!: Tree
+    constructor() {
+
+    }
+    add() {
+        const nb = new Tree()
+        nb.parent = this.tree
+        this.tree.children.push(nb)
+        this.tree.labelToggle = "+"
+        this.tree.childrenVisible = [...this.tree.children]
+        this.tree.treeMenu = undefined
+
+    }
+    remove() {
+        if (this.tree.parent) {
+            this.tree.parent.children = this.tree.parent.children.filter((t) => t !== this.tree)
+            if (this.tree.parent.childrenVisible) {
+                this.tree.parent.childrenVisible = this.tree.parent.children
+            }
+        }
+        this.tree.treeMenu = undefined
+
+    }
+
+}
+export class Tree {
+    childrenVisible: Tree[] = []
+    children: Tree[] = []
+    value: string = ""
+    parent: Tree | undefined
+    treeMenu: TreeMenu | undefined
+
+    labelToggle = "-"
+
+
+    toggle() {
+        if (this.labelToggle === "-") {
+            this.childrenVisible = this.children
+            this.labelToggle = "+"
+        } else {
+            this.childrenVisible = []
+            this.labelToggle = "-"
+        }
+
+    }
+
+
+
+
+    menu() {
+        const menu = new TreeMenu()
+        menu.tree = this
+        this.treeMenu = menu
+    }
+
+
+}
 export class DialogOwner {
     app: App | undefined
     appTable: AppTable | undefined
     appImage: AfficherImage | undefined
+    appTree: AppTree | undefined
     sizeCanvas: string = ""
     canvas!: HTMLCanvasElement
     label: string = "X"
@@ -266,6 +337,11 @@ export class DialogOwner {
     initDialogueAfficherImage() {
         this.appImage = new AfficherImage()
         this.appImage.owner = this
+    }
+    initTree() {
+        this.appTree = new AppTree()
+        this.appTree.owner = this
+
     }
     initDialogue() {
         this.app = new App()

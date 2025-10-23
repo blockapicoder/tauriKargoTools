@@ -35,7 +35,7 @@ export interface InputNode<
     class?: string | string[];
 
     name: NK;
-    update: MethodNames0<T>;
+    update?: MethodNames0<T>;
     label?: string;
     inputType?: InputType;
     muted?: boolean;
@@ -211,6 +211,27 @@ export interface DialogNode<T extends object> {
     action?: KeysOfType<T, () => void>;
 }
 
+/** MENU — mêmes paramètres que dialog, rendu différent côté renderer */
+export interface MenuNode<T extends object> {
+    kind: 'menu';
+    /** Identifiants CSS/DOM */
+    id?: string;
+    class?: string | string[];
+
+    name: KeysOfType<T, Objectish | null | undefined>;
+    label: string;
+    buttonWidth?: number | string;
+    buttonHeight?: number | string;
+    width?: number | string;
+    height?: number | string;
+    closeOnBackdrop?: boolean;
+    closeOnEsc?: boolean;
+    modal?: boolean;
+    visible?: KeysOfType<T, boolean>;
+    enable?: KeysOfType<T, boolean>;
+    action?: KeysOfType<T, () => void>;
+}
+
 /** CUSTOM — créé via une méthode de T (sans argument) qui retourne un HTMLElement
  *  + une méthode d'init optionnelle (() => void) exécutée par le builder.
  */
@@ -247,6 +268,7 @@ export type UINode<T extends object> =
     | SingleUINode<T>
     | ListUINode<T>
     | DialogNode<T>
+    | MenuNode<T>
     | CustomNode<T>;
 
 /* ===================== UI (déclaratif uniquement) ===================== */
@@ -270,7 +292,7 @@ export class UI<T extends object> {
     >(opts: {
         /** Identifiants CSS/DOM */
         id?: string; class?: string | string[];
-        name: NK; update: M; label?: string; inputType?: InputType; muted?: boolean;
+        name: NK; update?: M; label?: string; inputType?: InputType; muted?: boolean;
         width?: number | string; height?: number | string;
         visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
     }): this {
@@ -449,6 +471,26 @@ export class UI<T extends object> {
     }): this {
         const node: DialogNode<T> = {
             kind: 'dialog',
+            ...opt
+        };
+        this.cursor.push(node as unknown as UINode<T>);
+        return this;
+    }
+
+    /* ------------ Menu (mêmes paramètres que Dialog) ------------ */
+    menu<NK extends KeysOfType<T, Objectish | null | undefined>>(opt: {
+        /** Identifiants CSS/DOM */
+        id?: string; class?: string | string[];
+        name: NK;
+        label: string;
+        buttonWidth?: number | string; buttonHeight?: number | string;
+        width?: number | string; height?: number | string;
+        closeOnBackdrop?: boolean; closeOnEsc?: boolean; modal?: boolean;
+        visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
+        action?: KeysOfType<T, () => void>;
+    }): this {
+        const node: MenuNode<T> = {
+            kind: 'menu',
             ...opt
         };
         this.cursor.push(node as unknown as UINode<T>);

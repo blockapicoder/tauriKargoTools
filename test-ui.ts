@@ -1,4 +1,4 @@
-import { AfficherImage, App, AppPersonMoral, AppPersonPhysique, DialogOwner } from "./test-model"
+import { AfficherImage, App, AppPersonMoral, AppPersonPhysique, AppTree, DialogOwner, Tree, TreeMenu } from "./test-model"
 import { } from "./test-table"
 import { defineUI, boot } from "./dist/ui";
 
@@ -84,11 +84,12 @@ defineUI(DialogOwner, (uiDialog) => {
 
     uiDialog.flow({ orientation: "column" }, () => {
         uiDialog.flow({ orientation: "row", gap: 20, align: "center", justify: "center" }, () => {
-            uiDialog.dialog({ name: "app", label: 'Personne', action: "initDialogue", buttonWidth: "25%", width: "50%" })
-            uiDialog.dialog({ name: "appTable", label: 'Table', action: "initDialogueAppTable", buttonWidth: "25%", width: "50%" })
-            uiDialog.dialog({ name: "appImage", label: 'Image', action: "initDialogueAfficherImage", buttonWidth: "25%", width: "50%" })
-          
-            uiDialog.buttonLabel({ label: "label", action: "actionLabel", width: "25%" })
+            uiDialog.dialog({ name: "app", label: 'Personne', action: "initDialogue", buttonWidth: "20%", width: "50%" })
+            uiDialog.dialog({ name: "appTable", label: 'Table', action: "initDialogueAppTable", buttonWidth: "20%", width: "50%" })
+            uiDialog.dialog({ name: "appImage", label: 'Image', action: "initDialogueAfficherImage", buttonWidth: "20%", width: "50%" })
+            uiDialog.dialog({ name: "appTree", label: 'Tree', action: "initTree", buttonWidth: "20%", width: "50%" })
+
+            uiDialog.buttonLabel({ label: "label", action: "actionLabel", width: "20%" })
         })
         uiDialog.label("sizeCanvas", { width: "100%" })
         uiDialog.custom({ factory: "createCanvas", init: "initCanvas", width: "100%", height: "100%" })
@@ -97,7 +98,7 @@ defineUI(DialogOwner, (uiDialog) => {
 
 })
 defineUI(AfficherImage, (ui) => {
-    ui.flow({ orientation: "column" ,gap:10}, () => {
+    ui.flow({ orientation: "column", gap: 10 }, () => {
         ui.flow({ orientation: "row", gap: 5, style: { margin: "25" } }, () => {
             ui.button({ action: "chat", label: "Chat", width: "50%" })
             ui.button({ action: "chien", label: "Chien", width: "50%" })
@@ -106,6 +107,37 @@ defineUI(AfficherImage, (ui) => {
         ui.button({ action: "close", label: "Close", width: "100%" });
 
     })
+})
+defineUI(AppTree, (ui) => {
+    ui.flow({ orientation: "column", gap: 5 }, () => {
+        ui.ui({ name: "tree" })
+        ui.button({ action: "close", label: "Close" })
+    })
+})
+defineUI(TreeMenu,(ui)=> {
+        ui.flow( {orientation:"column"},()=> {
+            ui.button({action:"add", label:"Add"})
+            ui.button( { action:"remove" , label:"Remove"})
+        })
+})
+defineUI(Tree, (ui) => {
+
+    ui.flow({ orientation: "row", gap: 5 }, () => {
+        ui.buttonLabel({ action: "toggle", label: "labelToggle" })
+        ui.flow({ orientation: "column" }, () => {
+            ui.flow({ orientation: "row", gap: 5 }, () => {
+
+                ui.menu({ name:"treeMenu" , label:"*",action:"menu"})
+                ui.input({ name: "value" })
+            })
+            ui.listUI({
+                orientation: "column",
+                list: "childrenVisible",
+                gap:5
+            })
+        })
+    })
+
 })
 
 const app = new App();
