@@ -1,4 +1,4 @@
-import { AfficherImage, App, AppPersonMoral, AppPersonPhysique, AppTree, DialogOwner, Tree, TreeMenu } from "./test-model"
+import { AfficherImage, App, AppPersonMoral, AppPersonPhysique, AppTree, ButtonPanel, DialogOwner, ElementPanel, Panel, Tree, TreeMenu } from "./test-model"
 import { } from "./test-table"
 import { defineUI, boot } from "./dist/ui";
 
@@ -98,12 +98,12 @@ defineUI(DialogOwner, (uiDialog) => {
 
 })
 defineUI(AfficherImage, (ui) => {
-    ui.flow({ orientation: "column", gap: 10 }, () => {
-        ui.flow({ orientation: "row", gap: 5, style: { margin: "25" } }, () => {
-            ui.button({ action: "chat", label: "Chat", width: "50%" })
-            ui.button({ action: "chien", label: "Chien", width: "50%" })
+    ui.flow({ orientation: "column", gap: 10, height: "100%",width:"100%" ,align:"center"}, () => {
+        ui.flow({ orientation: "row", gap: 5,width:"100%" }, () => {
+            ui.button({ action: "chat", label: "Chat",width:"50%" })
+            ui.button({ action: "chien", label: "Chien",width:"50%"})
         })
-        ui.img({ url: "urlImage", width: "100%" })
+        ui.img({ url: "urlImage", width: "50%", height: 500})
         ui.button({ action: "close", label: "Close", width: "100%" });
 
     })
@@ -139,8 +139,20 @@ defineUI(Tree, (ui) => {
     })
 
 })
+defineUI(ButtonPanel, (ui) => {
+    ui.flow({ orientation: "row" }, () => {
+        ui.buttonLabel({ label: "name", action: "select", width: "100%" ,enable:"enable"})
+    })
+})
+defineUI(Panel, (ui) => {
+    ui.flow({ orientation: "column", width: "100%", gap: 10 }, () => {
+        ui.listUI({ orientation: "row", list: "buttons", gap: 5, class: "container" })
+        ui.ui({ name: "elementPanel", width: "100%" })
 
+
+    })
+})
 const app = new App();
 const dialog = new DialogOwner()
-boot(dialog, "#app")
+boot(new Panel(), "#app")
 //uiApp.boot(app, "#app"); // <div id="app"></div>

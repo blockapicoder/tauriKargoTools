@@ -234,9 +234,46 @@ export class Builder {
         const btn = document.createElement('button');
         applyIdAndClass(btn, node);
         btn.type = 'button';
-        btn.textContent = node.label;
         applySize(btn, node.width, node.height);
         ctx.add(btn);
+
+        // --- rendu du contenu (texte / html / img) ---
+        const ctype = (node as any).type as ('img' | 'html' | undefined);
+        const nameKey = (node as any).name as (keyof T | undefined);
+
+        const renderContent = (valFromModel?: any) => {
+            const fallback = node.label ?? '';
+            const value = (valFromModel !== undefined) ? String(valFromModel ?? '') :
+                          (nameKey ? String((ctx.obj as any)[nameKey] ?? '') : String(fallback));
+
+            if (!ctype) {
+                if (btn.innerHTML !== '') btn.innerHTML = '';
+                if (btn.textContent !== fallback) btn.textContent = fallback;
+                return;
+            }
+
+            if (ctype === 'html') {
+                if (btn.innerHTML !== value) btn.innerHTML = value;
+                return;
+            }
+
+            // ctype === 'img'
+            btn.innerHTML = '';
+            const img = document.createElement('img');
+            if (value) img.setAttribute('src', value);
+            img.alt = typeof node.label === 'string' ? node.label : '';
+            img.style.maxWidth = '100%';
+            img.style.maxHeight = '100%';
+            img.style.pointerEvents = 'none';
+            btn.appendChild(img);
+        };
+
+        renderContent();
+
+        if (ctype && nameKey) {
+            const off = ctx.listener.listen(nameKey, (v) => renderContent(v));
+            ctx.dataUnsubs.push(off);
+        }
 
         if (node.visible) {
             const k = node.visible as keyof T;
@@ -267,9 +304,47 @@ export class Builder {
         const btn = document.createElement('button');
         applyIdAndClass(btn, node);
         btn.type = 'button';
-        btn.textContent = String((ctx.obj as any)[node.label] ?? '');
         applySize(btn, node.width, node.height);
         ctx.add(btn);
+
+        const ctype = (node as any).type as ('img' | 'html' | undefined);
+        const sourceKey = ((node as any).name as (keyof T | undefined)) ?? (node.label as keyof T);
+
+        const renderFrom = (val: any) => {
+            const value = String(val ?? '');
+            if (!ctype) {
+                if (btn.innerHTML !== '') btn.innerHTML = '';
+                if (btn.textContent !== value) btn.textContent = value;
+                return;
+            }
+            if (ctype === 'html') {
+                if (btn.innerHTML !== value) btn.innerHTML = value;
+                return;
+            }
+            // ctype === 'img'
+            btn.innerHTML = '';
+            const img = document.createElement('img');
+            if (value) img.setAttribute('src', value);
+            const altText = String((ctx.obj as any)[node.label] ?? '');
+            img.alt = altText;
+            img.style.maxWidth = '100%';
+            img.style.maxHeight = '100%';
+            img.style.pointerEvents = 'none';
+            btn.appendChild(img);
+        };
+
+        renderFrom((ctx.obj as any)[sourceKey]);
+
+        const offSource = ctx.listener.listen(sourceKey, (v) => renderFrom(v));
+        ctx.dataUnsubs.push(offSource);
+
+        if (ctype === 'img' && sourceKey !== (node.label as keyof T)) {
+            const offAlt = ctx.listener.listen(node.label as keyof T, () => {
+                const img = btn.querySelector('img');
+                if (img) img.alt = String((ctx.obj as any)[node.label] ?? '');
+            });
+            ctx.dataUnsubs.push(offAlt);
+        }
 
         if (node.visible) {
             const k = node.visible as keyof T;
@@ -283,12 +358,6 @@ export class Builder {
             const off = ctx.listener.listen(k, (v: any) => setEnabled(btn, !!v));
             ctx.dataUnsubs.push(off);
         }
-
-        const offLabel = ctx.listener.listen(node.label as keyof T, (v) => {
-            const s = String(v ?? '');
-            if (btn.textContent !== s) btn.textContent = s;
-        });
-        ctx.dataUnsubs.push(offLabel);
 
         const onClick = () => {
             if (node.muted && (ctx.listener as any).withAllMuted) {
@@ -308,13 +377,11 @@ export class Builder {
         applySize(img, node.width, node.height);
         if (node.alt != null) img.alt = node.alt;
 
-        // init src depuis le modèle (en évitant la normalisation .src absolue)
         const initial = String((ctx.obj as any)[node.url] ?? '');
         if (initial !== '') img.setAttribute('src', initial);
 
         ctx.add(img);
 
-        // visible / enable
         if (node.visible) {
             const k = node.visible as keyof T;
             setVisible(img, !!(ctx.obj as any)[k]);
@@ -328,7 +395,6 @@ export class Builder {
             ctx.dataUnsubs.push(off);
         }
 
-        // réactivité sur l'URL
         const offUrl = ctx.listener.listen(node.url as keyof T, (v) => {
             const s = String(v ?? '');
             const cur = img.getAttribute('src') ?? '';
@@ -568,12 +634,35 @@ export class Builder {
         ctx.add(div);
     }
 
+    /* ---- Helper rendu du bouton trigger (Dialog/Menu) selon node.type ---- */
+    private renderTrigger(btn: HTMLButtonElement, label: string, type?: 'html' | 'img') {
+        if (!type) {
+            if (btn.innerHTML !== '') btn.innerHTML = '';
+            if (btn.textContent !== label) btn.textContent = label;
+            return;
+        }
+        if (type === 'html') {
+            if (btn.innerHTML !== label) btn.innerHTML = label; // HTML de confiance
+            return;
+        }
+        // type === 'img'
+        btn.innerHTML = '';
+        const img = document.createElement('img');
+        if (label) img.setAttribute('src', label); // label = URL
+        img.alt = '';
+        img.style.maxWidth = '100%';
+        img.style.maxHeight = '100%';
+        img.style.pointerEvents = 'none';
+        btn.appendChild(img);
+    }
+
     /* ----------- Dialog ----------- */
     private buildDialog<T extends object>(node: DialogNode<T>, ctx: Ctx<T>) {
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.textContent = node.label;
         applySize(btn, node.buttonWidth, node.buttonHeight);
+        // Rendu du trigger (texte/html/img) – source = `label`
+        this.renderTrigger(btn, node.label, (node as any).type as ('html' | 'img' | undefined));
         ctx.add(btn);
 
         const dlg = document.createElement('dialog') as HTMLDialogElement;
@@ -653,12 +742,14 @@ export class Builder {
         ctx.add(dlg);
         ctx.domUnsubs.push(() => { try { dlg.close(); } catch { } });
     }
+
     /* ----------- Menu (modal <dialog> top-layer, placement précis, clics transmis aux items) ----------- */
     private buildMenu<T extends object>(node: MenuNode<T>, ctx: Ctx<T>) {
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.textContent = node.label;
         applySize(btn, node.buttonWidth, node.buttonHeight);
+        // Rendu du trigger (texte/html/img) – source = `label`
+        this.renderTrigger(btn, node.label, (node as any).type as ('html' | 'img' | undefined));
         ctx.add(btn);
 
         // <dialog> modal (top-layer) pour capturer focus/clavier et bloquer l’arrière-plan
@@ -687,6 +778,7 @@ export class Builder {
         applyIdAndClass(panel, node);
         applySize(panel, node.width, node.height);
         panel.setAttribute('role', 'menu');
+         panel.setAttribute('class', 'app');
         panel.tabIndex = -1;
         panel.style.maxWidth = 'min(90vw, 640px)';
         panel.style.maxHeight = '80vh';
@@ -755,14 +847,12 @@ export class Builder {
             if (e.target === pop) { e.preventDefault(); e.stopPropagation(); close(); }
         });
 
-        // Gestion des clics **dans** le panel : on laisse passer aux cibles,
-        // et on ferme automatiquement si l'item le demande.
+        // Gestion des clics **dans** le panel : laisser passer aux cibles, puis fermer
         const onInsideClick = (e: MouseEvent) => {
             const t = e.target as HTMLElement | null;
             if (!t) return;
             const item = t.closest('[data-menu-close], [role="menuitem"], button, a');
             if (!item) return;
-            // Laisser le handler de l’item s’exécuter, puis fermer juste après
             setTimeout(() => close(), 0);
         };
         panel.addEventListener('click', onInsideClick);
@@ -789,7 +879,6 @@ export class Builder {
                 next.focus();
                 return;
             }
-            // Empêcher la fuite de tout le clavier vers l’arrière-plan
             e.stopPropagation();
         };
 
@@ -813,7 +902,6 @@ export class Builder {
             place();
             requestAnimationFrame(() => {
                 place();
-                // Focus initial : premier focusable sinon le panel
                 const list = getFocusables();
                 (list[0] ?? panel).focus({ preventScroll: true });
             });
@@ -830,7 +918,6 @@ export class Builder {
                 window.removeEventListener('scroll', onScroll, true);
             });
 
-            // Empêcher la fermeture par "cancel" si closeOnEsc === false
             if (!(node.closeOnEsc ?? true)) {
                 const onCancel = (e: Event) => e.preventDefault();
                 pop.addEventListener('cancel', onCancel);
@@ -870,10 +957,6 @@ export class Builder {
         ctx.domUnsubs.push(() => btn.removeEventListener('click', open));
         ctx.domUnsubs.push(() => close());
     }
-
-
-
-
 
     /* ----------- Custom ----------- */
     private buildCustom<T extends object>(node: CustomNode<T, any, any>, ctx: Ctx<T>) {

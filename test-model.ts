@@ -3,18 +3,22 @@
 type Sexe = "Homme" | "Femme";
 type Person = { nom: string; prenom: string; age: number; sexe: Sexe };
 type PersonMoral = { nom: string; age: number; };
+export class ElementPanel {
+
+}
 class AppPerson {
 
 }
 
 // --- Modèle ---
-export class AppTable {
+export class AppTable extends ElementPanel {
     persons: Personne[] = [];
     colNom = "Nom"
     colPrenom = "Prenom"
     colAge = "Age"
     dialogOwner!: DialogOwner
     constructor() {
+        super()
         // une ligne de départ
         this.addPerson();
     }
@@ -213,12 +217,13 @@ export class AppPersonPhysique extends AppPerson {
         this.onSelectedChange();
     }
 }
-export class App {
+export class App extends ElementPanel {
     applis: AppPerson[] = []
     appli: AppPerson | undefined
     idxApp: number[] = []
     dialogOwner!: DialogOwner
     constructor() {
+        super()
         this.applis = []
         this.applis.push(new AppPersonMoral())
         this.applis.push(new AppPersonPhysique())
@@ -249,11 +254,12 @@ export class App {
     }
 
 }
-export class AppTree {
+export class AppTree extends ElementPanel {
     tree: Tree
     owner: DialogOwner | undefined
 
     constructor() {
+        super()
         this.tree = new Tree()
     }
     close() {
@@ -271,7 +277,7 @@ export class TreeMenu {
         const nb = new Tree()
         nb.parent = this.tree
         this.tree.children.push(nb)
-        this.tree.labelToggle = "+"
+        this.tree.labelToggle = this.tree.open
         this.tree.childrenVisible = [...this.tree.children]
         this.tree.treeMenu = undefined
 
@@ -294,17 +300,18 @@ export class Tree {
     value: string = ""
     parent: Tree | undefined
     treeMenu: TreeMenu | undefined
-
-    labelToggle = "-"
+    close = "./folder-add-line.png"
+    open = "./folder-reduce-line.png"
+    labelToggle = this.close
 
 
     toggle() {
-        if (this.labelToggle === "-") {
+        if (this.labelToggle === this.close) {
             this.childrenVisible = this.children
-            this.labelToggle = "+"
+            this.labelToggle = this.open
         } else {
             this.childrenVisible = []
-            this.labelToggle = "-"
+            this.labelToggle = this.close
         }
 
     }
@@ -373,7 +380,7 @@ export class DialogOwner {
 
     }
 }
-export class AfficherImage {
+export class AfficherImage extends ElementPanel {
     urlImage = "./chat.png"
     owner!: DialogOwner
 
@@ -388,6 +395,55 @@ export class AfficherImage {
         if (this.owner) {
             this.owner.appImage = undefined
         }
+    }
+
+}
+
+export class ButtonPanel {
+    name!: string
+    elementPanel!: ElementPanel
+    panel!: Panel
+    idx!: number
+    enable: boolean = true
+    select() {
+        for (const p of this.panel.buttons) {
+            p.enable = true
+        }
+        this.enable = false
+        this.panel.elementPanel = this.elementPanel
+
+    }
+
+}
+export class Panel {
+    buttons: ButtonPanel[] = []
+    elementPanel!: ElementPanel
+    constructor() {
+        let bp = new ButtonPanel()
+        bp.elementPanel = new AppTree()
+        bp.name = "Tree"
+        bp.idx = 0
+
+        this.buttons.push(bp)
+        bp = new ButtonPanel()
+        bp.elementPanel = new AfficherImage()
+        bp.name = "Image"
+        bp.idx = 1
+        this.buttons.push(bp)
+        bp = new ButtonPanel()
+        bp.elementPanel = new AppTable()
+        bp.name = "Table"
+        bp.idx = 2
+     /*   this.buttons.push(bp)
+        bp = new ButtonPanel()
+        bp.elementPanel = new App()
+        bp.name = "App"
+        bp.idx = 3*/
+        this.buttons.push(bp)
+        for(const b of this.buttons) {
+            b.panel = this
+        }
+
     }
 
 }

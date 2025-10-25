@@ -1,15 +1,31 @@
 <html>
-    <link rel="stylesheet" href="./dist/ui-darkmode.css">
-    <style>
-        .cadre {
-            border-style: groove;
-            border-width: 3;
-            margin: 10px;
-        }
-        .marge {
-            margin: 3px;
-        }
-    </style>
-    <body><div id="app" class="app"></div></body>
-    <script src="./test-ui.ts" type="module"></script>
+<link rel="stylesheet" href="./dist/ui.css">
+<style>
+    .cadre {
+        border-style: groove;
+        border-width: 3;
+        margin: 10px;
+    }
+
+    .marge {
+        margin: 3px;
+    }
+
+    .container {
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .container>* {
+        box-sizing: border-box;
+        flex: 1 1 12rem;
+        /* tous prennent la même place par ligne */
+    }
+</style>
+
+<body>
+    <div id="app" class="app"></div>
+</body>
+<script src="./test-ui-panel.ts" type="module"></script>
+
 </html>

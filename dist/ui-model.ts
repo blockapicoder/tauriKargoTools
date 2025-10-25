@@ -13,6 +13,9 @@ export type InputType = 'auto' | 'text' | 'number' | 'checkbox';
 export type MethodNames0<T> = { [K in keyof T]-?: T[K] extends (() => any) ? K : never }[keyof T];
 export type Objectish = object;
 
+/** Type de contenu pour Button / ButtonLabel / (Dialog/Menu trigger) */
+export type ButtonContentType = 'img' | 'html';
+
 /** Clés dont la valeur est un tableau (mutable ou readonly) */
 export type ArrayKeys<T> = {
     [K in keyof T]-?: T[K] extends ReadonlyArray<any> | any[] ? K : never
@@ -45,12 +48,13 @@ export interface InputNode<
     enable?: KeysOfType<T, boolean>;
 }
 
-export interface ButtonNode<T extends object> {
+export interface ButtonNode<T extends object, NK extends KeysOfType<T, string> = KeysOfType<T, string>> {
     kind: 'button';
     /** Identifiants CSS/DOM */
     id?: string;
     class?: string | string[];
 
+    /** Libellé texte par défaut */
     label: string;
     action: MethodNames0<T>;
     muted?: boolean;
@@ -58,29 +62,39 @@ export interface ButtonNode<T extends object> {
     height?: number | string;
     visible?: KeysOfType<T, boolean>;
     enable?: KeysOfType<T, boolean>;
+
+    /** Rendu optionnel : 'img' = URL d'image, 'html' = markup HTML (depuis `name` si fourni, sinon `label`). */
+    type?: ButtonContentType;
+    /** Source du contenu si `type` défini (URL/HTML) ; sinon le rendu retombe sur `label`. */
+    name?: NK;
 }
 
-/** Nouveau: ButtonLabel — label typé comme une clé string de T */
+/** ButtonLabel — label typé comme une clé string de T */
 export interface ButtonLabelNode<
   T extends object,
-  NK extends KeysOfType<T, string> = KeysOfType<T, string>
+  LK extends KeysOfType<T, string> = KeysOfType<T, string>
 > {
   kind: 'buttonLabel';
   /** Identifiants CSS/DOM */
   id?: string;
   class?: string | string[];
 
-  /** Clé d'un champ string de T utilisé comme libellé */
-  label: NK;
+  /** Clé d'un champ string de T utilisé comme libellé (texte par défaut) */
+  label: LK;
   action: MethodNames0<T>;
   muted?: boolean;
   width?: number | string;
   height?: number | string;
   visible?: KeysOfType<T, boolean>;
   enable?: KeysOfType<T, boolean>;
+
+  /** Rendu optionnel : 'img' = URL d'image, 'html' = markup HTML (depuis `name` si fourni, sinon `label`). */
+  type?: ButtonContentType;
+  /** Clé string du modèle à utiliser pour le contenu quand `type` est défini. */
+  name?: KeysOfType<T, string>;
 }
 
-/** Nouveau: Img — URL typée comme une clé string de T */
+/** Img — URL typée comme une clé string de T */
 export interface ImgNode<
   T extends object,
   NK extends KeysOfType<T, string> = KeysOfType<T, string>
@@ -197,7 +211,9 @@ export interface DialogNode<T extends object> {
     id?: string;
     class?: string | string[];
 
+    /** Objet dont l'UI sera montée dans le dialog */
     name: KeysOfType<T, Objectish | null | undefined>;
+    /** Libellé du bouton qui ouvre le dialog (ou source si `type` est défini) */
     label: string;
     buttonWidth?: number | string;
     buttonHeight?: number | string;
@@ -209,6 +225,9 @@ export interface DialogNode<T extends object> {
     visible?: KeysOfType<T, boolean>;
     enable?: KeysOfType<T, boolean>;
     action?: KeysOfType<T, () => void>;
+
+    /** Rendu du bouton trigger : 'img' = URL (dans `label`), 'html' = markup (dans `label`). */
+    type?: ButtonContentType;
 }
 
 /** MENU — mêmes paramètres que dialog, rendu différent côté renderer */
@@ -218,7 +237,9 @@ export interface MenuNode<T extends object> {
     id?: string;
     class?: string | string[];
 
+    /** Objet dont l'UI sera montée dans le menu */
     name: KeysOfType<T, Objectish | null | undefined>;
+    /** Libellé du bouton qui ouvre le menu (ou source si `type` est défini) */
     label: string;
     buttonWidth?: number | string;
     buttonHeight?: number | string;
@@ -230,6 +251,9 @@ export interface MenuNode<T extends object> {
     visible?: KeysOfType<T, boolean>;
     enable?: KeysOfType<T, boolean>;
     action?: KeysOfType<T, () => void>;
+
+    /** Rendu du bouton trigger : 'img' = URL (dans `label`), 'html' = markup (dans `label`). */
+    type?: ButtonContentType;
 }
 
 /** CUSTOM — créé via une méthode de T (sans argument) qui retourne un HTMLElement
@@ -259,7 +283,7 @@ export interface CustomNode<
 
 export type UINode<T extends object> =
     | InputNode<T, any>
-    | ButtonNode<T>
+    | ButtonNode<T, any>
     | ButtonLabelNode<T, any>
     | ImgNode<T, any>
     | SelectNode<T, any, any, any, any>
@@ -305,14 +329,20 @@ export class UI<T extends object> {
     }
 
     /* ------------ Button ------------ */
-    button<MN extends MethodNames0<T>>(opts: {
+    button<
+      MN extends MethodNames0<T>,
+      NK extends KeysOfType<T, string>
+    >(opts: {
         /** Identifiants CSS/DOM */
         id?: string; class?: string | string[];
         label: string; action: MN; muted?: boolean;
         width?: number | string; height?: number | string;
         visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
+        /** Nouveaux champs */
+        type?: ButtonContentType;
+        name?: NK;
     }): this {
-        const node: ButtonNode<T> = {
+        const node: ButtonNode<T, NK> = {
             kind: 'button',
             ...opts
         };
@@ -320,18 +350,21 @@ export class UI<T extends object> {
         return this;
     }
 
-    /* ------------ ButtonLabel (label lié à une clé string de T) ------------ */
+    /* ------------ ButtonLabel ------------ */
     buttonLabel<
-      NK extends KeysOfType<T, string>,
+      LK extends KeysOfType<T, string>,
       MN extends MethodNames0<T>
     >(opts: {
       /** Identifiants CSS/DOM */
       id?: string; class?: string | string[];
-      label: NK; action: MN; muted?: boolean;
+      label: LK; action: MN; muted?: boolean;
       width?: number | string; height?: number | string;
       visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
+      /** Nouveaux champs */
+      type?: ButtonContentType;
+      name?: KeysOfType<T, string>;
     }): this {
-      const node: ButtonLabelNode<T, NK> = {
+      const node: ButtonLabelNode<T, LK> = {
         kind: 'buttonLabel',
         ...opts
       };
@@ -339,7 +372,7 @@ export class UI<T extends object> {
       return this;
     }
 
-    /* ------------ Img (url liée à une clé string de T) ------------ */
+    /* ------------ Img ------------ */
     img<NK extends KeysOfType<T, string>>(opts: {
         /** Identifiants CSS/DOM */
         id?: string; class?: string | string[];
@@ -393,7 +426,7 @@ export class UI<T extends object> {
         return this;
     }
 
-    /* ------------ Flow (row|column) ------------ */
+    /* ------------ Flow ------------ */
     flow(opt: {
         /** Identifiants CSS/DOM */
         id?: string; class?: string | string[];
@@ -420,7 +453,7 @@ export class UI<T extends object> {
         return this;
     }
 
-    /* ------------ Single UI (champ objet) — plus de listUI ------------ */
+    /* ------------ Single UI ------------ */
     ui<NK extends KeysOfType<T, Objectish | null | undefined>>(opt: {
         /** Identifiants CSS/DOM */
         id?: string; class?: string | string[];
@@ -435,7 +468,7 @@ export class UI<T extends object> {
         return this;
     }
 
-    /* ------------ List UI (liste d’objets) — plus de listUI ------------ */
+    /* ------------ List UI ------------ */
     listUI<LK extends ArrayKeys<T>>(opt: {
         /** Identifiants CSS/DOM */
         id?: string; class?: string | string[];
@@ -457,7 +490,7 @@ export class UI<T extends object> {
         return this;
     }
 
-    /* ------------ Dialog — plus de listUI ------------ */
+    /* ------------ Dialog ------------ */
     dialog<NK extends KeysOfType<T, Objectish | null | undefined>>(opt: {
         /** Identifiants CSS/DOM */
         id?: string; class?: string | string[];
@@ -468,6 +501,8 @@ export class UI<T extends object> {
         closeOnBackdrop?: boolean; closeOnEsc?: boolean; modal?: boolean;
         visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
         action?: KeysOfType<T, () => void>;
+        /** Nouveau : rendu du bouton trigger */
+        type?: ButtonContentType;
     }): this {
         const node: DialogNode<T> = {
             kind: 'dialog',
@@ -477,7 +512,7 @@ export class UI<T extends object> {
         return this;
     }
 
-    /* ------------ Menu (mêmes paramètres que Dialog) ------------ */
+    /* ------------ Menu ------------ */
     menu<NK extends KeysOfType<T, Objectish | null | undefined>>(opt: {
         /** Identifiants CSS/DOM */
         id?: string; class?: string | string[];
@@ -488,6 +523,8 @@ export class UI<T extends object> {
         closeOnBackdrop?: boolean; closeOnEsc?: boolean; modal?: boolean;
         visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
         action?: KeysOfType<T, () => void>;
+        /** Nouveau : rendu du bouton trigger */
+        type?: ButtonContentType;
     }): this {
         const node: MenuNode<T> = {
             kind: 'menu',
@@ -497,7 +534,7 @@ export class UI<T extends object> {
         return this;
     }
 
-    /* ------------ Custom (HTMLElement via méthode de T) ------------ */
+    /* ------------ Custom ------------ */
     custom<FK extends HTMLElementFactoryName<T>, IK extends VoidMethodName<T>>(opt: {
         /** Identifiants CSS/DOM */
         id?: string; class?: string | string[];
