@@ -1,54 +1,69 @@
-/* ===== Sexy Darkmode for Builder UI =====
-   - Compatible avec les nœuds créés par builder.ts
-   - Couvre: body, .panel, button, input, select, label/span, dialog
-   - Gère :disabled et [aria-disabled="true"], focus-visible, animations légères
+/* ===== Sexy Darkmode for Builder UI — High Contrast (scoped .app) =====
+   - Scope total: rien ne sort du conteneur .app
+   - Contraste ↑ : contrôles plus clairs, bordures plus visibles, focus plus lumineux
+   - Couvre: .panel, button, input, select, textarea, label/span, dialog, chips, états
 */
 
 /* ---------- Thème & reset léger ---------- */
-:root {
-  --bg: #0d0f14;
-  --bg-elev: #121620;
-  --surface: #161b26;
-  --surface-2: #1a2030;
-  --text: #e6eaf3;
-  --muted: #9aa4b2;
-  --border: #232a3a;
-  --ring: #7aa2ff;
-  --accent: #7aa2ff;
-  --accent-2: #9b7aff;
-  --danger: #ff5c7a;
-  --ok: #4dd4a8;
-  --shadow: 0 8px 30px rgba(0,0,0,.45);
+.app {
+  /* Fond & surfaces (fond sombre pour contraste fort) */
+  --bg: #090c12;
+  --bg-elev: #0b1120;
+  --surface: #0f1523;
+  --surface-2: #0c1320;
+
+  /* Texte */
+  --text: #f5f8ff;
+  --muted: #b9c4da;
+
+  /* Contrôles (gris + clairs) */
+  --control-bg: #3a455c;      /* <— plus clair */
+  --control-hover: #46526b;   /* hover + lumineux */
+  --control-active: #3a455c;
+  --control-inset: rgba(255,255,255,.10);
+
+  /* Bordures & accents (plus visibles) */
+  --border: #5f74a1;          /* <— plus clair et net */
+  --ring: #b8d0ff;            /* focus très visible */
+  --accent: #89bbff;
+  --accent-2: #c0a6ff;
+
+  /* États */
+  --danger: #ff597a;
+  --ok: #38d6a5;
+
+  --shadow: 0 12px 38px rgba(0,0,0,.6);
   --radius: 14px;
   --radius-sm: 10px;
   --radius-xs: 8px;
   --pad: 12px;
   --pad-lg: 18px;
   --transition: 160ms cubic-bezier(.2,.7,.2,1);
-  --focus-ring: 0 0 0 2px var(--ring), 0 0 0 6px rgba(122,162,255,.18);
-}
+  --focus-ring: 0 0 0 3px var(--ring), 0 0 0 10px rgba(184,208,255,.22);
 
-* { box-sizing: border-box; }
-html, body {
   margin: 0;
   padding: 0;
-  background: radial-gradient(1200px 700px at 20% -10%, #121725 0%, #0d0f14 55%) fixed;
+  background:
+    radial-gradient(1200px 700px at 20% -10%, #10172b 0%, var(--bg) 60%) fixed;
   color: var(--text);
   font: 14px/1.45 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Apple Color Emoji","Segoe UI Emoji";
 }
+.app, .app * { box-sizing: border-box; }
 
 /* Scrollbar (WebKit + Firefox) */
-*::-webkit-scrollbar { width: 10px; height: 10px; }
-*::-webkit-scrollbar-thumb { background: #2a3146; border-radius: 999px; border: 2px solid transparent; background-clip: padding-box; }
-*::-webkit-scrollbar-track { background: transparent; }
-* { scrollbar-color: #2a3146 transparent; scrollbar-width: thin; }
+.app *::-webkit-scrollbar { width: 10px; height: 10px; }
+.app *::-webkit-scrollbar-thumb {
+  background: #3b4a6d; border-radius: 999px; border: 2px solid transparent; background-clip: padding-box;
+}
+.app *::-webkit-scrollbar-track { background: transparent; }
+.app * { scrollbar-color: #3b4a6d transparent; scrollbar-width: thin; }
 
-/* Liens par défaut (si présents) */
-a { color: var(--accent); text-decoration: none; }
-a:hover { text-decoration: underline; }
+/* Liens */
+.app a { color: var(--accent); text-decoration: none; }
+.app a:hover { text-decoration: underline; }
 
 /* ---------- Conteneurs & “panel” ---------- */
-.panel {
+.app .panel {
   background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -57,194 +72,235 @@ a:hover { text-decoration: underline; }
   position: relative;
   overflow: hidden;
 }
-
-.panel::before {
+.app .panel::before {
   content: "";
   position: absolute;
   inset: -1px;
   border-radius: inherit;
   background:
-    radial-gradient(600px 200px at -10% -20%, rgba(122,162,255,.08), transparent 40%),
-    radial-gradient(500px 180px at 120% -10%, rgba(155,122,255,.08), transparent 45%);
+    radial-gradient(600px 200px at -10% -20%, rgba(137,187,255,.12), transparent 40%),
+    radial-gradient(500px 180px at 120% -10%, rgba(192,166,255,.12), transparent 45%);
   pointer-events: none;
 }
 
-/* ---------- Typo inline (labels, spans) ---------- */
-label, span {
-  color: var(--text);
-}
-
-/* Le builder met l'input dans un <label> block → ajout d’espacement */
-label {
+/* ---------- Typo inline ---------- */
+.app label, .app span { color: var(--text); }
+.app label {
   display: block;
   gap: 8px;
   margin-bottom: 10px;
-  font-weight: 500;
-  color: #d7dcef;
+  font-weight: 600;
+  color: #eaf0ff;
 }
 
-/* ---------- Champs (input, select) ---------- */
-input[type="text"],
-input[type="number"],
-select {
+/* ---------- Champs (inputs/select/textarea) ---------- */
+/* Tous les inputs sauf checkbox/radio/range/file color */
+.app input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]),
+.app select,
+.app textarea {
   width: 100%;
-  background: #0f1420;
+  background: var(--control-bg);
   color: var(--text);
   border: 1px solid var(--border);
   border-radius: var(--radius-xs);
   padding: 10px 12px;
   outline: none;
-  transition: border-color var(--transition), box-shadow var(--transition), background var(--transition), transform var(--transition);
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+  transition:
+    border-color var(--transition),
+    box-shadow var(--transition),
+    background var(--transition),
+    transform var(--transition),
+    filter var(--transition);
+  box-shadow: inset 0 0 0 1px var(--control-inset);
+}
+.app textarea { min-height: 88px; resize: vertical; }
+.app input::placeholder, .app textarea::placeholder { color: #c3cde3; opacity: 1; }
+
+/* Hover/Focus */
+.app input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]):hover,
+.app select:hover,
+.app textarea:hover {
+  background: var(--control-hover);
+  transform: translateY(-1px);
+}
+.app input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]):focus-visible,
+.app select:focus-visible,
+.app textarea:focus-visible {
+  border-color: var(--ring);
+  box-shadow: var(--focus-ring), inset 0 0 0 1px rgba(255,255,255,.08);
+  filter: saturate(1.06);
 }
 
-/* Boîte à cocher */
-input[type="checkbox"] {
+/* Select multiple + options */
+.app select[multiple] { min-height: 120px; padding: 8px; }
+.app option { background: var(--control-bg); color: var(--text); }
+
+/* Checkbox & Radio */
+.app input[type="checkbox"],
+.app input[type="radio"] {
   width: 18px; height: 18px;
   accent-color: var(--accent);
   vertical-align: middle;
   transform: translateY(2px);
 }
 
-/* Focus ring harmonisé */
-input[type="text"]:focus-visible,
-input[type="number"]:focus-visible,
-select:focus-visible {
-  border-color: var(--ring);
-  box-shadow: var(--focus-ring);
+/* Range */
+.app input[type="range"] {
+  width: 100%;
+  appearance: none;
+  background: transparent;
+  height: 24px;
+}
+.app input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px; border-radius: 999px; background: color-mix(in oklab, var(--border) 45%, #0b1120);
+}
+.app input[type="range"]::-webkit-slider-thumb {
+  appearance: none; width: 16px; height: 16px; border-radius: 50%;
+  background: var(--accent); border: 2px solid #ffffff22; margin-top: -6px;
+  box-shadow: 0 0 0 3px rgba(184,208,255,.25);
+}
+.app input[type="range"]::-moz-range-track {
+  height: 4px; border-radius: 999px; background: color-mix(in oklab, var(--border) 45%, #0b1120);
+}
+.app input[type="range"]::-moz-range-thumb {
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--accent); border: 2px solid #ffffff22;
+  box-shadow: 0 0 0 3px rgba(184,208,255,.25);
 }
 
-/* Hover subtil */
-input[type="text"]:hover,
-input[type="number"]:hover,
-select:hover {
-  background: #10182a;
-  transform: translateY(-1px);
-}
-
-/* Select multiple */
-select[multiple] {
-  min-height: 120px;
-  padding: 8px;
-}
-
-/* Options */
-option {
-  background: #0f1420;
+/* File & Color (cadres alignés au thème) */
+.app input[type="file"],
+.app input[type="color"] {
+  background: var(--control-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  padding: 8px 10px;
   color: var(--text);
 }
 
-/* Synchronisation disabled */
-:where(input, select)[disabled],
-:where(input, select)[aria-disabled="true"] {
-  opacity: .55;
+/* Disabled (tous champs) */
+.app :where(input, select, textarea)[disabled],
+.app :where(input, select, textarea)[aria-disabled="true"] {
+  opacity: .7;
   cursor: not-allowed;
-  filter: grayscale(.15);
+  filter: grayscale(.08) contrast(1.05);
 }
 
 /* ---------- Boutons ---------- */
-button {
+.app button {
   appearance: none;
   border: 1px solid var(--border);
-  background:
-    linear-gradient(180deg, #1b2335 0%, #141b2a 100%);
+  background: linear-gradient(180deg, #4a5773 0%, #3a485f 100%); /* plus clair */
   color: var(--text);
   padding: 10px 14px;
   border-radius: var(--radius-sm);
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: .2px;
   cursor: pointer;
-  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition), background var(--transition), filter var(--transition);
-  box-shadow: 0 4px 18px rgba(0,0,0,.35);
+  transition:
+    transform var(--transition),
+    box-shadow var(--transition),
+    border-color var(--transition),
+    background var(--transition),
+    filter var(--transition);
+  box-shadow: 0 8px 28px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.04) inset;
 }
-
-button:hover {
+.app button:hover {
   transform: translateY(-1px);
-  border-color: color-mix(in oklab, var(--accent) 40%, var(--border));
-  box-shadow: 0 8px 26px rgba(0,0,0,.45), 0 0 0 1px rgba(122,162,255,.15) inset;
+  border-color: color-mix(in oklab, var(--accent) 60%, var(--border));
+  background: linear-gradient(180deg, #566589 0%, #445979 100%);
+  box-shadow: 0 12px 34px rgba(0,0,0,.6), 0 0 0 1px rgba(137,187,255,.2) inset;
 }
-
-button:active {
-  transform: translateY(0);
-  filter: brightness(.98);
-}
-
-button:focus-visible {
-  outline: none;
-  box-shadow: var(--focus-ring), 0 4px 18px rgba(0,0,0,.35);
-}
-
-button[disabled],
-button[aria-disabled="true"] {
-  opacity: .55;
+.app button:active { transform: translateY(0); filter: brightness(.99); }
+.app button:focus-visible { outline: none; box-shadow: var(--focus-ring), 0 8px 28px rgba(0,0,0,.55); }
+.app button[disabled],
+.app button[aria-disabled="true"] {
+  opacity: .7;
   cursor: not-allowed;
-  filter: grayscale(.15);
+  filter: grayscale(.08) contrast(1.02);
 }
 
-/* Variantes utilitaires optionnelles (ajoute ces classes via node.class si besoin) */
-button.accent {
-  background: linear-gradient(180deg, color-mix(in oklab, var(--accent) 22%, #1b2335) 0%, #141b2a 100%);
-  border-color: color-mix(in oklab, var(--accent) 45%, var(--border));
+/* Variantes utilitaires */
+.app button.accent {
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--accent) 58%, #4a5773) 0%,
+    #3a485f 100%
+  );
+  border-color: color-mix(in oklab, var(--accent) 70%, var(--border));
 }
-button.ok {
-  background: linear-gradient(180deg, color-mix(in oklab, var(--ok) 30%, #17252c) 0%, #111a18 100%);
-  border-color: color-mix(in oklab, var(--ok) 45%, var(--border));
+.app button.ok {
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--ok) 58%, #2d4b4f) 0%,
+    #1c3236 100%
+  );
+  border-color: color-mix(in oklab, var(--ok) 70%, var(--border));
 }
-button.danger {
-  background: linear-gradient(180deg, color-mix(in oklab, var(--danger) 30%, #2a1620) 0%, #1a0f12 100%);
-  border-color: color-mix(in oklab, var(--danger) 45%, var(--border));
+.app button.danger {
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--danger) 60%, #4b1b29) 0%,
+    #2b1420 100%
+  );
+  border-color: color-mix(in oklab, var(--danger) 72%, var(--border));
 }
 
 /* ---------- Dialog ---------- */
-dialog {
+.app dialog {
   border: 1px solid var(--border);
   border-radius: 18px;
   padding: 0;
   background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
   color: var(--text);
-  box-shadow: 0 20px 60px rgba(0,0,0,.6);
+  box-shadow: 0 26px 78px rgba(0,0,0,.7);
   overflow: hidden;
-  animation: dlg-in .18s ease-out both;
+  animation: app-dlg-in .18s ease-out both;
 }
-
-dialog > div { /* host créé par le builder */
+.app dialog > div {
   padding: 18px;
   background:
-    radial-gradient(500px 200px at 120% -10%, rgba(155,122,255,.08), transparent 45%),
-    radial-gradient(400px 180px at -10% -20%, rgba(122,162,255,.08), transparent 40%);
+    radial-gradient(500px 200px at 120% -10%, rgba(192,166,255,.12), transparent 45%),
+    radial-gradient(400px 180px at -10% -20%, rgba(137,187,255,.12), transparent 40%);
 }
-
-@keyframes dlg-in {
+@keyframes app-dlg-in {
   from { opacity: 0; transform: translateY(8px) scale(.98); }
   to   { opacity: 1; transform: translateY(0)   scale(1); }
 }
-
-dialog::backdrop {
+.app dialog::backdrop {
   background:
-    radial-gradient(1200px 800px at 50% 0%, rgba(122,162,255,.12), transparent 40%),
-    rgba(3,6,12,.62);
+    radial-gradient(1200px 800px at 50% 0%, rgba(137,187,255,.16), transparent 40%),
+    rgba(3,6,12,.68);
   backdrop-filter: blur(2px);
 }
 
 /* ---------- Infos / états ---------- */
-[aria-disabled="true"] { cursor: not-allowed; }
+.app [aria-disabled="true"] { cursor: not-allowed; }
+.app .muted { color: var(--muted); }
 
-/* Labels “muted” ou infos secondaires (ajoute .muted via node.class si voulu) */
-.muted { color: var(--muted); }
-
-/* Petites chips (ajoute .chip via node.class) */
-.chip {
+/* Chips */
+.app .chip {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 6px 10px;
   border-radius: 999px;
-  background: #0f1420;
+  background: var(--control-bg);
   border: 1px solid var(--border);
   color: var(--text);
+  box-shadow: inset 0 0 0 1px var(--control-inset);
 }
 
-/* ---------- Préférence utilisateur ---------- */
+/* ---------- Accessibilité contraste ---------- */
+@media (prefers-contrast: more) {
+  .app {
+    --border: #7892c2;
+    --ring: #cfe1ff;
+    --focus-ring: 0 0 0 3px var(--ring), 0 0 0 12px rgba(207,225,255,.24);
+  }
+}
+
+/* ---------- Préférence utilisateur (motion) ---------- */
 @media (prefers-reduced-motion: reduce) {
-  * { transition: none !important; animation: none !important; }
+  .app * { transition: none !important; animation: none !important; }
 }

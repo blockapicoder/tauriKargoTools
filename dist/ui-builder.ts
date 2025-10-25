@@ -376,7 +376,6 @@ export class Builder {
         applyIdAndClass(img, node);
         applySize(img, node.width, node.height);
         if (node.alt != null) img.alt = node.alt;
-
         const initial = String((ctx.obj as any)[node.url] ?? '');
         if (initial !== '') img.setAttribute('src', initial);
 
