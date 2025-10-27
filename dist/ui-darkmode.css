@@ -256,6 +256,10 @@
   box-shadow: 0 26px 78px rgba(0,0,0,.7);
   overflow: hidden;
   animation: app-dlg-in .18s ease-out both;
+
+  /* Assure qu'aucun flou ne soit appliqué au dialog lui-même */
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 .app dialog > div {
   padding: 18px;
@@ -271,7 +275,10 @@
   background:
     radial-gradient(1200px 800px at 50% 0%, rgba(137,187,255,.16), transparent 40%),
     rgba(3,6,12,.68);
-  backdrop-filter: blur(2px);
+
+  /* ❌ Enlève le fond flou (blur) */
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 /* ---------- Infos / états ---------- */

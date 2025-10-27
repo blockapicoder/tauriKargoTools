@@ -47,11 +47,25 @@
     --ui-dialog-bg: color-mix(in oklab, #0e1324 86%, transparent);
     --ui-dialog-border: color-mix(in oklab, var(--ui-accent-b) 28%, var(--ui-border));
     --ui-dialog-shadow: 0 26px 68px rgba(0,0,0,0.65);
+
+    /* En mode sombre, on garde un fond uni sombre */
+    background: var(--ui-bg);
+    background-image: none;
   }
 }
 
 .app, .app * { box-sizing: border-box; }
-.app { background: var(--ui-bg); color: var(--ui-fg); }
+
+/* Fond bleu très clair (mode clair) */
+.app {
+  background: var(--ui-bg);
+  color: var(--ui-fg);
+  background-image:
+    radial-gradient(900px 600px at 20% -10%, rgba(102,153,255,0.14), transparent 60%),
+    radial-gradient(800px 500px at 110% 0%, rgba(167,187,255,0.12), transparent 55%),
+    linear-gradient(180deg, #f7fbff 0%, #eef6ff 100%);
+  background-attachment: fixed;
+}
 
 /* Layout helpers */
 .app div {
@@ -207,12 +221,15 @@
     linear-gradient(135deg, color-mix(in oklab, var(--ui-accent-a) 55%, transparent), color-mix(in oklab, var(--ui-accent-b) 45%, transparent)) border-box;
   border: 1px solid transparent;
   border-radius: calc(var(--ui-radius) + 8px);
-  width: clamp(360px, 60vw, 720px);
   max-width: 92vw;
   max-height: 82vh;
   box-shadow: var(--ui-dialog-shadow);
   overflow: hidden;
-  backdrop-filter: saturate(140%) blur(10px);
+
+  /* Flou désactivé pour le dialog */
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+
   animation: dlg-pop 200ms cubic-bezier(.17,.84,.44,1) both;
 }
 
@@ -231,7 +248,11 @@
 /* Backdrop */
 .app dialog::backdrop {
   background: var(--ui-backdrop);
-  backdrop-filter: blur(6px) saturate(120%);
+
+  /* Flou désactivé pour le backdrop */
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+
   animation: backdrop-fade 180ms ease both;
 }
 
@@ -250,6 +271,13 @@
 .app dialog select,
 .app dialog .panel {
   width: 100%;
+}
+
+/* Désactive aussi le flou sur les champs à l'intérieur du dialog */
+.app dialog input,
+.app dialog select {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 /* Optional footer area if you add a container with data-actions */

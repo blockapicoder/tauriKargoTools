@@ -1,16 +1,16 @@
-import { Builder, UIRuntime } from "./ui-builder";
-import { UI } from "./ui-model";
+import { Builder, VueRuntime } from "./ui-builder";
+import { Vue } from "./ui-model";
 
 const builder: Builder = new Builder()
 export function boot<T extends object>(
     model: T,
     id: string
-): UIRuntime<T> {
+): VueRuntime<T> {
 
     return builder.boot(model, id);
 }
-export function defineUI<T extends object>(targetClass: new (...args: any[]) => T, f: (ui: UI<T>) => void) {
-    const ui: UI<T> = new UI(targetClass)
+export function defineVue<T extends object>(targetClass: new (...args: any[]) => T, f: (ui: Vue<T>) => void) {
+    const ui: Vue<T> = new Vue(targetClass)
     builder.addUI(ui)
     f(ui)
 }

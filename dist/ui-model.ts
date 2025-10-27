@@ -48,8 +48,8 @@ export interface InputNode<
     enable?: KeysOfType<T, boolean>;
 }
 
-export interface ButtonNode<T extends object, NK extends KeysOfType<T, string> = KeysOfType<T, string>> {
-    kind: 'button';
+export interface StaticButtonNode<T extends object, NK extends KeysOfType<T, string> = KeysOfType<T, string>> {
+    kind: 'staticButton';
     /** Identifiants CSS/DOM */
     id?: string;
     class?: string | string[];
@@ -70,11 +70,11 @@ export interface ButtonNode<T extends object, NK extends KeysOfType<T, string> =
 }
 
 /** ButtonLabel — label typé comme une clé string de T */
-export interface ButtonLabelNode<
+export interface ButtonNode<
   T extends object,
   LK extends KeysOfType<T, string> = KeysOfType<T, string>
 > {
-  kind: 'buttonLabel';
+  kind: 'button';
   /** Identifiants CSS/DOM */
   id?: string;
   class?: string | string[];
@@ -174,7 +174,7 @@ export interface FlowNode<T extends object> {
 }
 
 /** SINGLE UI — plus de listUI */
-export interface SingleUINode<T extends object> {
+export interface SingleVueNode<T extends object> {
     kind: 'singleUI';
     /** Identifiants CSS/DOM */
     id?: string;
@@ -186,7 +186,7 @@ export interface SingleUINode<T extends object> {
 }
 
 /** LIST UI — plus de listUI */
-export interface ListUINode<T extends object> {
+export interface ListVueNode<T extends object> {
     kind: 'listUI';
     /** Identifiants CSS/DOM */
     id?: string;
@@ -283,20 +283,20 @@ export interface CustomNode<
 
 export type UINode<T extends object> =
     | InputNode<T, any>
+    | StaticButtonNode<T, any>
     | ButtonNode<T, any>
-    | ButtonLabelNode<T, any>
     | ImgNode<T, any>
     | SelectNode<T, any, any, any, any>
     | LabelNode<T, any>
     | FlowNode<T>
-    | SingleUINode<T>
-    | ListUINode<T>
+    | SingleVueNode<T>
+    | ListVueNode<T>
     | DialogNode<T>
     | MenuNode<T>
     | CustomNode<T>;
 
 /* ===================== UI (déclaratif uniquement) ===================== */
-export class UI<T extends object> {
+export class Vue<T extends object> {
     private readonly targetClass: new (...args: any[]) => T;
     private readonly root: UINode<T>[] = [];
     private cursor: UINode<T>[] = this.root;   // conteneur courant
@@ -329,7 +329,7 @@ export class UI<T extends object> {
     }
 
     /* ------------ Button ------------ */
-    button<
+    staticButton<
       MN extends MethodNames0<T>,
       NK extends KeysOfType<T, string>
     >(opts: {
@@ -342,8 +342,8 @@ export class UI<T extends object> {
         type?: ButtonContentType;
         name?: NK;
     }): this {
-        const node: ButtonNode<T, NK> = {
-            kind: 'button',
+        const node: StaticButtonNode<T, NK> = {
+            kind: 'staticButton',
             ...opts
         };
         this.cursor.push(node as unknown as UINode<T>);
@@ -351,7 +351,7 @@ export class UI<T extends object> {
     }
 
     /* ------------ ButtonLabel ------------ */
-    buttonLabel<
+    button<
       LK extends KeysOfType<T, string>,
       MN extends MethodNames0<T>
     >(opts: {
@@ -364,8 +364,8 @@ export class UI<T extends object> {
       type?: ButtonContentType;
       name?: KeysOfType<T, string>;
     }): this {
-      const node: ButtonLabelNode<T, LK> = {
-        kind: 'buttonLabel',
+      const node: ButtonNode<T, LK> = {
+        kind: 'button',
         ...opts
       };
       this.cursor.push(node as unknown as UINode<T>);
@@ -460,7 +460,7 @@ export class UI<T extends object> {
         name: NK;
         width?: number | string; height?: number | string;
     }): this {
-        const node: SingleUINode<T> = {
+        const node: SingleVueNode<T> = {
             kind: 'singleUI',
             ...opt
         };
@@ -469,7 +469,7 @@ export class UI<T extends object> {
     }
 
     /* ------------ List UI ------------ */
-    listUI<LK extends ArrayKeys<T>>(opt: {
+    listOfVue<LK extends ArrayKeys<T>>(opt: {
         /** Identifiants CSS/DOM */
         id?: string; class?: string | string[];
         list: LK;
@@ -482,7 +482,7 @@ export class UI<T extends object> {
         panel?: boolean;
         width?: number | string; height?: number | string;
     }): this {
-        const node: ListUINode<T> = {
+        const node: ListVueNode<T> = {
             kind: 'listUI',
             ...opt
         };

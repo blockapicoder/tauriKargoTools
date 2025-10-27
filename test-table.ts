@@ -1,13 +1,13 @@
-import { UI } from "./dist/ui-model";
+import { Vue } from "./dist/ui-model";
 import { AppTable, Personne } from "./test-model";
-import { defineUI } from "./dist/ui";
+import { defineVue } from "./dist/ui";
 
 
 // --- UIs (en t’appuyant sur ta classe UI avec .flow/.listUI/.input/.button) ---
 
 
 
-defineUI(Personne, (PersonRowUI) => {
+defineVue(Personne, (PersonRowUI) => {
     PersonRowUI.flow({ orientation: "row", gap: 12, align: "center", justify: "start" ,class:"marge"}, () => {
         // Case à cocher
         // PersonRowUI.input({ name: "selected", update: "update", inputType: "checkbox" });
@@ -18,16 +18,16 @@ defineUI(Personne, (PersonRowUI) => {
         PersonRowUI.input({ name: "age", update: "update", width: 200, inputType: "number" });
 
         // Action supprimer (sur la ligne)
-        PersonRowUI.button({ label: "Supprimer", action: "deleteSelf" });
+        PersonRowUI.staticButton({ label: "Supprimer", action: "deleteSelf" });
     });
 })
 // UI principale (liste + bouton ajouter)
 
-defineUI(AppTable, (AppUI) => {
+defineVue(AppTable, (AppUI) => {
     AppUI.flow({ orientation: "column", gap: 16, align: "center", justify: "start" }, () => {
         // Ligne d'actions (bouton Ajouter)
         AppUI.flow({ orientation: "row", gap: 8, align: "center" }, () => {
-            AppUI.button({ label: "Ajouter", action: "addPerson" });
+            AppUI.staticButton({ label: "Ajouter", action: "addPerson" });
         });
         AppUI.flow({ orientation: "row", gap: 12, align: "center", justify: "start" }, () => {
             AppUI.label("colNom", { width: 200 })
@@ -35,7 +35,7 @@ defineUI(AppTable, (AppUI) => {
             AppUI.label("colAge", { width: 200 })
         });
         // Liste des personnes : une sous-UI PersonRowUI par élément
-        AppUI.listUI({
+        AppUI.listOfVue({
             list: "persons",
             orientation: "column",
             gap: 10,
@@ -43,7 +43,7 @@ defineUI(AppTable, (AppUI) => {
             justify: "start",
             class:"cadre"
         });
-        AppUI.button({ label: "Close", action: "close" })
+        AppUI.staticButton({ label: "Close", action: "close" })
     });
 })
 
