@@ -29,7 +29,7 @@ defineVue(AppPersonPhysique, (uiPerson) => {
                     displayMethod: "formatPerson",
                     selection: "selected",
                     update: "onSelectedChange",
-                    mode: "list"
+                    mode: "multi-list"
                 });
             });
         });

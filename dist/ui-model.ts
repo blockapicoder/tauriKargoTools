@@ -131,7 +131,7 @@ export interface SelectNode<
     selection: SK;       // number[]
     update: UM;
     muted?: boolean;
-    mode?: 'dropdown' | 'list';
+    mode?: 'dropdown' | 'list' | 'multi-list';
     width?: number | string;
     height?: number | string;
     visible?: KeysOfType<T, boolean>;
@@ -398,7 +398,7 @@ export class Vue<T extends object> {
         /** Identifiants CSS/DOM */
         id?: string; class?: string | string[];
         list: LK; displayMethod: DM; selection: SK; update: UM;
-        muted?: boolean; mode?: 'dropdown' | 'list';
+        muted?: boolean; mode?: 'dropdown' | 'list' |"multi-list";
         width?: number | string; height?: number | string;
         visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
     }): this {
