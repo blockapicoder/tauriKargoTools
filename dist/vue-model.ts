@@ -169,6 +169,66 @@ export interface StaticLabelNode<
     visible?: KeysOfType<T, boolean>;
     enable?: KeysOfType<T, boolean>;
 }
+
+/** BootVue — bouton qui "boot" une Vue (label dynamique depuis T) */
+export interface BootVueNode<
+  T extends object,
+  NK extends KeysOfType<T, Objectish | null | undefined> = KeysOfType<T, Objectish | null | undefined>,
+  LK extends KeysOfType<T, string> = KeysOfType<T, string>,
+  MN extends MethodNames0<T> = MethodNames0<T>
+> {
+  kind: 'bootVue';
+  /** Identifiants CSS/DOM */
+  id?: string;
+  class?: string | string[];
+
+  /** Objet dont l'UI sera montée quand on clique */
+  name: NK;
+
+  /** Clé string de T utilisée comme libellé du bouton */
+  label: LK;
+
+  /** Méthode 0-arg déclenchée au clic */
+  action: MN;
+
+  /** Rendu optionnel du bouton */
+  type?: ButtonContentType;
+
+  width?: number | string;
+  height?: number | string;
+  visible?: KeysOfType<T, boolean>;
+  enable?: KeysOfType<T, boolean>;
+}
+
+/** StaticBootVue — bouton qui "boot" une Vue (label fixe) */
+export interface StaticBootVueNode<
+  T extends object,
+  NK extends KeysOfType<T, Objectish | null | undefined> = KeysOfType<T, Objectish | null | undefined>,
+  MN extends MethodNames0<T> = MethodNames0<T>
+> {
+  kind: 'staticBootVue';
+  /** Identifiants CSS/DOM */
+  id?: string;
+  class?: string | string[];
+
+  /** Objet dont l'UI sera montée quand on clique */
+  name: NK;
+
+  /** Libellé texte non dynamique */
+  label: string;
+
+  /** Méthode 0-arg déclenchée au clic */
+  action: MN;
+
+  /** Rendu optionnel du bouton */
+  type?: ButtonContentType;
+
+  width?: number | string;
+  height?: number | string;
+  visible?: KeysOfType<T, boolean>;
+  enable?: KeysOfType<T, boolean>;
+}
+
 export interface FlowNode<T extends object> {
     kind: 'flow';
     /** Identifiants CSS/DOM */
@@ -308,7 +368,9 @@ export type UINode<T extends object> =
     | DialogNode<T>
     | MenuNode<T>
     | CustomNode<T>
-    | StaticLabelNode<T>;
+    | StaticLabelNode<T>
+    | BootVueNode<T, any, any, any>
+    | StaticBootVueNode<T, any, any>;
 
 /* ===================== UI (déclaratif uniquement) ===================== */
 export class Vue<T extends object> {
@@ -440,7 +502,8 @@ export class Vue<T extends object> {
         this.cursor.push(node as unknown as UINode<T>);
         return this;
     }
-   /* ------------Static Label ------------ */
+
+    /* ------------Static Label ------------ */
     staticLabel(label: string, opt?: {
         /** Identifiants CSS/DOM */
         id?: string; class?: string | string[];
@@ -455,6 +518,60 @@ export class Vue<T extends object> {
         this.cursor.push(node as unknown as UINode<T>);
         return this;
     }
+
+    /* ------------ BootVue (label dynamique) ------------ */
+    bootVue<
+      NK extends KeysOfType<T, Objectish | null | undefined>,
+      LK extends KeysOfType<T, string>,
+      MN extends MethodNames0<T>
+    >(opts: {
+      /** Identifiants CSS/DOM */
+      id?: string; class?: string | string[];
+      /** Objet dont on veut monter la Vue au clic */
+      name: NK;
+      /** Clé string de T pour le libellé du bouton */
+      label: LK;
+      /** Méthode 0-arg à appeler au clic */
+      action: MN;
+      /** Optionnel : rendu du bouton */
+      type?: ButtonContentType;
+      width?: number | string; height?: number | string;
+      visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
+    }): this {
+      const node: BootVueNode<T, NK, LK, MN> = {
+        kind: 'bootVue',
+        ...opts
+      };
+      this.cursor.push(node as unknown as UINode<T>);
+      return this;
+    }
+
+    /* ------------ StaticBootVue (label fixe) ------------ */
+    staticBootVue<
+      NK extends KeysOfType<T, Objectish | null | undefined>,
+      MN extends MethodNames0<T>
+    >(opts: {
+      /** Identifiants CSS/DOM */
+      id?: string; class?: string | string[];
+      /** Objet dont on veut monter la Vue au clic */
+      name: NK;
+      /** Libellé texte fixe */
+      label: string;
+      /** Méthode 0-arg à appeler au clic */
+      action: MN;
+      /** Optionnel : rendu du bouton */
+      type?: ButtonContentType;
+      width?: number | string; height?: number | string;
+      visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
+    }): this {
+      const node: StaticBootVueNode<T, NK, MN> = {
+        kind: 'staticBootVue',
+        ...opts
+      };
+      this.cursor.push(node as unknown as UINode<T>);
+      return this;
+    }
+
     /* ------------ Flow ------------ */
     flow(opt: {
         /** Identifiants CSS/DOM */

@@ -17,14 +17,18 @@
   --muted: #b9c4da;
 
   /* Contrôles (gris + clairs) */
-  --control-bg: #3a455c;      /* <— plus clair */
-  --control-hover: #46526b;   /* hover + lumineux */
+  --control-bg: #3a455c;
+  /* <— plus clair */
+  --control-hover: #46526b;
+  /* hover + lumineux */
   --control-active: #3a455c;
-  --control-inset: rgba(255,255,255,.10);
+  --control-inset: rgba(255, 255, 255, .10);
 
   /* Bordures & accents (plus visibles) */
-  --border: #5f74a1;          /* <— plus clair et net */
-  --ring: #b8d0ff;            /* focus très visible */
+  --border: #5f74a1;
+  /* <— plus clair et net */
+  --ring: #b8d0ff;
+  /* focus très visible */
   --accent: #89bbff;
   --accent-2: #c0a6ff;
 
@@ -32,35 +36,59 @@
   --danger: #ff597a;
   --ok: #38d6a5;
 
-  --shadow: 0 12px 38px rgba(0,0,0,.6);
+  --shadow: 0 12px 38px rgba(0, 0, 0, .6);
   --radius: 14px;
   --radius-sm: 10px;
   --radius-xs: 8px;
   --pad: 12px;
   --pad-lg: 18px;
-  --transition: 160ms cubic-bezier(.2,.7,.2,1);
-  --focus-ring: 0 0 0 3px var(--ring), 0 0 0 10px rgba(184,208,255,.22);
+  --transition: 160ms cubic-bezier(.2, .7, .2, 1);
+  --focus-ring: 0 0 0 3px var(--ring), 0 0 0 10px rgba(184, 208, 255, .22);
 
   margin: 0;
   padding: 0;
   background:
     radial-gradient(1200px 700px at 20% -10%, #10172b 0%, var(--bg) 60%) fixed;
   color: var(--text);
-  font: 14px/1.45 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Apple Color Emoji","Segoe UI Emoji";
+  font: 14px/1.45 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
 }
-.app, .app * { box-sizing: border-box; }
+
+.app,
+.app * {
+  box-sizing: border-box;
+}
 
 /* Scrollbar (WebKit + Firefox) */
-.app *::-webkit-scrollbar { width: 10px; height: 10px; }
-.app *::-webkit-scrollbar-thumb {
-  background: #3b4a6d; border-radius: 999px; border: 2px solid transparent; background-clip: padding-box;
+.app *::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
 }
-.app *::-webkit-scrollbar-track { background: transparent; }
-.app * { scrollbar-color: #3b4a6d transparent; scrollbar-width: thin; }
+
+.app *::-webkit-scrollbar-thumb {
+  background: #3b4a6d;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.app *::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.app * {
+  scrollbar-color: #3b4a6d transparent;
+  scrollbar-width: thin;
+}
 
 /* Liens */
-.app a { color: var(--accent); text-decoration: none; }
-.app a:hover { text-decoration: underline; }
+.app a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.app a:hover {
+  text-decoration: underline;
+}
 
 /* ---------- Conteneurs & “panel” ---------- */
 .app .panel {
@@ -72,19 +100,24 @@
   position: relative;
   overflow: hidden;
 }
+
 .app .panel::before {
   content: "";
   position: absolute;
   inset: -1px;
   border-radius: inherit;
   background:
-    radial-gradient(600px 200px at -10% -20%, rgba(137,187,255,.12), transparent 40%),
-    radial-gradient(500px 180px at 120% -10%, rgba(192,166,255,.12), transparent 45%);
+    radial-gradient(600px 200px at -10% -20%, rgba(137, 187, 255, .12), transparent 40%),
+    radial-gradient(500px 180px at 120% -10%, rgba(192, 166, 255, .12), transparent 45%);
   pointer-events: none;
 }
 
 /* ---------- Typo inline ---------- */
-.app label, .app span { color: var(--text); }
+.app label,
+.app span {
+  color: var(--text);
+}
+
 .app label {
   display: block;
   gap: 8px;
@@ -113,8 +146,17 @@
     filter var(--transition);
   box-shadow: inset 0 0 0 1px var(--control-inset);
 }
-.app textarea { min-height: 88px; resize: vertical; }
-.app input::placeholder, .app textarea::placeholder { color: #c3cde3; opacity: 1; }
+
+.app textarea {
+  min-height: 88px;
+  resize: vertical;
+}
+
+.app input::placeholder,
+.app textarea::placeholder {
+  color: #c3cde3;
+  opacity: 1;
+}
 
 /* Hover/Focus */
 .app input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]):hover,
@@ -123,22 +165,31 @@
   background: var(--control-hover);
   transform: translateY(-1px);
 }
+
 .app input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]):focus-visible,
 .app select:focus-visible,
 .app textarea:focus-visible {
   border-color: var(--ring);
-  box-shadow: var(--focus-ring), inset 0 0 0 1px rgba(255,255,255,.08);
+  box-shadow: var(--focus-ring), inset 0 0 0 1px rgba(255, 255, 255, .08);
   filter: saturate(1.06);
 }
 
 /* Select multiple + options */
-.app select[multiple] { min-height: 120px; padding: 8px; }
-.app option { background: var(--control-bg); color: var(--text); }
+.app select[multiple] {
+  min-height: 120px;
+  padding: 8px;
+}
+
+.app option {
+  background: var(--control-bg);
+  color: var(--text);
+}
 
 /* Checkbox & Radio */
 .app input[type="checkbox"],
 .app input[type="radio"] {
-  width: 18px; height: 18px;
+  width: 18px;
+  height: 18px;
   accent-color: var(--accent);
   vertical-align: middle;
   transform: translateY(2px);
@@ -151,21 +202,37 @@
   background: transparent;
   height: 24px;
 }
+
 .app input[type="range"]::-webkit-slider-runnable-track {
-  height: 4px; border-radius: 999px; background: color-mix(in oklab, var(--border) 45%, #0b1120);
+  height: 4px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--border) 45%, #0b1120);
 }
+
 .app input[type="range"]::-webkit-slider-thumb {
-  appearance: none; width: 16px; height: 16px; border-radius: 50%;
-  background: var(--accent); border: 2px solid #ffffff22; margin-top: -6px;
-  box-shadow: 0 0 0 3px rgba(184,208,255,.25);
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid #ffffff22;
+  margin-top: -6px;
+  box-shadow: 0 0 0 3px rgba(184, 208, 255, .25);
 }
+
 .app input[type="range"]::-moz-range-track {
-  height: 4px; border-radius: 999px; background: color-mix(in oklab, var(--border) 45%, #0b1120);
+  height: 4px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--border) 45%, #0b1120);
 }
+
 .app input[type="range"]::-moz-range-thumb {
-  width: 16px; height: 16px; border-radius: 50%;
-  background: var(--accent); border: 2px solid #ffffff22;
-  box-shadow: 0 0 0 3px rgba(184,208,255,.25);
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid #ffffff22;
+  box-shadow: 0 0 0 3px rgba(184, 208, 255, .25);
 }
 
 /* File & Color (cadres alignés au thème) */
@@ -190,7 +257,8 @@
 .app button {
   appearance: none;
   border: 1px solid var(--border);
-  background: linear-gradient(180deg, #4a5773 0%, #3a485f 100%); /* plus clair */
+  background: linear-gradient(180deg, #4a5773 0%, #3a485f 100%);
+  /* plus clair */
   color: var(--text);
   padding: 10px 14px;
   border-radius: var(--radius-sm);
@@ -203,16 +271,26 @@
     border-color var(--transition),
     background var(--transition),
     filter var(--transition);
-  box-shadow: 0 8px 28px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.04) inset;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, .55), 0 0 0 1px rgba(255, 255, 255, .04) inset;
 }
+
 .app button:hover {
   transform: translateY(-1px);
   border-color: color-mix(in oklab, var(--accent) 60%, var(--border));
   background: linear-gradient(180deg, #566589 0%, #445979 100%);
-  box-shadow: 0 12px 34px rgba(0,0,0,.6), 0 0 0 1px rgba(137,187,255,.2) inset;
+  box-shadow: 0 12px 34px rgba(0, 0, 0, .6), 0 0 0 1px rgba(137, 187, 255, .2) inset;
 }
-.app button:active { transform: translateY(0); filter: brightness(.99); }
-.app button:focus-visible { outline: none; box-shadow: var(--focus-ring), 0 8px 28px rgba(0,0,0,.55); }
+
+.app button:active {
+  transform: translateY(0);
+  filter: brightness(.99);
+}
+
+.app button:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring), 0 8px 28px rgba(0, 0, 0, .55);
+}
+
 .app button[disabled],
 .app button[aria-disabled="true"] {
   opacity: .7;
@@ -222,27 +300,23 @@
 
 /* Variantes utilitaires */
 .app button.accent {
-  background: linear-gradient(
-    180deg,
-    color-mix(in oklab, var(--accent) 58%, #4a5773) 0%,
-    #3a485f 100%
-  );
+  background: linear-gradient(180deg,
+      color-mix(in oklab, var(--accent) 58%, #4a5773) 0%,
+      #3a485f 100%);
   border-color: color-mix(in oklab, var(--accent) 70%, var(--border));
 }
+
 .app button.ok {
-  background: linear-gradient(
-    180deg,
-    color-mix(in oklab, var(--ok) 58%, #2d4b4f) 0%,
-    #1c3236 100%
-  );
+  background: linear-gradient(180deg,
+      color-mix(in oklab, var(--ok) 58%, #2d4b4f) 0%,
+      #1c3236 100%);
   border-color: color-mix(in oklab, var(--ok) 70%, var(--border));
 }
+
 .app button.danger {
-  background: linear-gradient(
-    180deg,
-    color-mix(in oklab, var(--danger) 60%, #4b1b29) 0%,
-    #2b1420 100%
-  );
+  background: linear-gradient(180deg,
+      color-mix(in oklab, var(--danger) 60%, #4b1b29) 0%,
+      #2b1420 100%);
   border-color: color-mix(in oklab, var(--danger) 72%, var(--border));
 }
 
@@ -253,7 +327,7 @@
   padding: 0;
   background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
   color: var(--text);
-  box-shadow: 0 26px 78px rgba(0,0,0,.7);
+  box-shadow: 0 26px 78px rgba(0, 0, 0, .7);
   overflow: hidden;
   animation: app-dlg-in .18s ease-out both;
 
@@ -261,20 +335,30 @@
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
-.app dialog > div {
+
+.app dialog>div {
   padding: 18px;
   background:
-    radial-gradient(500px 200px at 120% -10%, rgba(192,166,255,.12), transparent 45%),
-    radial-gradient(400px 180px at -10% -20%, rgba(137,187,255,.12), transparent 40%);
+    radial-gradient(500px 200px at 120% -10%, rgba(192, 166, 255, .12), transparent 45%),
+    radial-gradient(400px 180px at -10% -20%, rgba(137, 187, 255, .12), transparent 40%);
 }
+
 @keyframes app-dlg-in {
-  from { opacity: 0; transform: translateY(8px) scale(.98); }
-  to   { opacity: 1; transform: translateY(0)   scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
+
 .app dialog::backdrop {
   background:
-    radial-gradient(1200px 800px at 50% 0%, rgba(137,187,255,.16), transparent 40%),
-    rgba(3,6,12,.68);
+    radial-gradient(1200px 800px at 50% 0%, rgba(137, 187, 255, .16), transparent 40%),
+    rgba(3, 6, 12, .68);
 
   /* ❌ Enlève le fond flou (blur) */
   backdrop-filter: none !important;
@@ -282,8 +366,13 @@
 }
 
 /* ---------- Infos / états ---------- */
-.app [aria-disabled="true"] { cursor: not-allowed; }
-.app .muted { color: var(--muted); }
+.app [aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+.app .muted {
+  color: var(--muted);
+}
 
 /* Chips */
 .app .chip {
@@ -303,11 +392,26 @@
   .app {
     --border: #7892c2;
     --ring: #cfe1ff;
-    --focus-ring: 0 0 0 3px var(--ring), 0 0 0 12px rgba(207,225,255,.24);
+    --focus-ring: 0 0 0 3px var(--ring), 0 0 0 12px rgba(207, 225, 255, .24);
   }
 }
 
 /* ---------- Préférence utilisateur (motion) ---------- */
 @media (prefers-reduced-motion: reduce) {
-  .app * { transition: none !important; animation: none !important; }
+  .app * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+
+.container {
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.container>* {
+  box-sizing: border-box;
+  flex: 1 1 12rem;
+  /* tous prennent la même place par ligne */
 }

@@ -4,6 +4,7 @@
  * - Appelle Custom.init **après** reconstruction complète de l'interface concernée.
  */
 
+import { buildBootVue, buildStaticBootVue } from "./builder/boot-vue";
 import { buildButton, buildStaticButton } from "./builder/button";
 import { buildCustom } from "./builder/custom";
 import { buildDialog } from "./builder/dialog";
@@ -22,7 +23,9 @@ import {
     InputNode, StaticButtonNode, SelectNode, LabelNode, FlowNode,
     SingleVueNode, ListVueNode, DialogNode, CustomNode,
     ButtonNode, ImgNode, MenuNode,
-    StaticLabelNode
+    StaticLabelNode,
+    BootVueNode,
+    StaticBootVueNode
 } from "./vue-model";
 
 /* ===================== Runtime result ===================== */
@@ -103,6 +106,7 @@ export type Ctx<T extends object> = {
 /** Le Builder détient un *registry* d’UIs disponibles pour le dispatch dynamique. */
 export class Builder {
     registry: Vue<any>[] = [];
+    container!: HTMLElement | null
     constructor() { }
     addUI(ui: Vue<any>) {
         this.registry.push(ui);
@@ -110,9 +114,15 @@ export class Builder {
 
     /** Monte `ui` dans `selector`. */
     boot<T extends object>(a: T, selector: string): VueRuntime<T> {
-        const container = document.querySelector(selector) as HTMLElement | null;
-        if (!container) throw new Error('Conteneur introuvable : ' + selector);
-        return this.bootInto(this.findVueFor(a)!, a, container);
+        this.container = document.querySelector(selector) as HTMLElement | null;
+        if (!this.container) throw new Error('Conteneur introuvable : ' + selector);
+        this.container.replaceChildren()
+        return this.bootInto(this.findVueFor(a)!, a, this.container);
+    }
+    bootInContainer<T extends object>(a: T): VueRuntime<T> {
+        if (!this.container) throw new Error('Conteneur introuvable : ');
+        this.container.replaceChildren()
+        return this.bootInto(this.findVueFor(a)!, a, this.container);
     }
 
     /**
@@ -164,16 +174,18 @@ export class Builder {
                 case 'input': buildInput(this, node as InputNode<T, any>, ctx); break;
                 case 'staticButton': buildStaticButton(this, node as StaticButtonNode<T>, ctx); break;
                 case 'button': buildButton(this, node as ButtonNode<T, any>, ctx); break;
-                case 'img': buildImg(this,node as ImgNode<T, any>, ctx); break;
+                case 'img': buildImg(this, node as ImgNode<T, any>, ctx); break;
                 case 'select': buildSelect(this, node as SelectNode<T, any, any, any, any>, ctx); break;
-                case 'label': buildLabel(this,node as LabelNode<T, any>, ctx); break;
-                case 'staticLabel': buildStaticLabel(this,node as StaticLabelNode<T>, ctx); break;
+                case 'label': buildLabel(this, node as LabelNode<T, any>, ctx); break;
+                case 'staticLabel': buildStaticLabel(this, node as StaticLabelNode<T>, ctx); break;
                 case 'flow': buildFlow(this, node as FlowNode<T>, ctx); break;
                 case 'singleUI': buildSingleVue(this, node as SingleVueNode<T>, ctx); break;
                 case 'listUI': buildListOfVue(this, node as ListVueNode<T>, ctx); break;
                 case 'dialog': buildDialog(this, node as DialogNode<T>, ctx); break;
                 case 'menu': buildMenu(this, node as MenuNode<T>, ctx); break;
-                case 'custom': buildCustom(this,node as CustomNode<T, any, any>, ctx); break;
+                case 'custom': buildCustom(this, node as CustomNode<T, any, any>, ctx); break;
+                case "bootVue": buildBootVue(this, node as BootVueNode<T, any>, ctx); break;
+                case 'staticBootVue': buildStaticBootVue(this, node as StaticBootVueNode<T>, ctx); break;
             }
         }
     }
@@ -183,9 +195,9 @@ export class Builder {
         if (!value || typeof value !== "object") return undefined;
         return this.registry.find((u: Vue<any>) => value instanceof u.getTargetClass());
     }
-  
 
-  
+
+
     /* ---- Helper rendu du bouton trigger (Dialog/Menu) selon node.type ---- */
     renderTrigger(btn: HTMLButtonElement, label: string, type?: 'html' | 'img') {
         if (!type) {
@@ -207,5 +219,5 @@ export class Builder {
         img.style.pointerEvents = 'none';
         btn.appendChild(img);
     }
-   
+
 }

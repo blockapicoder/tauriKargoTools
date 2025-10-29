@@ -26,7 +26,7 @@
   --ui-backdrop: color-mix(in oklab, #0b0e1a 55%, transparent);
   --ui-dialog-bg: color-mix(in oklab, var(--ui-bg) 92%, transparent);
   --ui-dialog-border: color-mix(in oklab, var(--ui-accent-a) 38%, var(--ui-border));
-  --ui-dialog-shadow: 0 24px 64px rgba(10,12,20,0.45);
+  --ui-dialog-shadow: 0 24px 64px rgba(10, 12, 20, 0.45);
 
   color-scheme: light dark;
   font-family: var(--ui-font);
@@ -46,7 +46,7 @@
     --ui-backdrop: color-mix(in oklab, #000 65%, transparent);
     --ui-dialog-bg: color-mix(in oklab, #0e1324 86%, transparent);
     --ui-dialog-border: color-mix(in oklab, var(--ui-accent-b) 28%, var(--ui-border));
-    --ui-dialog-shadow: 0 26px 68px rgba(0,0,0,0.65);
+    --ui-dialog-shadow: 0 26px 68px rgba(0, 0, 0, 0.65);
 
     /* En mode sombre, on garde un fond uni sombre */
     background: var(--ui-bg);
@@ -54,15 +54,18 @@
   }
 }
 
-.app, .app * { box-sizing: border-box; }
+.app,
+.app * {
+  box-sizing: border-box;
+}
 
 /* Fond bleu très clair (mode clair) */
 .app {
   background: var(--ui-bg);
   color: var(--ui-fg);
   background-image:
-    radial-gradient(900px 600px at 20% -10%, rgba(102,153,255,0.14), transparent 60%),
-    radial-gradient(800px 500px at 110% 0%, rgba(167,187,255,0.12), transparent 55%),
+    radial-gradient(900px 600px at 20% -10%, rgba(102, 153, 255, 0.14), transparent 60%),
+    radial-gradient(800px 500px at 110% 0%, rgba(167, 187, 255, 0.12), transparent 55%),
     linear-gradient(180deg, #f7fbff 0%, #eef6ff 100%);
   background-attachment: fixed;
 }
@@ -81,7 +84,9 @@
 }
 
 /* Form controls base */
-.app input, .app select, .app button {
+.app input,
+.app select,
+.app button {
   font: inherit;
   border-radius: var(--ui-radius);
   transition: transform 120ms ease, box-shadow 160ms ease, border-color 160ms ease, background 160ms ease, color 160ms ease, opacity 160ms ease;
@@ -89,7 +94,8 @@
 }
 
 /* Inputs & selects */
-.app input, .app select {
+.app input,
+.app select {
   width: max(180px, 12ch);
   padding: var(--ui-padding-y) var(--ui-padding-x);
   background: var(--ui-input-bg);
@@ -101,7 +107,10 @@
 }
 
 /* Number inputs alignment */
-.app input[type="number"] { text-align: right; width: 120px; }
+.app input[type="number"] {
+  text-align: right;
+  width: 120px;
+}
 
 /* Checkbox size & custom check */
 .app input[type="checkbox"] {
@@ -112,6 +121,7 @@
   display: inline-grid;
   place-items: center;
 }
+
 .app input[type="checkbox"]::before {
   content: "";
   width: 0.65rem;
@@ -121,7 +131,10 @@
   box-shadow: inset 1rem 1rem var(--ui-focus);
   border-radius: 4px;
 }
-.app input[type="checkbox"]:checked::before { transform: scale(1); }
+
+.app input[type="checkbox"]:checked::before {
+  transform: scale(1);
+}
 
 /* Select custom arrow (not for multiple) */
 .app select:not([multiple]) {
@@ -142,28 +155,35 @@
   min-height: 160px;
   padding: 8px;
 }
+
 .app select[multiple] option {
   padding: 8px 10px;
   border-radius: 10px;
   margin: 2px;
   cursor: pointer;
 }
+
 .app select[multiple] option:hover {
   outline: 2px solid color-mix(in oklab, var(--ui-focus) 60%, transparent);
   outline-offset: -2px;
 }
+
 .app select[multiple] option:checked {
   background: linear-gradient(135deg, var(--ui-accent-a), var(--ui-accent-b));
   color: white;
 }
 
 /* Hover / focus states */
-.app input:hover, .app select:hover {
+.app input:hover,
+.app select:hover {
   border-color: color-mix(in oklab, var(--ui-focus) 60%, var(--ui-border));
   box-shadow: var(--ui-shadow-strong);
   transform: translateY(-1px);
 }
-.app input:focus-visible, .app select:focus-visible, .app button:focus-visible {
+
+.app input:focus-visible,
+.app select:focus-visible,
+.app button:focus-visible {
   outline: 2px solid color-mix(in oklab, var(--ui-focus) 80%, transparent);
   outline-offset: 2px;
   box-shadow: 0 0 0 6px color-mix(in oklab, var(--ui-focus) 18%, transparent), var(--ui-shadow-strong);
@@ -179,11 +199,25 @@
   box-shadow: var(--ui-shadow);
   letter-spacing: 0.3px;
   font-weight: 700;
-  text-shadow: 0 1px 0 rgba(0,0,0,0.1);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
 }
-.app button:hover { transform: translateY(-1px); box-shadow: var(--ui-shadow-strong); filter: brightness(1.04); }
-.app button:active { transform: translateY(0); filter: brightness(0.98); }
-.app button:disabled { opacity: 0.55; cursor: not-allowed; filter: saturate(70%); }
+
+.app button:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--ui-shadow-strong);
+  filter: brightness(1.04);
+}
+
+.app button:active {
+  transform: translateY(0);
+  filter: brightness(0.98);
+}
+
+.app button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  filter: saturate(70%);
+}
 
 /* Panel */
 .app .panel {
@@ -195,19 +229,34 @@
 }
 
 /* Spacing utilities */
-.app .gap-8  > * + * { margin-top: 8px; }
-.app .gap-12 > * + * { margin-top: 12px; }
-.app .gap-16 > * + * { margin-top: 16px; }
+.app .gap-8>*+* {
+  margin-top: 8px;
+}
+
+.app .gap-12>*+* {
+  margin-top: 12px;
+}
+
+.app .gap-16>*+* {
+  margin-top: 16px;
+}
 
 /* Scrollbar polish */
-.app ::-webkit-scrollbar { width: 10px; height: 10px; }
+.app ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
 .app ::-webkit-scrollbar-thumb {
   background: color-mix(in oklab, var(--ui-accent-a) 40%, var(--ui-fg-muted));
   border-radius: 999px;
   border: 2px solid transparent;
   background-clip: padding-box;
 }
-.app ::-webkit-scrollbar-track { background: transparent; }
+
+.app ::-webkit-scrollbar-track {
+  background: transparent;
+}
 
 /* =========================================
    ✨ Sexy Dialog Styles
@@ -230,7 +279,7 @@
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 
-  animation: dlg-pop 200ms cubic-bezier(.17,.84,.44,1) both;
+  animation: dlg-pop 200ms cubic-bezier(.17, .84, .44, 1) both;
 }
 
 /* Decorative handle */
@@ -257,7 +306,7 @@
 }
 
 /* Dialog content host (UI.dialog ajoute un <div> interne) */
-.app dialog > div {
+.app dialog>div {
   padding: 20px 22px 22px;
   display: flex;
   flex-direction: column;
@@ -302,12 +351,25 @@
 
 /* Animations */
 @keyframes dlg-pop {
-  from { transform: translateY(10px) scale(.98); opacity: 0; }
-  to   { transform: translateY(0)    scale(1);   opacity: 1; }
+  from {
+    transform: translateY(10px) scale(.98);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
 }
+
 @keyframes backdrop-fade {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 /* Responsive polish */
@@ -316,7 +378,8 @@
     width: 94vw;
     max-height: 86vh;
   }
-  .app dialog > div {
+
+  .app dialog>div {
     padding: 16px;
     gap: 12px;
   }
@@ -324,8 +387,25 @@
 
 /* Reduce motion respect */
 @media (prefers-reduced-motion: reduce) {
-  .app input, .app select, .app button, .app dialog, .app dialog::backdrop {
+
+  .app input,
+  .app select,
+  .app button,
+  .app dialog,
+  .app dialog::backdrop {
     transition: none;
     animation: none;
   }
+}
+
+
+.container {
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.container>* {
+  box-sizing: border-box;
+  flex: 1 1 12rem;
+  /* tous prennent la même place par ligne */
 }

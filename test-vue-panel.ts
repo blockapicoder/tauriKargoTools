@@ -140,9 +140,9 @@ defineVue(Tree, (ui) => {
 
 })
 defineVue(ButtonPanel, (ui) => {
-    ui.flow({ orientation: "row" }, () => {
+   // ui.flow({ orientation: "row" }, () => {
         ui.button({ label: "name", action: "select", width: "100%" ,enable:"enable"})
-    })
+    //})
 })
 defineVue(Panel, (ui) => {
     ui.flow({ orientation: "column", width: "100%", gap: 10 }, () => {

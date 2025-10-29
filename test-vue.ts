@@ -1,5 +1,6 @@
 import { AfficherImage, App, AppPersonMoral, AppPersonPhysique, AppTree, DialogOwner, Tree, TreeMenu } from "./test-model"
 import { } from "./test-table"
+
 import { defineVue, boot } from "./dist/vue";
 
 // ---- Montage UI ----
