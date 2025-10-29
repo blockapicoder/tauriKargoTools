@@ -154,7 +154,21 @@ export interface LabelNode<
     visible?: KeysOfType<T, boolean>;
     enable?: KeysOfType<T, boolean>;
 }
+/** Label: clé limitée à string */
+export interface StaticLabelNode<
+    T extends object
+> {
+    kind: 'staticLabel';
+    /** Identifiants CSS/DOM */
+    id?: string;
+    class?: string | string[];
 
+    label: string;
+    width?: number | string;
+    height?: number | string;
+    visible?: KeysOfType<T, boolean>;
+    enable?: KeysOfType<T, boolean>;
+}
 export interface FlowNode<T extends object> {
     kind: 'flow';
     /** Identifiants CSS/DOM */
@@ -293,7 +307,8 @@ export type UINode<T extends object> =
     | ListVueNode<T>
     | DialogNode<T>
     | MenuNode<T>
-    | CustomNode<T>;
+    | CustomNode<T>
+    | StaticLabelNode<T>;
 
 /* ===================== UI (déclaratif uniquement) ===================== */
 export class Vue<T extends object> {
@@ -425,7 +440,21 @@ export class Vue<T extends object> {
         this.cursor.push(node as unknown as UINode<T>);
         return this;
     }
-
+   /* ------------Static Label ------------ */
+    staticLabel(label: string, opt?: {
+        /** Identifiants CSS/DOM */
+        id?: string; class?: string | string[];
+        width?: number | string; height?: number | string;
+        visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
+    }): this {
+        const node: StaticLabelNode<T> = {
+            kind: 'staticLabel',
+            label,
+            ...opt
+        };
+        this.cursor.push(node as unknown as UINode<T>);
+        return this;
+    }
     /* ------------ Flow ------------ */
     flow(opt: {
         /** Identifiants CSS/DOM */

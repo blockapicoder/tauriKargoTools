@@ -10,7 +10,7 @@ import { buildDialog } from "./builder/dialog";
 import { buildFlow } from "./builder/flow";
 import { buildImg } from "./builder/img";
 import { buildInput } from "./builder/input";
-import { buildLabel } from "./builder/label";
+import { buildLabel, buildStaticLabel } from "./builder/label";
 import { buildListOfVue } from "./builder/list-of-vue";
 import { buildMenu } from "./builder/menu";
 import { buildSelect } from "./builder/select";
@@ -21,8 +21,9 @@ import {
     Vue, UINode,
     InputNode, StaticButtonNode, SelectNode, LabelNode, FlowNode,
     SingleVueNode, ListVueNode, DialogNode, CustomNode,
-    ButtonNode, ImgNode, MenuNode
-} from "./ui-model";
+    ButtonNode, ImgNode, MenuNode,
+    StaticLabelNode
+} from "./vue-model";
 
 /* ===================== Runtime result ===================== */
 export type VueRuntime<T extends object> = {
@@ -166,6 +167,7 @@ export class Builder {
                 case 'img': buildImg(this,node as ImgNode<T, any>, ctx); break;
                 case 'select': buildSelect(this, node as SelectNode<T, any, any, any, any>, ctx); break;
                 case 'label': buildLabel(this,node as LabelNode<T, any>, ctx); break;
+                case 'staticLabel': buildStaticLabel(this,node as StaticLabelNode<T>, ctx); break;
                 case 'flow': buildFlow(this, node as FlowNode<T>, ctx); break;
                 case 'singleUI': buildSingleVue(this, node as SingleVueNode<T>, ctx); break;
                 case 'listUI': buildListOfVue(this, node as ListVueNode<T>, ctx); break;

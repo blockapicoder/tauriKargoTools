@@ -1,5 +1,5 @@
-import { applyIdAndClass, applySize, bindVisibleEnabled, Builder, Ctx } from "../ui-builder";
-import { ButtonNode, StaticButtonNode } from "../ui-model";
+import { applyIdAndClass, applySize, bindVisibleEnabled, Builder, Ctx } from "../vue-builder";
+import { ButtonNode, StaticButtonNode } from "../vue-model";
 
 /* ----------- Button ----------- */
 export function buildStaticButton<T extends object>(builder: Builder, node: StaticButtonNode<T>, ctx: Ctx<T>) {

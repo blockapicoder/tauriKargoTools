@@ -1,5 +1,5 @@
-import { applyIdAndClass, applySize, Builder, Ctx, VueRuntime } from "../ui-builder";
-import { ListVueNode, Vue } from "../ui-model";
+import { applyIdAndClass, applySize, Builder, Ctx, VueRuntime } from "../vue-builder";
+import { ListVueNode, Vue } from "../vue-model";
 
 /* ----------- List UI (liste d'objets) ----------- */
 export function buildListOfVue<T extends object>(builder: Builder, node: ListVueNode<T>, ctx: Ctx<T>) {

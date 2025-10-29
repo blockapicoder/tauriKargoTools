@@ -1,5 +1,5 @@
-import { Builder, VueRuntime } from "./ui-builder";
-import { Vue } from "./ui-model";
+import { Builder, VueRuntime } from "./vue-builder";
+import { Vue } from "./vue-model";
 
 const builder: Builder = new Builder()
 export function boot<T extends object>(
@@ -10,7 +10,7 @@ export function boot<T extends object>(
     return builder.boot(model, id);
 }
 export function defineVue<T extends object>(targetClass: new (...args: any[]) => T, f: (ui: Vue<T>) => void) {
-    const ui: Vue<T> = new Vue(targetClass)
-    builder.addUI(ui)
-    f(ui)
+    const vue: Vue<T> = new Vue(targetClass)
+    builder.addUI(vue)
+    f(vue)
 }

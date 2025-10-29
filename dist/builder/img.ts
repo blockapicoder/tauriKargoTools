@@ -1,5 +1,5 @@
-import { applyIdAndClass, applySize, bindVisibleEnabled, Builder, Ctx } from "../ui-builder";
-import { ImgNode } from "../ui-model";
+import { applyIdAndClass, applySize, bindVisibleEnabled, Builder, Ctx } from "../vue-builder";
+import { ImgNode } from "../vue-model";
 
 
     /* ----------- Img ----------- */

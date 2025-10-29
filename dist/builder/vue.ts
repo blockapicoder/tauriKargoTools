@@ -1,5 +1,5 @@
-import { applyIdAndClass, applySize, Builder, Ctx, VueRuntime } from "../ui-builder";
-import { SingleVueNode, Vue } from "../ui-model";
+import { applyIdAndClass, applySize, Builder, Ctx, VueRuntime } from "../vue-builder";
+import { SingleVueNode, Vue } from "../vue-model";
 
 /* ----------- Single UI (champ objet) ----------- */
     export function buildSingleVue<T extends object>(builder:Builder,node: SingleVueNode<T>, ctx: Ctx<T>) {

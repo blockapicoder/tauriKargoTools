@@ -1,5 +1,5 @@
-import { applyIdAndClass, applySize, bindVisibleEnabled, Builder, Ctx } from "../ui-builder";
-import { CustomNode } from "../ui-model";
+import { applyIdAndClass, applySize, bindVisibleEnabled, Builder, Ctx } from "../vue-builder";
+import { CustomNode } from "../vue-model";
 
  /* ----------- Custom ----------- */
     export function buildCustom<T extends object>(builder:Builder,node: CustomNode<T, any, any>, ctx: Ctx<T>) {

@@ -1,5 +1,5 @@
-import { applyIdAndClass, applySize, bindVisibleEnabled, Builder, Ctx } from "../ui-builder";
-import { SelectNode } from "../ui-model";
+import { applyIdAndClass, applySize, bindVisibleEnabled, Builder, Ctx } from "../vue-builder";
+import { SelectNode } from "../vue-model";
 
 /* ----------- Select ----------- */
 export function buildSelect<T extends object>(builder: Builder, node: SelectNode<T, any, any, any, any>, ctx: Ctx<T>) {
