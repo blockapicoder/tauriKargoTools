@@ -41,6 +41,14 @@ export function buildListOfVue<T extends object>(builder: Builder, node: ListVue
             const ui = builder.findVueFor(item);
             if (!ui) continue;
             const host = document.createElement('div');
+            if (node.wrap) {
+                host.style.boxSizing = "border-box";
+                host.style.flex = "1 1 12rem";
+            }
+            if (node.elementStyle) for (const k of Object.keys(node.elementStyle) as Array<keyof CSSStyleDeclaration>) {
+                const v = node.elementStyle[k]; if (v != null) (host.style as any)[k] = v as any;
+            }
+            applySize(host, node.elementWidth, node.elementHeight);
             div.appendChild(host);
             const runtime = builder.bootInto(ui as Vue<any>, item, host, initial ? ctx.postInits : undefined);
             children.push(runtime);

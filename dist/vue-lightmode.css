@@ -399,13 +399,3 @@
 }
 
 
-.container {
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.container>* {
-  box-sizing: border-box;
-  flex: 1 1 12rem;
-  /* tous prennent la même place par ligne */
-}

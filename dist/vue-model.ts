@@ -71,46 +71,46 @@ export interface StaticButtonNode<T extends object, NK extends KeysOfType<T, str
 
 /** ButtonLabel — label typé comme une clé string de T */
 export interface ButtonNode<
-  T extends object,
-  LK extends KeysOfType<T, string> = KeysOfType<T, string>
+    T extends object,
+    LK extends KeysOfType<T, string> = KeysOfType<T, string>
 > {
-  kind: 'button';
-  /** Identifiants CSS/DOM */
-  id?: string;
-  class?: string | string[];
+    kind: 'button';
+    /** Identifiants CSS/DOM */
+    id?: string;
+    class?: string | string[];
 
-  /** Clé d'un champ string de T utilisé comme libellé (texte par défaut) */
-  label: LK;
-  action: MethodNames0<T>;
-  muted?: boolean;
-  width?: number | string;
-  height?: number | string;
-  visible?: KeysOfType<T, boolean>;
-  enable?: KeysOfType<T, boolean>;
+    /** Clé d'un champ string de T utilisé comme libellé (texte par défaut) */
+    label: LK;
+    action: MethodNames0<T>;
+    muted?: boolean;
+    width?: number | string;
+    height?: number | string;
+    visible?: KeysOfType<T, boolean>;
+    enable?: KeysOfType<T, boolean>;
 
-  /** Rendu optionnel : 'img' = URL d'image, 'html' = markup HTML (depuis `name` si fourni, sinon `label`). */
-  type?: ButtonContentType;
-  /** Clé string du modèle à utiliser pour le contenu quand `type` est défini. */
-  name?: KeysOfType<T, string>;
+    /** Rendu optionnel : 'img' = URL d'image, 'html' = markup HTML (depuis `name` si fourni, sinon `label`). */
+    type?: ButtonContentType;
+    /** Clé string du modèle à utiliser pour le contenu quand `type` est défini. */
+    name?: KeysOfType<T, string>;
 }
 
 /** Img — URL typée comme une clé string de T */
 export interface ImgNode<
-  T extends object,
-  NK extends KeysOfType<T, string> = KeysOfType<T, string>
+    T extends object,
+    NK extends KeysOfType<T, string> = KeysOfType<T, string>
 > {
-  kind: 'img';
-  /** Identifiants CSS/DOM */
-  id?: string;
-  class?: string | string[];
+    kind: 'img';
+    /** Identifiants CSS/DOM */
+    id?: string;
+    class?: string | string[];
 
-  /** Clé d'un champ string de T contenant l'URL de l'image */
-  url: NK;
-  alt?: string;
-  width?: number | string;
-  height?: number | string;
-  visible?: KeysOfType<T, boolean>;
-  enable?: KeysOfType<T, boolean>;
+    /** Clé d'un champ string de T contenant l'URL de l'image */
+    url: NK;
+    alt?: string;
+    width?: number | string;
+    height?: number | string;
+    visible?: KeysOfType<T, boolean>;
+    enable?: KeysOfType<T, boolean>;
 }
 
 /** Select: typé par list (clé de tableau), displayMethod et selection */
@@ -172,61 +172,59 @@ export interface StaticLabelNode<
 
 /** BootVue — bouton qui "boot" une Vue (label dynamique depuis T) */
 export interface BootVueNode<
-  T extends object,
-  NK extends KeysOfType<T, Objectish | null | undefined> = KeysOfType<T, Objectish | null | undefined>,
-  LK extends KeysOfType<T, string> = KeysOfType<T, string>,
-  MN extends MethodNames0<T> = MethodNames0<T>
+    T extends object,
+    NK extends KeysOfType<T, Objectish | null | undefined> = KeysOfType<T, Objectish | null | undefined>,
+    LK extends KeysOfType<T, string> = KeysOfType<T, string>,
+    MN extends MethodNames0<T> = MethodNames0<T>
 > {
-  kind: 'bootVue';
-  /** Identifiants CSS/DOM */
-  id?: string;
-  class?: string | string[];
+    kind: 'bootVue';
+    /** Identifiants CSS/DOM */
+    id?: string;
+    class?: string | string[];
 
-  /** Objet dont l'UI sera montée quand on clique */
-  name: NK;
+    /** Objet dont l'UI sera montée quand on clique */
+    factory: KeysOfType<T, () => object>;
 
-  /** Clé string de T utilisée comme libellé du bouton */
-  label: LK;
+    /** Clé string de T utilisée comme libellé du bouton */
+    label: LK;
 
-  /** Méthode 0-arg déclenchée au clic */
-  action: MN;
 
-  /** Rendu optionnel du bouton */
-  type?: ButtonContentType;
 
-  width?: number | string;
-  height?: number | string;
-  visible?: KeysOfType<T, boolean>;
-  enable?: KeysOfType<T, boolean>;
+    /** Rendu optionnel du bouton */
+    type?: ButtonContentType;
+
+    width?: number | string;
+    height?: number | string;
+    visible?: KeysOfType<T, boolean>;
+    enable?: KeysOfType<T, boolean>;
 }
 
 /** StaticBootVue — bouton qui "boot" une Vue (label fixe) */
 export interface StaticBootVueNode<
-  T extends object,
-  NK extends KeysOfType<T, Objectish | null | undefined> = KeysOfType<T, Objectish | null | undefined>,
-  MN extends MethodNames0<T> = MethodNames0<T>
+    T extends object,
+    NK extends KeysOfType<T, Objectish | null | undefined> = KeysOfType<T, Objectish | null | undefined>,
+    MN extends MethodNames0<T> = MethodNames0<T>
 > {
-  kind: 'staticBootVue';
-  /** Identifiants CSS/DOM */
-  id?: string;
-  class?: string | string[];
+    kind: 'staticBootVue';
+    /** Identifiants CSS/DOM */
+    id?: string;
+    class?: string | string[];
 
-  /** Objet dont l'UI sera montée quand on clique */
-  name: NK;
+    /** Objet dont l'UI sera montée quand on clique */
+    factory: KeysOfType<T, () => object>;
 
-  /** Libellé texte non dynamique */
-  label: string;
+    /** Libellé texte non dynamique */
+    label: string;
 
-  /** Méthode 0-arg déclenchée au clic */
-  action: MN;
 
-  /** Rendu optionnel du bouton */
-  type?: ButtonContentType;
 
-  width?: number | string;
-  height?: number | string;
-  visible?: KeysOfType<T, boolean>;
-  enable?: KeysOfType<T, boolean>;
+    /** Rendu optionnel du bouton */
+    type?: ButtonContentType;
+
+    width?: number | string;
+    height?: number | string;
+    visible?: KeysOfType<T, boolean>;
+    enable?: KeysOfType<T, boolean>;
 }
 
 export interface FlowNode<T extends object> {
@@ -249,7 +247,7 @@ export interface FlowNode<T extends object> {
 
 /** SINGLE UI — plus de listUI */
 export interface SingleVueNode<T extends object> {
-    kind: 'singleUI';
+    kind: 'singleVue';
     /** Identifiants CSS/DOM */
     id?: string;
     class?: string | string[];
@@ -261,11 +259,10 @@ export interface SingleVueNode<T extends object> {
 
 /** LIST UI — plus de listUI */
 export interface ListVueNode<T extends object> {
-    kind: 'listUI';
+    kind: 'listOfVue';
     /** Identifiants CSS/DOM */
     id?: string;
     class?: string | string[];
-
     list: ArrayKeys<T>;
     orientation?: 'row' | 'column';
     gap?: number | string;
@@ -273,9 +270,12 @@ export interface ListVueNode<T extends object> {
     justify?: 'start' | 'center' | 'end' | 'space-between' | 'space-around' | 'space-evenly';
     wrap?: boolean;
     style?: Partial<CSSStyleDeclaration>;
+    elementStyle?: Partial<CSSStyleDeclaration>;
     panel?: boolean;
     width?: number | string;
     height?: number | string;
+    elementWidth?: number | string;
+    elementHeight?: number | string;
 }
 
 /** DIALOG — plus de listUI */
@@ -334,25 +334,25 @@ export interface MenuNode<T extends object> {
  *  + une méthode d'init optionnelle (() => void) exécutée par le builder.
  */
 export interface CustomNode<
-  T extends object,
-  FK extends HTMLElementFactoryName<T> = HTMLElementFactoryName<T>,
-  IK extends VoidMethodName<T> = VoidMethodName<T>
+    T extends object,
+    FK extends HTMLElementFactoryName<T> = HTMLElementFactoryName<T>,
+    IK extends VoidMethodName<T> = VoidMethodName<T>
 > {
-  kind: 'custom';
-  /** Identifiants CSS/DOM */
-  id?: string;
-  class?: string | string[];
+    kind: 'custom';
+    /** Identifiants CSS/DOM */
+    id?: string;
+    class?: string | string[];
 
-  width?: number | string;
-  height?: number | string;
-  visible?: KeysOfType<T, boolean>;
-  enable?: KeysOfType<T, boolean>;
+    width?: number | string;
+    height?: number | string;
+    visible?: KeysOfType<T, boolean>;
+    enable?: KeysOfType<T, boolean>;
 
-  /** Nom de la méthode sur T: () => HTMLElement */
-  factory: FK;
+    /** Nom de la méthode sur T: () => HTMLElement */
+    factory: FK;
 
-  /** Nom d'une méthode sur T: () => void (appelée après création/insert du DOM) */
-  init?: IK;
+    /** Nom d'une méthode sur T: () => void (appelée après création/insert du DOM) */
+    init?: IK;
 }
 
 export type UINode<T extends object> =
@@ -407,8 +407,8 @@ export class Vue<T extends object> {
 
     /* ------------ Button ------------ */
     staticButton<
-      MN extends MethodNames0<T>,
-      NK extends KeysOfType<T, string>
+        MN extends MethodNames0<T>,
+        NK extends KeysOfType<T, string>
     >(opts: {
         /** Identifiants CSS/DOM */
         id?: string; class?: string | string[];
@@ -429,24 +429,24 @@ export class Vue<T extends object> {
 
     /* ------------ ButtonLabel ------------ */
     button<
-      LK extends KeysOfType<T, string>,
-      MN extends MethodNames0<T>
+        LK extends KeysOfType<T, string>,
+        MN extends MethodNames0<T>
     >(opts: {
-      /** Identifiants CSS/DOM */
-      id?: string; class?: string | string[];
-      label: LK; action: MN; muted?: boolean;
-      width?: number | string; height?: number | string;
-      visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
-      /** Nouveaux champs */
-      type?: ButtonContentType;
-      name?: KeysOfType<T, string>;
+        /** Identifiants CSS/DOM */
+        id?: string; class?: string | string[];
+        label: LK; action: MN; muted?: boolean;
+        width?: number | string; height?: number | string;
+        visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
+        /** Nouveaux champs */
+        type?: ButtonContentType;
+        name?: KeysOfType<T, string>;
     }): this {
-      const node: ButtonNode<T, LK> = {
-        kind: 'button',
-        ...opts
-      };
-      this.cursor.push(node as unknown as UINode<T>);
-      return this;
+        const node: ButtonNode<T, LK> = {
+            kind: 'button',
+            ...opts
+        };
+        this.cursor.push(node as unknown as UINode<T>);
+        return this;
     }
 
     /* ------------ Img ------------ */
@@ -475,7 +475,7 @@ export class Vue<T extends object> {
         /** Identifiants CSS/DOM */
         id?: string; class?: string | string[];
         list: LK; displayMethod: DM; selection: SK; update: UM;
-        muted?: boolean; mode?: 'dropdown' | 'list' |"multi-list";
+        muted?: boolean; mode?: 'dropdown' | 'list' | "multi-list";
         width?: number | string; height?: number | string;
         visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
     }): this {
@@ -521,55 +521,54 @@ export class Vue<T extends object> {
 
     /* ------------ BootVue (label dynamique) ------------ */
     bootVue<
-      NK extends KeysOfType<T, Objectish | null | undefined>,
-      LK extends KeysOfType<T, string>,
-      MN extends MethodNames0<T>
+        NK extends KeysOfType<T, Objectish | null | undefined>,
+        LK extends KeysOfType<T, string>,
+        MN extends MethodNames0<T>
     >(opts: {
-      /** Identifiants CSS/DOM */
-      id?: string; class?: string | string[];
-      /** Objet dont on veut monter la Vue au clic */
-      name: NK;
-      /** Clé string de T pour le libellé du bouton */
-      label: LK;
-      /** Méthode 0-arg à appeler au clic */
-      action: MN;
-      /** Optionnel : rendu du bouton */
-      type?: ButtonContentType;
-      width?: number | string; height?: number | string;
-      visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
+        /** Identifiants CSS/DOM */
+        id?: string; class?: string | string[];
+        /** Objet dont on veut monter la Vue au clic */
+        factory: KeysOfType<T, () => object>;
+        /** Clé string de T pour le libellé du bouton */
+        label: LK;
+        /** Méthode 0-arg à appeler au clic */
+   
+        /** Optionnel : rendu du bouton */
+        type?: ButtonContentType;
+        width?: number | string; height?: number | string;
+        visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
     }): this {
-      const node: BootVueNode<T, NK, LK, MN> = {
-        kind: 'bootVue',
-        ...opts
-      };
-      this.cursor.push(node as unknown as UINode<T>);
-      return this;
+        const node: BootVueNode<T, NK, LK, MN> = {
+            kind: 'bootVue',
+            ...opts
+        };
+        this.cursor.push(node as unknown as UINode<T>);
+        return this;
     }
 
     /* ------------ StaticBootVue (label fixe) ------------ */
     staticBootVue<
-      NK extends KeysOfType<T, Objectish | null | undefined>,
-      MN extends MethodNames0<T>
+        NK extends KeysOfType<T, Objectish | null | undefined>,
+        MN extends MethodNames0<T>
     >(opts: {
-      /** Identifiants CSS/DOM */
-      id?: string; class?: string | string[];
-      /** Objet dont on veut monter la Vue au clic */
-      name: NK;
-      /** Libellé texte fixe */
-      label: string;
-      /** Méthode 0-arg à appeler au clic */
-      action: MN;
-      /** Optionnel : rendu du bouton */
-      type?: ButtonContentType;
-      width?: number | string; height?: number | string;
-      visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
+        /** Identifiants CSS/DOM */
+        id?: string; class?: string | string[];
+   
+        /** Libellé texte fixe */
+        label: string;
+        /** Méthode 0-arg à appeler au clic */
+        factory: KeysOfType<T, () => object>;
+        /** Optionnel : rendu du bouton */
+        type?: ButtonContentType;
+        width?: number | string; height?: number | string;
+        visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
     }): this {
-      const node: StaticBootVueNode<T, NK, MN> = {
-        kind: 'staticBootVue',
-        ...opts
-      };
-      this.cursor.push(node as unknown as UINode<T>);
-      return this;
+        const node: StaticBootVueNode<T, NK, MN> = {
+            kind: 'staticBootVue',
+            ...opts
+        };
+        this.cursor.push(node as unknown as UINode<T>);
+        return this;
     }
 
     /* ------------ Flow ------------ */
@@ -607,7 +606,7 @@ export class Vue<T extends object> {
         width?: number | string; height?: number | string;
     }): this {
         const node: SingleVueNode<T> = {
-            kind: 'singleUI',
+            kind: 'singleVue',
             ...opt
         };
         this.cursor.push(node as unknown as UINode<T>);
@@ -625,13 +624,19 @@ export class Vue<T extends object> {
         justify?: 'start' | 'center' | 'end' | 'space-between' | 'space-around' | 'space-evenly';
         wrap?: boolean;
         style?: Partial<CSSStyleDeclaration>;
+        elementStyle?: Partial<CSSStyleDeclaration>;
         panel?: boolean;
         width?: number | string; height?: number | string;
+        elementWidth?: number | string;
+        elementHeight?: number | string;
     }): this {
         const node: ListVueNode<T> = {
-            kind: 'listUI',
+            kind: 'listOfVue',
             ...opt
         };
+        if (node.wrap === undefined) {
+            node.wrap = true;
+        }
         this.cursor.push(node as unknown as UINode<T>);
         return this;
     }
@@ -654,6 +659,7 @@ export class Vue<T extends object> {
             kind: 'dialog',
             ...opt
         };
+
         this.cursor.push(node as unknown as UINode<T>);
         return this;
     }

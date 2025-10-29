@@ -98,12 +98,12 @@ defineVue(DialogOwner, (uiDialog) => {
 
 })
 defineVue(AfficherImage, (ui) => {
-    ui.flow({ orientation: "column", gap: 10, height: "100%",width:"100%" ,align:"center"}, () => {
-        ui.flow({ orientation: "row", gap: 5,width:"100%" }, () => {
-            ui.staticButton({ action: "chat", label: "Chat",width:"50%" })
-            ui.staticButton({ action: "chien", label: "Chien",width:"50%"})
+    ui.flow({ orientation: "column", gap: 10, height: "100%", width: "100%", align: "center" }, () => {
+        ui.flow({ orientation: "row", gap: 5, width: "100%" }, () => {
+            ui.staticButton({ action: "chat", label: "Chat", width: "50%" })
+            ui.staticButton({ action: "chien", label: "Chien", width: "50%" })
         })
-        ui.img({ url: "urlImage", width: "50%", height: 500})
+        ui.img({ url: "urlImage", width: "50%", height: 500 })
         ui.staticButton({ action: "close", label: "Close", width: "100%" });
 
     })
@@ -140,13 +140,15 @@ defineVue(Tree, (ui) => {
 
 })
 defineVue(ButtonPanel, (ui) => {
-   // ui.flow({ orientation: "row" }, () => {
-        ui.button({ label: "name", action: "select", width: "100%" ,enable:"enable"})
-    //})
+ 
+    ui.button({ label: "name", action: "select",  enable: "enable" })
+ 
 })
 defineVue(Panel, (ui) => {
     ui.flow({ orientation: "column", width: "100%", gap: 10 }, () => {
-        ui.listOfVue({ orientation: "row", list: "buttons", gap: 5, class: "container" })
+        ui.listOfVue({
+            orientation: "row", list: "buttons", gap: 5
+        })
         ui.ui({ name: "elementPanel", width: "100%" })
 
 

@@ -179,8 +179,8 @@ export class Builder {
                 case 'label': buildLabel(this, node as LabelNode<T, any>, ctx); break;
                 case 'staticLabel': buildStaticLabel(this, node as StaticLabelNode<T>, ctx); break;
                 case 'flow': buildFlow(this, node as FlowNode<T>, ctx); break;
-                case 'singleUI': buildSingleVue(this, node as SingleVueNode<T>, ctx); break;
-                case 'listUI': buildListOfVue(this, node as ListVueNode<T>, ctx); break;
+                case 'singleVue': buildSingleVue(this, node as SingleVueNode<T>, ctx); break;
+                case 'listOfVue': buildListOfVue(this, node as ListVueNode<T>, ctx); break;
                 case 'dialog': buildDialog(this, node as DialogNode<T>, ctx); break;
                 case 'menu': buildMenu(this, node as MenuNode<T>, ctx); break;
                 case 'custom': buildCustom(this, node as CustomNode<T, any, any>, ctx); break;

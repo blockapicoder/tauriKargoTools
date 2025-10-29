@@ -7,17 +7,17 @@ import { DialogOwner, Panel } from "./test-model"
 class Main {
     dialogue: DialogOwner
     panel: Panel
-    model: Object | undefined
+
     constructor() {
         this.dialogue = new DialogOwner()
         this.panel = new Panel()
     }
 
-    demarerPanel() {
-        this.model = this.panel
+    demarerPanel():Panel {
+        return this.panel
     }
-    demarerDialogue() {
-        this.model = this.dialogue
+    demarerDialogue():DialogOwner {
+       return this.dialogue
     }
 
 
@@ -25,8 +25,8 @@ class Main {
 defineVue(Main, (ui) => {
    
         ui.flow({ orientation: "row", gap: 20, align: "center", justify: "center" }, () => {
-            ui.staticBootVue({ action: "demarerDialogue", label: "Dialogue", name: "model", width: "50%" })
-            ui.staticBootVue({ action: "demarerPanel", label: "Panel", name: "model", width: "50%" })
+            ui.staticBootVue({ factory:"demarerDialogue", label: "Dialogue",  width: "50%" })
+            ui.staticBootVue({ factory: "demarerPanel", label: "Panel", width: "50%" })
         })
  
 })

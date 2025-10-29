@@ -24,11 +24,11 @@ export function buildBootVue<T extends object>(
 ) {
     // wrapper racine du node
 
-   
+
 
     // bouton + conteneur d'accueil de la sous-UI
     const btn = document.createElement("button");
-        applyIdAndClass(btn, node);
+    applyIdAndClass(btn, node);
 
 
     // taille appliquée au bouton (cohérent avec ButtonNode)
@@ -53,21 +53,21 @@ export function buildBootVue<T extends object>(
     const onClick = () => {
         // 1) action()
         try {
-            const fn = (ctx.obj as any)[node.action];
-            if (typeof fn === "function") fn.call(ctx.obj);
+            const fn = (ctx.obj as any)[node.factory];
+            if (typeof fn !== "function") return;
+
+            const child = fn.call(ctx.obj);
+
+            if (!child) return;
+            for (const u of ctx.domUnsubs) { try { u(); } catch { } }
+            for (const u of ctx.dataUnsubs) { try { u(); } catch { } }
+            b.bootInContainer(child)
+
+            // cleanup précédent
+            try { subStop?.(); } catch { }
         } catch (e) {
             console.warn("[bootVue.action] failed:", e);
         }
-
-        // 2) (re)monter la sous-UI
-        const child = (ctx.obj as any)[node.name];
-        if (!child) return;
-        for (const u of ctx.domUnsubs) { try { u(); } catch { } }
-        for (const u of ctx.dataUnsubs) { try { u(); } catch { } }
-        b.bootInContainer(child)
-
-        // cleanup précédent
-        try { subStop?.(); } catch { }
     };
 
     btn.addEventListener("click", onClick);
@@ -111,23 +111,19 @@ export function buildStaticBootVue<T extends object>(
     const onClick = () => {
         // 1) action()
         try {
-            const fn = (ctx.obj as any)[node.action];
-            if (typeof fn === "function") fn.call(ctx.obj);
+            const fn = (ctx.obj as any)[node.factory];
+            if (typeof fn !== "function") return;
+            const child = fn.call(ctx.obj);
+            if (!child) return;
+            for (const u of ctx.domUnsubs) { try { u(); } catch { } }
+            for (const u of ctx.dataUnsubs) { try { u(); } catch { } }
+            b.bootInContainer(child)
+
+            // cleanup précédent
+            try { subStop?.(); } catch { }
         } catch (e) {
             console.warn("[staticBootVue.action] failed:", e);
         }
-
-        // 2) (re)monter la sous-UI
-        const child = (ctx.obj as any)[node.name];
-        if (!child) return;
-
-        for (const u of ctx.domUnsubs) { try { u(); } catch { } }
-        for (const u of ctx.dataUnsubs) { try { u(); } catch { } }
-        b.bootInContainer(child)
-
-        // cleanup précédent
-        try { subStop?.(); } catch { }
-
     };
 
     btn.addEventListener("click", onClick);
