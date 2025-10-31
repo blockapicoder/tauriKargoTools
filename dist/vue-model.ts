@@ -599,7 +599,7 @@ export class Vue<T extends object> {
     }
 
     /* ------------ Single UI ------------ */
-    ui<NK extends KeysOfType<T, Objectish | null | undefined>>(opt: {
+    vue<NK extends KeysOfType<T, Objectish | null | undefined>>(opt: {
         /** Identifiants CSS/DOM */
         id?: string; class?: string | string[];
         name: NK;

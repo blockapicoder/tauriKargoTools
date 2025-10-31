@@ -74,7 +74,7 @@ defineVue(App, (uiApp) => {
             update: "changeApp",
             mode: "dropdown"
         })
-        uiApp.ui({ name: "appli" }),
+        uiApp.vue({ name: "appli" }),
             uiApp.staticButton({ action: "close", label: "Close" })
     })
 })
@@ -111,7 +111,7 @@ defineVue(AfficherImage, (ui) => {
 })
 defineVue(AppTree, (ui) => {
     ui.flow({ orientation: "column", gap: 5 }, () => {
-        ui.ui({ name: "tree" })
+        ui.vue({ name: "tree" })
         ui.staticButton({ action: "close", label: "Close" })
     })
 })
