@@ -32,6 +32,14 @@
   font-family: var(--ui-font);
 }
 
+.app span {
+  border: 1px solid var(--ui-border);
+  color: var(--ui-fg);
+  box-shadow: var(--ui-shadow);
+  border-radius: calc(var(--ui-radius) - 4px);
+  background-color: #b6c4e1;
+}
+
 @media (prefers-color-scheme: dark) {
   .app {
     --ui-fg: #e6e8ee;
@@ -397,5 +405,3 @@
     animation: none;
   }
 }
-
-

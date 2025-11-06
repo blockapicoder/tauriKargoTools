@@ -9,5 +9,5 @@
     "allowJs": false,
     "skipLibCheck": true
   },
-  "include": ["./dist","."]
+  "include": ["src","."]
 }

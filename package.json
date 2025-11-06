@@ -2,8 +2,8 @@
   "name": "tauri-kargo-tools",
   "version": "0.1.5",
   "description": "",
-   "files": ["dist"],
- "exports": { "./*": "./dist/*" },
+   "files": ["src"],
+ "exports": { "./*": "./src/*" },
   "publishConfig": { "access": "public" },
   "repository": {
     "type": "git",

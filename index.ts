@@ -1,5 +1,5 @@
-import * as test from "./dist/test"
-import * as api from './dist/api'
+import * as test from "./src/test"
+import * as api from './src/api'
 test.test("Test read file", async () => {
 
     const client = api.createClient();
