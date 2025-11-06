@@ -18,14 +18,21 @@ import { buildSelect } from "./builder/select";
 import { buildSingleVue } from "./builder/vue";
 import { Listener, Unlisten } from "./listener";
 import { getListener } from "./listener-factory";
+import { BootVueNode, StaticBootVueNode } from "./model/boot-vue";
+import { ButtonNode, StaticButtonNode } from "./model/button";
+import { CustomNode } from "./model/custom";
+import { DialogNode } from "./model/dialog";
+import { FlowNode } from "./model/flow";
+import { ImgNode } from "./model/img";
+import { InputNode } from "./model/input";
+import { LabelNode, StaticLabelNode } from "./model/label";
+import { ListVueNode } from "./model/list-of-vue";
+import { MenuNode } from "./model/menu";
+import { SelectNode } from "./model/select";
+import { SingleVueNode } from "./model/vue";
 import {
-    Vue, UINode,
-    InputNode, StaticButtonNode, SelectNode, LabelNode, FlowNode,
-    SingleVueNode, ListVueNode, DialogNode, CustomNode,
-    ButtonNode, ImgNode, MenuNode,
-    StaticLabelNode,
-    BootVueNode,
-    StaticBootVueNode
+    Vue, UINode
+
 } from "./vue-model";
 
 /* ===================== Runtime result ===================== */
@@ -119,10 +126,10 @@ export class Builder {
         this.container.replaceChildren()
         return this.bootInto(this.findVueFor(a)!, a, this.container);
     }
-    bootInContainer<T extends object>(a: T): VueRuntime<T> {
+    bootInContainer<T extends object>(a: T, parentQueue?: Array<() => void>): VueRuntime<T> {
         if (!this.container) throw new Error('Conteneur introuvable : ');
         this.container.replaceChildren()
-        return this.bootInto(this.findVueFor(a)!, a, this.container);
+        return this.bootInto(this.findVueFor(a)!, a, this.container, parentQueue);
     }
 
     /**
@@ -136,6 +143,7 @@ export class Builder {
         const dataUnsubs: Array<Unlisten> = [];
         const postInits: Array<() => void> = parentQueue ?? [];
 
+
         const ctx: Ctx<T> = {
             obj: a,
             listener,
@@ -144,6 +152,7 @@ export class Builder {
             dataUnsubs,
             postInits
         };
+
 
         this.buildNodes(ui.getTree(), ctx);
         for (const el of elements) container.appendChild(el);
@@ -154,6 +163,11 @@ export class Builder {
                 try { run(); } catch (e) { console.warn('[custom.init] failed:', e); }
             }
             postInits.length = 0;
+        }
+        const i = ui.init
+        if (i) {
+            try { (a as any)[i as unknown as string]!(container); }
+            catch (e) { console.warn('[custom.init] call failed:', e); }
         }
 
         return {

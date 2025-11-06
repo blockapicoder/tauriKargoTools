@@ -1,5 +1,6 @@
+import { ListVueNode } from "../model/list-of-vue";
 import { applyIdAndClass, applySize, Builder, Ctx, VueRuntime } from "../vue-builder";
-import { ListVueNode, Vue } from "../vue-model";
+import {  Vue } from "../vue-model";
 
 /* ----------- List UI (liste d'objets) ----------- */
 export function buildListOfVue<T extends object>(builder: Builder, node: ListVueNode<T>, ctx: Ctx<T>) {
@@ -62,4 +63,5 @@ export function buildListOfVue<T extends object>(builder: Builder, node: ListVue
     ctx.domUnsubs.push(() => clear());
 
     ctx.add(div);
+
 }

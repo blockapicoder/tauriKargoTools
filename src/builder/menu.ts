@@ -1,5 +1,6 @@
+import { MenuNode } from "../model/menu";
 import { applyIdAndClass, applySize, bindVisibleEnabled, Builder, clamp, Ctx, VueRuntime } from "../vue-builder";
-import { MenuNode, Vue } from "../vue-model";
+import {  Vue } from "../vue-model";
 /* ----------- Menu (modal <dialog> top-layer, placement précis, clics transmis aux items) ----------- */
 
 export function buildMenu<T extends object>(builder: Builder, node: MenuNode<T>, ctx: Ctx<T>) {

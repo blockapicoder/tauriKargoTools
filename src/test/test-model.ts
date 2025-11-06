@@ -377,8 +377,14 @@ export class DialogOwner {
         });
         const { width: cssW, height: cssH } = this.canvas.getBoundingClientRect();
         this.sizeCanvas = `${cssW}*${cssH}`
+        console.log("init Canvas")
 
     }
+    initVue( div:HTMLDivElement) {
+        console.log("initVue")
+        console.log(div.innerHTML)
+    }
+
 }
 export class AfficherImage extends ElementPanel {
     urlImage = "./chat.png"
@@ -434,13 +440,13 @@ export class Panel {
         bp.elementPanel = new AppTable()
         bp.name = "Table"
         bp.idx = 2
-     /*   this.buttons.push(bp)
-        bp = new ButtonPanel()
-        bp.elementPanel = new App()
-        bp.name = "App"
-        bp.idx = 3*/
+        /*   this.buttons.push(bp)
+           bp = new ButtonPanel()
+           bp.elementPanel = new App()
+           bp.name = "App"
+           bp.idx = 3*/
         this.buttons.push(bp)
-        for(const b of this.buttons) {
+        for (const b of this.buttons) {
             b.panel = this
         }
 

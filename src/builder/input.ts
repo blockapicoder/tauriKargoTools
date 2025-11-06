@@ -1,5 +1,6 @@
+import { InputNode } from "../model/input";
 import { applyIdAndClass, applySize, bindEnabled, bindVisible, Builder, Ctx } from "../vue-builder";
-import { InputNode } from "../vue-model";
+
 
 /* ----------- Input ----------- */
 export function buildInput<T extends object>(builder: Builder, node: InputNode<T, any>, ctx: Ctx<T>) {

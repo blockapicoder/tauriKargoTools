@@ -1,6 +1,6 @@
-import { Vue } from "./src/vue-model";
+import { Vue } from "../vue-model";
 import { AppTable, Personne } from "./test-model";
-import { defineVue } from "./src/vue";
+import { defineVue } from "../vue";
 
 
 // --- UIs (en t’appuyant sur ta classe UI avec .flow/.listUI/.input/.button) ---

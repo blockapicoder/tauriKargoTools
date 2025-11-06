@@ -1,5 +1,6 @@
+import { SingleVueNode } from "../model/vue";
 import { applyIdAndClass, applySize, Builder, Ctx, VueRuntime } from "../vue-builder";
-import { SingleVueNode, Vue } from "../vue-model";
+import {  Vue } from "../vue-model";
 
 /* ----------- Single UI (champ objet) ----------- */
     export function buildSingleVue<T extends object>(builder:Builder,node: SingleVueNode<T>, ctx: Ctx<T>) {
@@ -31,4 +32,6 @@ import { SingleVueNode, Vue } from "../vue-model";
         const off = ctx.listener.listen(node.name as keyof T, (v) => mountFor(v, false));
         ctx.dataUnsubs.push(off);
         ctx.domUnsubs.push(() => clearHost());
+
+    
     }

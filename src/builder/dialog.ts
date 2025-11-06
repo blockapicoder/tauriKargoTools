@@ -1,5 +1,6 @@
+import { DialogNode } from "../model/dialog";
 import { applyIdAndClass, applySize, bindVisibleEnabled, Builder, Ctx, VueRuntime } from "../vue-builder";
-import { DialogNode, Vue } from "../vue-model";
+import {  Vue } from "../vue-model";
 
  /* ----------- Dialog ----------- */
     export function buildDialog<T extends object>(builder:Builder,node: DialogNode<T>, ctx: Ctx<T>) {

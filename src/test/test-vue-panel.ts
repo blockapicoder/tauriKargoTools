@@ -1,7 +1,6 @@
-import { AfficherImage, App, AppPersonMoral, AppPersonPhysique, AppTree, DialogOwner, Tree, TreeMenu } from "./test-model"
+import { AfficherImage, App, AppPersonMoral, AppPersonPhysique, AppTree, ButtonPanel, DialogOwner, ElementPanel, Panel, Tree, TreeMenu } from "./test-model"
 import { } from "./test-table"
-
-import { defineVue, boot } from "./src/vue";
+import { defineVue, boot } from "../vue";
 
 // ---- Montage UI ----
 defineVue(AppPersonPhysique, (uiPerson) => {
@@ -30,7 +29,7 @@ defineVue(AppPersonPhysique, (uiPerson) => {
                     displayMethod: "formatPerson",
                     selection: "selected",
                     update: "onSelectedChange",
-                    mode: "multi-list"
+                    mode: "list"
                 });
             });
         });
@@ -97,14 +96,14 @@ defineVue(DialogOwner, (uiDialog) => {
 
     })
 
-})
+}, { init:"initVue"})
 defineVue(AfficherImage, (ui) => {
-    ui.flow({ orientation: "column", gap: 10 }, () => {
-        ui.flow({ orientation: "row", gap: 5, style: { margin: "25" } }, () => {
+    ui.flow({ orientation: "column", gap: 10, height: "100%", width: "100%", align: "center" }, () => {
+        ui.flow({ orientation: "row", gap: 5, width: "100%" }, () => {
             ui.staticButton({ action: "chat", label: "Chat", width: "50%" })
             ui.staticButton({ action: "chien", label: "Chien", width: "50%" })
         })
-        ui.img({ url: "urlImage", width: "100%" })
+        ui.img({ url: "urlImage", width: "50%", height: 500 })
         ui.staticButton({ action: "close", label: "Close", width: "100%" });
 
     })
@@ -140,8 +139,22 @@ defineVue(Tree, (ui) => {
     })
 
 })
+defineVue(ButtonPanel, (ui) => {
+ 
+    ui.button({ label: "name", action: "select",  enable: "enable" })
+ 
+})
+defineVue(Panel, (ui) => {
+    ui.flow({ orientation: "column", width: "100%", gap: 10 }, () => {
+        ui.listOfVue({
+            orientation: "row", list: "buttons", gap: 5
+        })
+        ui.vue({ name: "elementPanel", width: "100%" })
 
+
+    })
+})
 const app = new App();
 const dialog = new DialogOwner()
-boot(dialog, "#app")
+boot(new Panel(), "#app")
 //uiApp.boot(app, "#app"); // <div id="app"></div>

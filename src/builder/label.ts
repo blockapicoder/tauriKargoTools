@@ -1,5 +1,6 @@
+import { LabelNode, StaticLabelNode } from "../model/label";
 import { applyIdAndClass, applySize, bindVisibleEnabled, Builder, Ctx } from "../vue-builder";
-import { LabelNode, StaticLabelNode } from "../vue-model";
+
 /* ----------- Label ----------- */
 export function buildLabel<T extends object>(builder: Builder, node: LabelNode<T, any>, ctx: Ctx<T>) {
   const span = document.createElement('span');

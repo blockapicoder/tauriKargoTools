@@ -1,5 +1,5 @@
 import { Builder, VueRuntime } from "./vue-builder";
-import { Vue } from "./vue-model";
+import { HandlerKeys, Vue } from "./vue-model";
 
 const builder: Builder = new Builder()
 export function boot<T extends object>(
@@ -9,8 +9,14 @@ export function boot<T extends object>(
 
     return builder.boot(model, id);
 }
-export function defineVue<T extends object>(targetClass: new (...args: any[]) => T, f: (ui: Vue<T>) => void) {
+export interface Init<T> {
+    init?: HandlerKeys<T, HTMLDivElement>
+}
+export function defineVue<T extends object>(targetClass: new (...args: any[]) => T, f: (ui: Vue<T>) => void, init?: Init<T>) {
     const vue: Vue<T> = new Vue(targetClass)
+    if (init && init.init) {
+        vue.init = init.init
+    }
     builder.addUI(vue)
     f(vue)
 }

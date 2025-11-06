@@ -1,4 +1,5 @@
 // ./builder/boot-vue.ts
+import { BootVueNode, StaticBootVueNode } from "../model/boot-vue";
 import {
     Builder,
     Ctx,
@@ -8,8 +9,7 @@ import {
     bindEnabled,
 } from "../vue-builder";
 import {
-    BootVueNode,
-    StaticBootVueNode,
+
     Vue,
 } from "../vue-model";
 

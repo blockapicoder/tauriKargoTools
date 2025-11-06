@@ -1,5 +1,6 @@
+import { FlowNode } from "../model/flow";
 import { applyIdAndClass, applySize, Builder, Ctx } from "../vue-builder";
-import { FlowNode } from "../vue-model";
+
 
 /* ----------- Flow ----------- */
     export function buildFlow<T extends object>(builder:Builder,node: FlowNode<T>, ctx: Ctx<T>) {
