@@ -69,12 +69,12 @@ export type VoidMethodName1<T extends object, M> = KeysOfType<T, (m: M) => void>
 
 
 export type UINode<T extends object> =
-    | InputNode<T, any>
-    | StaticButtonNode<T, any>
-    | ButtonNode<T, any>
-    | ImgNode<T, any>
-    | SelectNode<T, any, any, any, any>
-    | LabelNode<T, any>
+    | InputNode<T>
+    | StaticButtonNode<T>
+    | ButtonNode<T>
+    | ImgNode<T>
+    | SelectNode<T>
+    | LabelNode<T>
     | FlowNode<T>
     | SingleVueNode<T>
     | ListVueNode<T>
@@ -82,8 +82,8 @@ export type UINode<T extends object> =
     | MenuNode<T>
     | CustomNode<T>
     | StaticLabelNode<T>
-    | BootVueNode<T, any, any, any>
-    | StaticBootVueNode<T, any, any>;
+    | BootVueNode<T>
+    | StaticBootVueNode<T>;
 
 /* ===================== UI (déclaratif uniquement) ===================== */
 export class Vue<T extends object> {
@@ -98,6 +98,9 @@ export class Vue<T extends object> {
 
     getTargetClass(): new (...args: any[]) => T { return this.targetClass; }
     getTree(): ReadonlyArray<UINode<T>> { return this.root; }
+    setTree( root:UINode<T>) {
+        this.root.push(root)
+    }
 
     /* ------------ Input ------------ */
     input<
@@ -201,7 +204,7 @@ export class Vue<T extends object> {
     }
 
     /* ------------ Label ------------ */
-    label<NK extends KeysOfType<T, string>>(name: NK, opt?: {
+    label<NK extends KeysOfType<T, string|number>>(name: NK, opt?: {
         /** Identifiants CSS/DOM */
         id?: string; class?: string | string[];
         width?: number | string; height?: number | string;

@@ -128,7 +128,7 @@ defineVue(Tree, (ui) => {
         ui.flow({ orientation: "column", gap: 5 }, () => {
             ui.flow({ orientation: "row", gap: 5 }, () => {
 
-                ui.menu({ name: "treeMenu", label: "./edit-2-line.png", action: "menu", type: "img", buttonHeight: 64, buttonWidth: 64 })
+                ui.menu({ name: "treeMenu", label: "./src/test/edit-2-line.png", action: "menu", type: "img", buttonHeight: 64, buttonWidth: 64 })
                 ui.input({ name: "value" })
             })
             ui.listOfVue({

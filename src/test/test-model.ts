@@ -1,11 +1,11 @@
+import { ElementPanel } from "./test-model-panel";
+import { Base, BaseAvecLog, BaseAvecMenu } from "./test-polymorphe";
 
 
 type Sexe = "Homme" | "Femme";
 type Person = { nom: string; prenom: string; age: number; sexe: Sexe };
 type PersonMoral = { nom: string; age: number; };
-export class ElementPanel {
 
-}
 class AppPerson {
 
 }
@@ -300,8 +300,8 @@ export class Tree {
     value: string = ""
     parent: Tree | undefined
     treeMenu: TreeMenu | undefined
-    close = "./folder-add-line.png"
-    open = "./folder-reduce-line.png"
+    close = "./src/test/folder-add-line.png"
+    open = "./src/test/folder-reduce-line.png"
     labelToggle = this.close
 
 
@@ -380,22 +380,22 @@ export class DialogOwner {
         console.log("init Canvas")
 
     }
-    initVue( div:HTMLDivElement) {
+    initVue(div: HTMLDivElement) {
         console.log("initVue")
         console.log(div.innerHTML)
     }
 
 }
 export class AfficherImage extends ElementPanel {
-    urlImage = "./chat.png"
+    urlImage = "./src/test/chat.png"
     owner!: DialogOwner
 
     chat() {
-        this.urlImage = "./chat.png"
+        this.urlImage = "./src/test/chat.png"
 
     }
     chien() {
-        this.urlImage = "./chien.png"
+        this.urlImage = "./src/test/chien.png"
     }
     close() {
         if (this.owner) {
@@ -440,11 +440,11 @@ export class Panel {
         bp.elementPanel = new AppTable()
         bp.name = "Table"
         bp.idx = 2
-        /*   this.buttons.push(bp)
-           bp = new ButtonPanel()
-           bp.elementPanel = new App()
-           bp.name = "App"
-           bp.idx = 3*/
+        this.buttons.push(bp)
+        bp = new ButtonPanel()
+        bp.elementPanel = new BaseAvecLog()
+        bp.name = "Compute"
+        bp.idx = 3
         this.buttons.push(bp)
         for (const b of this.buttons) {
             b.panel = this

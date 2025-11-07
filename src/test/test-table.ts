@@ -8,7 +8,7 @@ import { defineVue } from "../vue";
 
 
 defineVue(Personne, (PersonRowUI) => {
-    PersonRowUI.flow({ orientation: "row", gap: 12, align: "center", justify: "start" ,class:"marge"}, () => {
+    PersonRowUI.flow({ orientation: "row", gap: 12, justify: "center", class: "marge" }, () => {
         // Case à cocher
         // PersonRowUI.input({ name: "selected", update: "update", inputType: "checkbox" });
 
@@ -29,20 +29,24 @@ defineVue(AppTable, (AppUI) => {
         AppUI.flow({ orientation: "row", gap: 8, align: "center" }, () => {
             AppUI.staticButton({ label: "Ajouter", action: "addPerson" });
         });
-        AppUI.flow({ orientation: "row", gap: 12, align: "center", justify: "start" }, () => {
-            AppUI.label("colNom", { width: 200 })
-            AppUI.label("colPrenom", { width: 200 })
-            AppUI.label("colAge", { width: 200 })
-        });
-        // Liste des personnes : une sous-UI PersonRowUI par élément
-        AppUI.listOfVue({
-            list: "persons",
-            orientation: "column",
-            gap: 10,
-           // align: "stretch",
-            justify: "start",
-            class:"cadre"
-        });
+        AppUI.flow({ orientation: 'column', justify: 'start' ,class:"cadre"}, () => {
+            AppUI.flow({ orientation: "row", gap: 12, justify: "start", class: "marge" }, () => {
+                AppUI.label("colNom", { width: 200 })
+                AppUI.label("colPrenom", { width: 200 })
+                AppUI.label("colAge", { width: 200 })
+            });
+            // Liste des personnes : une sous-UI PersonRowUI par élément
+            AppUI.listOfVue({
+                list: "persons",
+                orientation: "column",
+                gap: 12,
+                // align: "stretch",
+              //  justify: "start",
+
+        
+                wrap: false
+            });
+        })
         AppUI.staticButton({ label: "Close", action: "close" })
     });
 })

@@ -1,4 +1,4 @@
-import { AfficherImage, App, AppPersonMoral, AppPersonPhysique, AppTree, ButtonPanel, DialogOwner, ElementPanel, Panel, Tree, TreeMenu } from "./test-model"
+import { AfficherImage, App, AppPersonMoral, AppPersonPhysique, AppTree, ButtonPanel, DialogOwner, Panel, Tree, TreeMenu } from "./test-model"
 import { } from "./test-table"
 import { defineVue, boot } from "../vue";
 
@@ -96,7 +96,7 @@ defineVue(DialogOwner, (uiDialog) => {
 
     })
 
-}, { init:"initVue"})
+}, { init: "initVue" })
 defineVue(AfficherImage, (ui) => {
     ui.flow({ orientation: "column", gap: 10, height: "100%", width: "100%", align: "center" }, () => {
         ui.flow({ orientation: "row", gap: 5, width: "100%" }, () => {
@@ -127,34 +127,34 @@ defineVue(Tree, (ui) => {
         ui.flow({ orientation: "column", gap: 5 }, () => {
             ui.flow({ orientation: "row", gap: 5 }, () => {
 
-                ui.menu({ name: "treeMenu", label: "./edit-2-line.png", action: "menu", type: "img", buttonHeight: 64, buttonWidth: 64 })
+                ui.menu({ name: "treeMenu", label: "./src/test/edit-2-line.png", action: "menu", type: "img", buttonHeight: 64, buttonWidth: 64 })
                 ui.input({ name: "value" })
             })
             ui.listOfVue({
                 orientation: "column",
                 list: "childrenVisible",
-                gap: 5
+                gap: 5,
+                wrap:false
             })
         })
     })
 
 })
 defineVue(ButtonPanel, (ui) => {
- 
-    ui.button({ label: "name", action: "select",  enable: "enable" })
- 
+
+    ui.button({ label: "name", action: "select", enable: "enable", width: "100%" })
+
 })
 defineVue(Panel, (ui) => {
     ui.flow({ orientation: "column", width: "100%", gap: 10 }, () => {
         ui.listOfVue({
-            orientation: "row", list: "buttons", gap: 5
+            orientation: "row", list: "buttons", gap: 5, wrap: true
         })
         ui.vue({ name: "elementPanel", width: "100%" })
 
 
     })
 })
-const app = new App();
-const dialog = new DialogOwner()
+
 boot(new Panel(), "#app")
-//uiApp.boot(app, "#app"); // <div id="app"></div>
+

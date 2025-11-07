@@ -3,7 +3,7 @@ import { KeysOfType } from "../vue-model";
 /** Label: clé limitée à string */
 export interface LabelNode<
     T extends object,
-    NK extends KeysOfType<T, string> = KeysOfType<T, string>
+    NK extends KeysOfType<T, string|number> = KeysOfType<T, string|number>
 > {
     kind: 'label';
     /** Identifiants CSS/DOM */

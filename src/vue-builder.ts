@@ -207,9 +207,22 @@ export class Builder {
     /* ===================== Sous-UI lookup via registry ===================== */
     findVueFor<T extends object>(value: any): Vue<T> | undefined {
         if (!value || typeof value !== "object") return undefined;
-        return this.registry.find((u: Vue<any>) => value instanceof u.getTargetClass());
+        return this.findVueForConstructor(value.constructor)
+
     }
 
+    findVueForConstructor<T extends object>(c: new (...args: any[]) => T): Vue<T> | undefined {
+        const r = this.registry.find((u: Vue<any>) => c === u.getTargetClass());
+        if (r) {
+            return r
+        }
+        const s = Object.getPrototypeOf(c)
+        if (s) {
+            return this.findVueForConstructor(s)
+        }
+        return undefined
+
+    }
 
 
     /* ---- Helper rendu du bouton trigger (Dialog/Menu) selon node.type ---- */
