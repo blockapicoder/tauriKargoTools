@@ -1,4 +1,4 @@
-import { ArrayKeys, VoidMethodName1 } from "../vue-model";
+import { ArrayKeys, KeysOfType, VoidMethodName1 } from "../vue-model";
 
 /** LIST UI — plus de listUI */
 export interface ListVueNode<T extends object> {
@@ -19,5 +19,6 @@ export interface ListVueNode<T extends object> {
     height?: number | string;
     elementWidth?: number | string;
     elementHeight?: number | string;
+    visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
 
 }

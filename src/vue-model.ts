@@ -18,7 +18,7 @@ import { SingleVueNode } from "./model/vue";
 
 /* ===================== Types utils et exports ===================== */
 export type KeysOfType<T, V> = { [K in keyof T]-?: T[K] extends V ? K : never }[keyof T];
-export type KeysOfTypeFunction<T, V> = { [K in keyof T]-?: T[K] extends (v:V)=>void ? K : never }[keyof T];
+export type KeysOfTypeFunction<T, V> = { [K in keyof T]-?: T[K] extends (v: V) => void ? K : never }[keyof T];
 export type ElementOf<A> =
     A extends ReadonlyArray<infer U> ? U :
     A extends (infer U)[] ? U : never;
@@ -31,10 +31,10 @@ export type Objectish = object;
 
 
 export type HandlerKeys<C, E> = {
-  [K in keyof C]-?:
-    C[K] extends (t:infer M) => void
-      ? M extends E ? K : never
-      : never
+    [K in keyof C]-?:
+    C[K] extends (t: infer M) => void
+    ? M extends E ? K : never
+    : never
 }[keyof C];
 
 
@@ -46,7 +46,7 @@ export type ButtonContentType = 'img' | 'html';
 
 /** Clés dont la valeur est un tableau (mutable ou readonly) */
 export type ArrayKeys<T> = {
-    [K in keyof T]-?: T[K] extends ReadonlyArray<any> | any[] ? K : never
+    [K in keyof T]-?: T[K] extends ReadonlyArray<any> | Array<any> ? K : never
 }[keyof T];
 
 /** Nom d'une méthode 0-arg de T qui retourne un HTMLElement */
@@ -91,14 +91,14 @@ export class Vue<T extends object> {
     private readonly root: UINode<T>[] = [];
     private cursor: UINode<T>[] = this.root;   // conteneur courant
     private stack: UINode<T>[][] = [];         // pile pour flow
-    init?:HandlerKeys<T,HTMLDivElement>
+    init?: HandlerKeys<T, HTMLDivElement>
     constructor(targetClass: new (...args: any[]) => T) {
         this.targetClass = targetClass;
     }
 
     getTargetClass(): new (...args: any[]) => T { return this.targetClass; }
     getTree(): ReadonlyArray<UINode<T>> { return this.root; }
-    setTree( root:UINode<T>) {
+    setTree(root: UINode<T>) {
         this.root.push(root)
     }
 
@@ -204,7 +204,7 @@ export class Vue<T extends object> {
     }
 
     /* ------------ Label ------------ */
-    label<NK extends KeysOfType<T, string|number>>(name: NK, opt?: {
+    label<NK extends KeysOfType<T, string | number>>(name: NK, opt?: {
         /** Identifiants CSS/DOM */
         id?: string; class?: string | string[];
         width?: number | string; height?: number | string;
@@ -260,7 +260,7 @@ export class Vue<T extends object> {
         label: string;
         /** Méthode 0-arg à appeler au clic */
         factory: KeysOfType<T, () => object>;
-         init?: KeysOfType<T, (m: HTMLDivElement) => void>;
+        init?: KeysOfType<T, (m: HTMLDivElement) => void>;
         /** Optionnel : rendu du bouton */
         type?: ButtonContentType;
         width?: number | string; height?: number | string;
@@ -334,6 +334,7 @@ export class Vue<T extends object> {
         width?: number | string; height?: number | string;
         elementWidth?: number | string;
         elementHeight?: number | string;
+        visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
     }): this {
         const node: ListVueNode<T> = {
             kind: 'listOfVue',

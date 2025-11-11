@@ -14,7 +14,7 @@ export interface InputNode<
 
     name: NK;
     update?: MethodNames0<T>;
-    label?: string;
+
     inputType?: InputType;
     muted?: boolean;
     width?: number | string;

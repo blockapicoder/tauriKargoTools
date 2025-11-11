@@ -4,14 +4,13 @@ import { applyIdAndClass, applySize, bindEnabled, bindVisible, Builder, Ctx } fr
 
 /* ----------- Input ----------- */
 export function buildInput<T extends object>(builder: Builder, node: InputNode<T, any>, ctx: Ctx<T>) {
-    const wrapper = document.createElement('label');
-    applyIdAndClass(wrapper, node);
-    wrapper.style.display = 'block';
-    if (node.label) wrapper.append(document.createTextNode(node.label + ' '));
+
+  
+
 
     const input = document.createElement('input');
-    applySize(wrapper, node.width, node.height);
-    applySize(input, "100%", "100%");
+    applySize(input, node.width, node.height);
+  applyIdAndClass(input, node);
     const current = (ctx.obj as any)[node.name];
     const typeGuess =
         node.inputType ??
@@ -32,11 +31,11 @@ export function buildInput<T extends object>(builder: Builder, node: InputNode<T
         (input as HTMLInputElement).value = (current ?? '') as any as string;
     }
 
-    wrapper.appendChild(input);
-    ctx.add(wrapper);
+
+    ctx.add(input);
 
     // visible / enable factorisés
-    bindVisible(node, wrapper, ctx);
+    bindVisible(node, input, ctx);
     bindEnabled(node, input, ctx);
 
     // modèle -> UI

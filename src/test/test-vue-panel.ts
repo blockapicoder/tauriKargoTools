@@ -123,18 +123,20 @@ defineVue(TreeMenu, (ui) => {
 defineVue(Tree, (ui) => {
 
     ui.flow({ orientation: "row", gap: 5 }, () => {
-        ui.button({ action: "toggle", label: "labelToggle", type: "img", height: 64, width: 64 })
-        ui.flow({ orientation: "column", gap: 5 }, () => {
-            ui.flow({ orientation: "row", gap: 5 }, () => {
+        ui.button({ action: "toggle", label: "labelToggle", type: "img", height: 64, width: 64 ,visible:"showToggle"})
+        ui.flow({ orientation: "column"}, () => {
+            ui.flow({ orientation: "row", gap: 5 ,style:{ marginBottom:'8px'} }, () => {
 
                 ui.menu({ name: "treeMenu", label: "./src/test/edit-2-line.png", action: "menu", type: "img", buttonHeight: 64, buttonWidth: 64 })
-                ui.input({ name: "value" })
+                ui.input({ name: "value", width: 300 })
             })
             ui.listOfVue({
                 orientation: "column",
-                list: "childrenVisible",
+                list: "children",
+                visible: "show",
                 gap: 5,
-                wrap:false
+
+                wrap: false
             })
         })
     })

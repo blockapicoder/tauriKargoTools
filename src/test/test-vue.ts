@@ -109,38 +109,5 @@ defineVue(AfficherImage, (ui) => {
 
     })
 })
-defineVue(AppTree, (ui) => {
-    ui.flow({ orientation: "column", gap: 5 }, () => {
-        ui.vue({ name: "tree" })
-        ui.staticButton({ action: "close", label: "Close" })
-    })
-})
-defineVue(TreeMenu, (ui) => {
-    ui.flow({ orientation: "column", gap: 5, style: { margin: "5px" } }, () => {
-        ui.staticButton({ action: "add", label: "Add" })
-        ui.staticButton({ action: "remove", label: "Remove" })
-    })
-})
-defineVue(Tree, (ui) => {
 
-    ui.flow({ orientation: "row", gap: 5 }, () => {
-        ui.button({ action: "toggle", label: "labelToggle", type: "img", height: 64, width: 64 })
-        ui.flow({ orientation: "column", gap: 5 }, () => {
-            ui.flow({ orientation: "row", gap: 5 }, () => {
-
-                ui.menu({ name: "treeMenu", label: "./src/test/edit-2-line.png", action: "menu", type: "img", buttonHeight: 64, buttonWidth: 64 })
-                ui.input({ name: "value" })
-            })
-            ui.listOfVue({
-                orientation: "column",
-                list: "childrenVisible",
-                gap: 5
-            })
-        })
-    })
-
-})
-
-const app = new App();
-const dialog = new DialogOwner()
 

@@ -1,6 +1,6 @@
 import { ListVueNode } from "../model/list-of-vue";
-import { applyIdAndClass, applySize, Builder, Ctx, VueRuntime } from "../vue-builder";
-import {  Vue } from "../vue-model";
+import { applyIdAndClass, applySize, bindEnabled, bindVisible, Builder, Ctx, VueRuntime } from "../vue-builder";
+import { Vue } from "../vue-model";
 
 /* ----------- List UI (liste d'objets) ----------- */
 export function buildListOfVue<T extends object>(builder: Builder, node: ListVueNode<T>, ctx: Ctx<T>) {
@@ -9,7 +9,8 @@ export function buildListOfVue<T extends object>(builder: Builder, node: ListVue
     div.style.display = 'flex';
     div.style.flexDirection = (node.orientation ?? 'column') === 'row' ? 'row' : 'column';
     applySize(div, node.width, node.height);
-
+    // bindVisible(node, div, ctx);
+    bindEnabled(node, div, ctx);
     if (node.gap !== undefined) (div.style as any).gap = typeof node.gap === 'number' ? `${node.gap}px` : String(node.gap);
     const mapJustify: Record<string, string> = {
         start: 'flex-start', end: 'flex-end', center: 'center',
@@ -37,7 +38,14 @@ export function buildListOfVue<T extends object>(builder: Builder, node: ListVue
 
     const render = () => {
         clear();
-        const arr = ((ctx.obj as any)[node.list] ?? []) as any[];
+        let visible = true
+        if (node.visible) {
+            visible = !!(ctx.obj as any)[node.visible]
+        }
+        let arr: any = [];
+        if (visible) {
+            arr = ((ctx.obj as any)[node.list] ?? []) as any[];
+        }
         for (const item of arr) {
             const ui = builder.findVueFor(item);
             if (!ui) continue;
@@ -60,6 +68,11 @@ export function buildListOfVue<T extends object>(builder: Builder, node: ListVue
     render();
     const off = ctx.listener.listen(node.list as keyof T, () => render());
     ctx.dataUnsubs.push(off);
+    if (node.visible) {
+        const offVisible = ctx.listener.listen(node.visible as keyof T, () => render());
+        ctx.dataUnsubs.push(offVisible);
+    }
+
     ctx.domUnsubs.push(() => clear());
 
     ctx.add(div);

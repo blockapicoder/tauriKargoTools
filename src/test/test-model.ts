@@ -277,17 +277,19 @@ export class TreeMenu {
         const nb = new Tree()
         nb.parent = this.tree
         this.tree.children.push(nb)
+        this.tree.children = [... this.tree.children]
         this.tree.labelToggle = this.tree.open
-        this.tree.childrenVisible = [...this.tree.children]
+        this.tree.show = true
+
         this.tree.treeMenu = undefined
+        this.tree.showToggle = true
 
     }
     remove() {
         if (this.tree.parent) {
             this.tree.parent.children = this.tree.parent.children.filter((t) => t !== this.tree)
-            if (this.tree.parent.childrenVisible) {
-                this.tree.parent.childrenVisible = this.tree.parent.children
-            }
+            this.tree.parent.showToggle = this.tree.parent.children.length > 0
+      
         }
         this.tree.treeMenu = undefined
 
@@ -295,7 +297,7 @@ export class TreeMenu {
 
 }
 export class Tree {
-    childrenVisible: Tree[] = []
+
     children: Tree[] = []
     value: string = ""
     parent: Tree | undefined
@@ -303,15 +305,19 @@ export class Tree {
     close = "./src/test/folder-add-line.png"
     open = "./src/test/folder-reduce-line.png"
     labelToggle = this.close
+    show: boolean = true
+    showToggle: boolean = false
 
 
     toggle() {
         if (this.labelToggle === this.close) {
-            this.childrenVisible = this.children
+          //  this.childrenVisible = this.children
             this.labelToggle = this.open
+            this.show = true
         } else {
-            this.childrenVisible = []
+           // this.childrenVisible = []
             this.labelToggle = this.close
+            this.show = false
         }
 
     }
