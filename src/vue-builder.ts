@@ -47,7 +47,11 @@ export function applySize(el: HTMLElement, width?: number | string, height?: num
     if (width !== undefined) el.style.width = typeof width === 'number' ? `${width}px` : width;
     if (height !== undefined) el.style.height = typeof height === 'number' ? `${height}px` : height;
 }
-export function setVisible(el: HTMLElement, v: boolean) {
+export function setVisible(el: HTMLElement, v: boolean, useVisibility: boolean) {
+    if (useVisibility) {
+        el.style.visibility = v ? "" : "hidden";
+        return;
+    }
     el.style.display = v ? "" : "none";
 }
 export function setEnabled(el: HTMLElement, enabled: boolean) {
@@ -70,14 +74,14 @@ export function clamp(v: number, min: number, max: number) {
     return Math.max(min, Math.min(max, v));
 }
 /** ===================== Factorisation visible/enable ===================== */
-export type WithVisible<T> = { visible?: keyof T };
+export type WithVisible<T> = { visible?: keyof T, useVisibility?: boolean };
 export type WithEnable<T> = { enable?: keyof T };
 
 export function bindVisible<T extends object>(node: WithVisible<T>, el: HTMLElement, ctx: Ctx<T>) {
     const key = node.visible as keyof T | undefined;
     if (key == null) return;
-    setVisible(el, !!(ctx.obj as any)[key]);
-    const off = ctx.listener.listen(key, (v: any) => setVisible(el, !!v));
+    setVisible(el, !!(ctx.obj as any)[key], !!node.useVisibility);
+    const off = ctx.listener.listen(key, (v: any) => setVisible(el, !!v, !!node.useVisibility));
     ctx.dataUnsubs.push(off);
 }
 

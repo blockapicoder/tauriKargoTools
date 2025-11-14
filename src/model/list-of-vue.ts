@@ -20,5 +20,6 @@ export interface ListVueNode<T extends object> {
     elementWidth?: number | string;
     elementHeight?: number | string;
     visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
+    useVisibility?: boolean;
 
 }

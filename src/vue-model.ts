@@ -112,6 +112,7 @@ export class Vue<T extends object> {
         name: NK; update?: M; label?: string; inputType?: InputType; muted?: boolean;
         width?: number | string; height?: number | string;
         visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
+        useVisibility?: boolean;
     }): this {
         const node: InputNode<T, NK> = {
             kind: 'input',
@@ -133,6 +134,7 @@ export class Vue<T extends object> {
         visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
         /** Nouveaux champs */
         type?: ButtonContentType;
+        useVisibility?: boolean;
         name?: NK;
     }): this {
         const node: StaticButtonNode<T, NK> = {
@@ -153,6 +155,7 @@ export class Vue<T extends object> {
         label: LK; action: MN; muted?: boolean;
         width?: number | string; height?: number | string;
         visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
+        useVisibility?: boolean;
         /** Nouveaux champs */
         type?: ButtonContentType;
         name?: KeysOfType<T, string>;
@@ -172,6 +175,7 @@ export class Vue<T extends object> {
         url: NK; alt?: string;
         width?: number | string; height?: number | string;
         visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
+        useVisibility?: boolean;
     }): this {
         const node: ImgNode<T, NK> = {
             kind: 'img',
@@ -194,6 +198,7 @@ export class Vue<T extends object> {
         muted?: boolean; mode?: 'dropdown' | 'list' | "multi-list";
         width?: number | string; height?: number | string;
         visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
+        useVisibility?: boolean;
     }): this {
         const node: SelectNode<T, LK, DM, SK, UM> = {
             kind: 'select',
@@ -209,6 +214,7 @@ export class Vue<T extends object> {
         id?: string; class?: string | string[];
         width?: number | string; height?: number | string;
         visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
+        useVisibility?: boolean;
     }): this {
         const node: LabelNode<T, NK> = {
             kind: 'label',
@@ -239,6 +245,7 @@ export class Vue<T extends object> {
         type?: ButtonContentType;
         width?: number | string; height?: number | string;
         visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
+        useVisibility?: boolean;
     }): this {
         const node: BootVueNode<T, NK, LK, MN> = {
             kind: 'bootVue',
@@ -265,6 +272,7 @@ export class Vue<T extends object> {
         type?: ButtonContentType;
         width?: number | string; height?: number | string;
         visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
+        useVisibility?: boolean;
     }): this {
         const node: StaticBootVueNode<T, NK, MN> = {
             kind: 'staticBootVue',
@@ -335,6 +343,7 @@ export class Vue<T extends object> {
         elementWidth?: number | string;
         elementHeight?: number | string;
         visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
+        useVisibility?: boolean;
     }): this {
         const node: ListVueNode<T> = {
             kind: 'listOfVue',
@@ -357,6 +366,7 @@ export class Vue<T extends object> {
         width?: number | string; height?: number | string;
         closeOnBackdrop?: boolean; closeOnEsc?: boolean; modal?: boolean;
         visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
+          useVisibility?: boolean;
         action?: KeysOfType<T, () => void>;
         /** Nouveau : rendu du bouton trigger */
         type?: ButtonContentType;
@@ -380,6 +390,7 @@ export class Vue<T extends object> {
         width?: number | string; height?: number | string;
         closeOnBackdrop?: boolean; closeOnEsc?: boolean; modal?: boolean;
         visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
+          useVisibility?: boolean;
         action?: KeysOfType<T, () => void>;
         /** Nouveau : rendu du bouton trigger */
         type?: ButtonContentType;
@@ -398,6 +409,7 @@ export class Vue<T extends object> {
         id?: string; class?: string | string[];
         width?: number | string; height?: number | string;
         visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
+         useVisibility?: boolean;
         /** Nom de la méthode de T: () => HTMLElement */
         factory: FK;
         /** Nom de la méthode d'init: () => void (optionnelle) */

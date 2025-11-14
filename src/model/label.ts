@@ -15,6 +15,7 @@ export interface LabelNode<
     height?: number | string;
     visible?: KeysOfType<T, boolean>;
     enable?: KeysOfType<T, boolean>;
+      useVisibility?: boolean;
 }
 /** Label: clé limitée à string */
 export interface StaticLabelNode<
@@ -30,4 +31,5 @@ export interface StaticLabelNode<
     height?: number | string;
     visible?: KeysOfType<T, boolean>;
     enable?: KeysOfType<T, boolean>;
+      useVisibility?: boolean;
 }

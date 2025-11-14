@@ -27,6 +27,7 @@ export interface BootVueNode<
     height?: number | string;
     visible?: KeysOfType<T, boolean>;
     enable?: KeysOfType<T, boolean>;
+    useVisibility?: boolean;
 }
 /** StaticBootVue — bouton qui "boot" une Vue (label fixe) */
 export interface StaticBootVueNode<

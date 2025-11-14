@@ -123,7 +123,7 @@ defineVue(TreeMenu, (ui) => {
 defineVue(Tree, (ui) => {
 
     ui.flow({ orientation: "row", gap: 5 }, () => {
-        ui.button({ action: "toggle", label: "labelToggle", type: "img", height: 64, width: 64 ,visible:"showToggle"})
+        ui.button({ action: "toggle", label: "labelToggle", type: "img", height: 64, width: 64 ,visible:"showToggle",useVisibility:true})
         ui.flow({ orientation: "column"}, () => {
             ui.flow({ orientation: "row", gap: 5 ,style:{ marginBottom:'8px'} }, () => {
 

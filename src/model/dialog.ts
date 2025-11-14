@@ -24,4 +24,5 @@ export interface DialogNode<T extends object> {
 
     /** Rendu du bouton trigger : 'img' = URL (dans `label`), 'html' = markup (dans `label`). */
     type?: ButtonContentType;
+      useVisibility?: boolean;
 }

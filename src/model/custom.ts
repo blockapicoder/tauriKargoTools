@@ -23,4 +23,5 @@ export interface CustomNode<
 
     /** Nom d'une méthode sur T: () => void (appelée après création/insert du DOM) */
     init?: IK;
+    useVisibility?: boolean;
 }

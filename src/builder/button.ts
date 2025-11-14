@@ -1,5 +1,5 @@
 import { ButtonNode, StaticButtonNode } from "../model/button";
-import { applyIdAndClass, applySize, bindVisibleEnabled, Builder, Ctx } from "../vue-builder";
+import { applyIdAndClass, applySize, bindEnabled, bindVisible, bindVisibleEnabled, Builder, Ctx } from "../vue-builder";
 
 
 /* ----------- Button ----------- */
@@ -107,7 +107,6 @@ export function buildButton<T extends object>(builder: Builder, node: ButtonNode
         });
         ctx.dataUnsubs.push(offAlt);
     }
-
     bindVisibleEnabled(node, btn, ctx);
 
     const onClick = () => {

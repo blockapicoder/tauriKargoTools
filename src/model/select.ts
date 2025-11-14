@@ -23,4 +23,5 @@ export interface SelectNode<
     height?: number | string;
     visible?: KeysOfType<T, boolean>;
     enable?: KeysOfType<T, boolean>;
+      useVisibility?: boolean;
 }

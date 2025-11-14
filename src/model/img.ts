@@ -17,4 +17,5 @@ export interface ImgNode<
     height?: number | string;
     visible?: KeysOfType<T, boolean>;
     enable?: KeysOfType<T, boolean>;
+      useVisibility?: boolean;
 }

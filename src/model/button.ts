@@ -14,6 +14,7 @@ export interface StaticButtonNode<T extends object, NK extends KeysOfType<T, str
     height?: number | string;
     visible?: KeysOfType<T, boolean>;
     enable?: KeysOfType<T, boolean>;
+     useVisibility?: boolean;
 
     /** Rendu optionnel : 'img' = URL d'image, 'html' = markup HTML (depuis `name` si fourni, sinon `label`). */
     type?: ButtonContentType;
