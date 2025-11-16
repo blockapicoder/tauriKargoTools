@@ -448,7 +448,7 @@ export class Panel {
         bp.idx = 2
         this.buttons.push(bp)
         bp = new ButtonPanel()
-        bp.elementPanel = new BaseAvecLog()
+        bp.elementPanel = new BaseAvecMenu()
         bp.name = "Compute"
         bp.idx = 3
         this.buttons.push(bp)

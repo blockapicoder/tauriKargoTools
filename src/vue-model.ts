@@ -14,6 +14,7 @@ import { LabelNode, StaticLabelNode } from "./model/label";
 import { ListVueNode } from "./model/list-of-vue";
 import { MenuNode } from "./model/menu";
 import { SelectNode } from "./model/select";
+import { Space } from "./model/space";
 import { SingleVueNode } from "./model/vue";
 
 /* ===================== Types utils et exports ===================== */
@@ -83,6 +84,7 @@ export type UINode<T extends object> =
     | CustomNode<T>
     | StaticLabelNode<T>
     | BootVueNode<T>
+    | Space
     | StaticBootVueNode<T>;
 
 /* ===================== UI (déclaratif uniquement) ===================== */
@@ -166,6 +168,12 @@ export class Vue<T extends object> {
         };
         this.cursor.push(node as unknown as UINode<T>);
         return this;
+    }
+    space(width: string, height: string) {
+        const space: Space = { kind: "space", width: width, height: height }
+        this.cursor.push(space);
+        return this;
+
     }
 
     /* ------------ Img ------------ */
@@ -366,7 +374,7 @@ export class Vue<T extends object> {
         width?: number | string; height?: number | string;
         closeOnBackdrop?: boolean; closeOnEsc?: boolean; modal?: boolean;
         visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
-          useVisibility?: boolean;
+        useVisibility?: boolean;
         action?: KeysOfType<T, () => void>;
         /** Nouveau : rendu du bouton trigger */
         type?: ButtonContentType;
@@ -390,7 +398,7 @@ export class Vue<T extends object> {
         width?: number | string; height?: number | string;
         closeOnBackdrop?: boolean; closeOnEsc?: boolean; modal?: boolean;
         visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
-          useVisibility?: boolean;
+        useVisibility?: boolean;
         action?: KeysOfType<T, () => void>;
         /** Nouveau : rendu du bouton trigger */
         type?: ButtonContentType;
@@ -409,7 +417,7 @@ export class Vue<T extends object> {
         id?: string; class?: string | string[];
         width?: number | string; height?: number | string;
         visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
-         useVisibility?: boolean;
+        useVisibility?: boolean;
         /** Nom de la méthode de T: () => HTMLElement */
         factory: FK;
         /** Nom de la méthode d'init: () => void (optionnelle) */

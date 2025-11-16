@@ -4,7 +4,7 @@ import { ElementPanel } from "./test-model-panel"
 
 
 
-export  class Base extends ElementPanel {
+export class Base extends ElementPanel {
     op!: string
     a!: number
     b!: number
@@ -104,6 +104,10 @@ defineVue(MenuOp, {
             label: '*',
             action: "mul",
             width: "100%"
+        },
+        {
+            kind: 'space',
+            height: 10
         },
         {
             kind: 'staticButton',

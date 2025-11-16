@@ -15,6 +15,7 @@ import { buildLabel, buildStaticLabel } from "./builder/label";
 import { buildListOfVue } from "./builder/list-of-vue";
 import { buildMenu } from "./builder/menu";
 import { buildSelect } from "./builder/select";
+import { buildSpace } from "./builder/space";
 import { buildSingleVue } from "./builder/vue";
 import { Listener, Unlisten } from "./listener";
 import { getListener } from "./listener-factory";
@@ -29,6 +30,7 @@ import { LabelNode, StaticLabelNode } from "./model/label";
 import { ListVueNode } from "./model/list-of-vue";
 import { MenuNode } from "./model/menu";
 import { SelectNode } from "./model/select";
+import { Space } from "./model/space";
 import { SingleVueNode } from "./model/vue";
 import {
     Vue, UINode
@@ -204,6 +206,7 @@ export class Builder {
                 case 'custom': buildCustom(this, node as CustomNode<T, any, any>, ctx); break;
                 case "bootVue": buildBootVue(this, node as BootVueNode<T, any>, ctx); break;
                 case 'staticBootVue': buildStaticBootVue(this, node as StaticBootVueNode<T>, ctx); break;
+                case "space":buildSpace(this,node as Space,ctx);
             }
         }
     }
