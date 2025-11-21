@@ -4,7 +4,7 @@ import { HandlerKeys, UINode, Vue } from "./vue-model";
 const builder: Builder = new Builder()
 export function boot<T extends object>(
     model: T,
-    id: string
+    id?: string
 ): VueRuntime<T> {
 
     return builder.boot(model, id);
