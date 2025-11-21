@@ -88,4 +88,6 @@ defineVue(Main, (ui) => {
 
 },{ init:"initVue"})
 
-boot(new Main(), "#app")
+boot(new Main())
+
+

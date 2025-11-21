@@ -158,5 +158,5 @@ defineVue(Panel, (ui) => {
     })
 })
 
-boot(new Panel(), "#app")
+boot(new Panel())
 

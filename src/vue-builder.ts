@@ -126,8 +126,21 @@ export class Builder {
     }
 
     /** Monte `ui` dans `selector`. */
-    boot<T extends object>(a: T, selector: string): VueRuntime<T> {
-        this.container = document.querySelector(selector) as HTMLElement | null;
+    boot<T extends object>(a: T, selector?: string): VueRuntime<T> {
+        if (!selector) {
+            document.body.className = "app"
+            this.container = document.createElement("div")
+            document.body.appendChild(this.container)    
+            const link = document.createElement("link")
+            link.rel ="stylesheet"
+            const scriptUrl = import.meta.url;
+            const scriptDir = scriptUrl.substring(0, scriptUrl.lastIndexOf('/') + 1);
+            const cssLink= `${scriptDir}css/vue-darkmode.css`
+            link.href = cssLink
+            document.body.appendChild(link)
+        } else {
+            this.container = document.querySelector(selector) as HTMLElement | null;
+        }
         if (!this.container) throw new Error('Conteneur introuvable : ' + selector);
         this.container.replaceChildren()
         return this.bootInto(this.findVueFor(a)!, a, this.container);
@@ -206,7 +219,7 @@ export class Builder {
                 case 'custom': buildCustom(this, node as CustomNode<T, any, any>, ctx); break;
                 case "bootVue": buildBootVue(this, node as BootVueNode<T, any>, ctx); break;
                 case 'staticBootVue': buildStaticBootVue(this, node as StaticBootVueNode<T>, ctx); break;
-                case "space":buildSpace(this,node as Space,ctx);
+                case "space": buildSpace(this, node as Space, ctx);
             }
         }
     }
