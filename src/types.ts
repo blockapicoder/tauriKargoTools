@@ -116,6 +116,7 @@ export interface ExplorerFile {
 
 export interface ExplorerDirectory {
   type: "directory";
+  name:string;
   path: string;
   parent: string | null;
   content: ExplorerElement[];
