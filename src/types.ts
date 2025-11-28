@@ -104,29 +104,86 @@ export interface StopAllResp {
 export interface ExplorerReq {
   path?: string;
 }
+// api-explorer
+// =====================
+// /api/explorer - types
+// =====================
 
-export type ExplorerElement = ExplorerDirectory | ExplorerFile
+export type ExplorerMode = "array" | "tree";
 
-export interface ExplorerFile {
-  type: "file";
-  path: string;
-  name: string;
-  parent: string | null;
-}
+export type ExplorerRequest = {
+  /** vide => CWD côté serveur ; relatif => CWD+rel ; absolu => tel quel */
+  path?: string;
 
-export interface ExplorerDirectory {
-  type: "directory";
-  name:string;
-  path: string;
-  parent: string | null;
-  content: ExplorerElement[];
-}
+  /** "array" => content = fichiers à plat ; "tree" => content = arborescence */
+  type?: ExplorerMode;
 
-export interface ExplorerError {
+  /** profondeur max (enfants directs = 1). Si absent et type absent => default serveur: 1 */
+  maxDeep?: number;
+
+  /** nombre max de fichiers retournés (limite globale) */
+  maxSize?: number;
+};
+
+// ---- réponses ----
+
+export type ExplorerErrorResponse = {
   type: "error";
   message: string;
-}
+};
 
+export type ExplorerFileResponse = {
+  type: "file";
+  /** chemin absolu (format "joli" Windows/UNC si applicable) */
+  path: string;
+  name: string;
+  /** chemin absolu du parent ou null si racine */
+  parent: string | null;
+};
+
+export type ExplorerArrayFileItem = {
+  type:'file'
+  name: string;
+  /** chemin absolu du fichier */
+  path: string;
+};
+
+export type ExplorerTreeItem =
+  | {
+      type: "file";
+      name: string;
+      path: string; // absolu
+    }
+  | {
+      type: "directory";
+      name: string;
+      path: string; // absolu
+      /** peut être absent si maxDeep empêche d'expand */
+      content?: ExplorerTreeItem[];
+    };
+
+export type ExplorerDirectoryResponse =
+  | {
+      type: "directory";
+      path: string; // absolu
+      parent: string | null;
+      /** si request.type === "array" */
+      content: ExplorerArrayFileItem[];
+    }
+  | {
+      type: "directory";
+      path: string; // absolu
+      parent: string | null;
+      /** si request.type === "tree" (ou mode absent côté compat) */
+      content: ExplorerTreeItem[];
+    };
+
+export type ExplorerResponse =
+  | ExplorerErrorResponse
+  | ExplorerFileResponse
+  | ExplorerDirectoryResponse;
+
+//
 export interface NewServerReq {
   code: string;
   executable: string;
@@ -156,10 +213,7 @@ export interface StopServerResp {
    ========================= */
 
 /** Result of /api/explorer (200) */
-export type ExplorerResult = ExplorerFile | ExplorerDirectory;
 
-/** Error shapes from /api/explorer (404/500) */
-export type ExplorerErrorResult = ExplorerError;
 
 /* =========================
    (Optionnel) Types d’IO par route

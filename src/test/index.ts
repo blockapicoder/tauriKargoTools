@@ -35,7 +35,8 @@ test.test("Test read file", async () => {
 
         }), false, "pas dans rep")
     }
-
+    rep  = await client.explorer( {  type:"array" ,  path:"C:/Users/david/Documents/GitHub/tauriKargoExamples/examples/test-api-file-typescript"})
+    console.log(rep)
 
 
 

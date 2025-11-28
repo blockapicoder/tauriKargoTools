@@ -185,8 +185,8 @@ async writeFileBinary(
   /* =============== Routes: Explorer =============== */
 
   /** POST /api/explorer */
-  explorer(body: T.ExplorerReq): Promise<T.ExplorerResult> {
-    return this.postJson<T.ExplorerResult>("/api/explorer", body);
+  explorer(body: T.ExplorerRequest): Promise<T.ExplorerResponse> {
+    return this.postJson<T.ExplorerResponse>("/api/explorer", body);
   }
 
   /* =============== Routes: Servers =============== */

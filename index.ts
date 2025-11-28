@@ -1,2 +1,2 @@
-import * as app from "./src/test/test-vue-boot"
+import * as app from "./src/test/index"
 console.log("hello bonjour",app)
