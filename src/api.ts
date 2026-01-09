@@ -21,7 +21,7 @@ export class TauriKargoClient {
 
   constructor(opts: ClientOptions = {}) {
     const port = opts.port ?? 8080;
-    this.baseUrl = opts.baseUrl ?? (opts.port ?`http://127.0.0.1:${port}`:'');
+    this.baseUrl = opts.baseUrl ?? (opts.port ? `http://127.0.0.1:${port}` : '');
     this.headers = opts.headers ?? {};
     this.fetchImpl = opts.fetchImpl ?? (globalThis.fetch?.bind(globalThis) as FetchLike);
     if (!this.fetchImpl) throw new Error("No fetch implementation available.");
@@ -29,7 +29,7 @@ export class TauriKargoClient {
 
   /* =============== Helpers HTTP =============== */
 
-  private  req(path: string, init: RequestInit): Promise<Response> {
+  private req(path: string, init: RequestInit): Promise<Response> {
     const url = this.baseUrl + path;
     const headers = { ...this.headers, ...(init.headers || {}) } as Record<string, string>;
     return this.fetchImpl(url, { ...init, headers });
@@ -91,7 +91,10 @@ export class TauriKargoClient {
   setCurrentDirectory(body: T.CurrentDirReq): Promise<T.CurrentDirResp> {
     return this.postJson<T.CurrentDirResp>("/api/current-directory", body);
   }
-
+  /**POST /api/directory/create*/
+  createDirectory(path: string): Promise<T.CreateDirResp> {
+    return this.postJson<T.CreateDirResp>("/api/directory/create", { path: path });
+  }
   /**
    * Lire un fichier texte relatif au répertoire courant.
    * (POST sans corps ⇒ READ ; renvoie text/plain ou octet-stream)
@@ -125,33 +128,33 @@ export class TauriKargoClient {
   }
 
   /** Écrire un fichier binaire */
-async writeFileBinary(
-  file: string,
-  data:  Blob 
-): Promise<T.FileWriteResp> {
-  // Normalise en Blob (OK WebView2/WebKit/Chromium)
-  const blob = data
+  async writeFileBinary(
+    file: string,
+    data: Blob
+  ): Promise<T.FileWriteResp> {
+    // Normalise en Blob (OK WebView2/WebKit/Chromium)
+    const blob = data
 
-  const res = await fetch(`${this.baseUrl}/api/file/${encodeURIComponent(file)}`, {
-    method: "POST",
-    // Laisser fetch gérer le Content-Length; Content-Type vient du blob
-    headers: { "content-type": blob.type || "application/octet-stream" },
-    body: blob,
-  });
+    const res = await fetch(`${this.baseUrl}/api/file/${encodeURIComponent(file)}`, {
+      method: "POST",
+      // Laisser fetch gérer le Content-Length; Content-Type vient du blob
+      headers: { "content-type": blob.type || "application/octet-stream" },
+      body: blob,
+    });
 
-  if (!res.ok) {
-    const text = await res.text().catch(() => "<no-body>");
-    throw new Error(`WRITE ${file} failed: ${res.status} ${text}`);
+    if (!res.ok) {
+      const text = await res.text().catch(() => "<no-body>");
+      throw new Error(`WRITE ${file} failed: ${res.status} ${text}`);
+    }
+
+    // La route renvoie du JSON en cas d’écriture
+    const ct = res.headers.get("content-type") || "";
+    if (ct.includes("application/json")) {
+      return (await res.json()) as T.FileWriteResp;
+    }
+    // Fallback s'il répond "text/plain" avec un JSON sérialisé
+    return JSON.parse(await res.text()) as T.FileWriteResp;
   }
-
-  // La route renvoie du JSON en cas d’écriture
-  const ct = res.headers.get("content-type") || "";
-  if (ct.includes("application/json")) {
-    return (await res.json()) as T.FileWriteResp;
-  }
-  // Fallback s'il répond "text/plain" avec un JSON sérialisé
-  return JSON.parse(await res.text()) as T.FileWriteResp;
-}
 
   /** DELETE /api/file/{file} */
   async deleteFile(file: string): Promise<T.FileDeleteResp> {

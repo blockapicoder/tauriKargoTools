@@ -45,7 +45,11 @@ export interface CurrentDirResp {
   message: string;
   current: string;
 }
-
+export interface CreateDirResp {
+  ok: boolean;
+  message: string;
+  created: string;
+}
 export interface FileWriteResp {
   ok: boolean;
   message: string;

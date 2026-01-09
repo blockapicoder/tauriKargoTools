@@ -126,6 +126,14 @@ test.test("Test read file", async () => {
 
         }), false, "pas dans rep")
     }
+    const repCreateDir = await client.createDirectory("toto/titi");
+    rep = await client.explorer({})
+    if (rep.type === "directory") {
+        test.assertEquals(rep.content.some((e) => e.name === "toto"), true)
+
+    } else {
+        throw new Error('error pas rep')
+    }
     rep = await client.explorer({ type: "array", path: "C:/Users/david/Documents/GitHub/tauriKargoExamples/examples/test-api-file-typescript" })
     console.log(rep)
 
