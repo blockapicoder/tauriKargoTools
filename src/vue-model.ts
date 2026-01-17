@@ -233,6 +233,22 @@ export class Vue<T extends object> {
         return this;
     }
 
+    /* ------------ Label ------------ */
+    staticLabel(label: string, opt?: {
+        /** Identifiants CSS/DOM */
+        id?: string; class?: string | string[];
+        width?: number | string; height?: number | string;
+        visible?: KeysOfType<T, boolean>; enable?: KeysOfType<T, boolean>;
+        useVisibility?: boolean;
+    }): this {
+        const node: StaticLabelNode<T>= {
+            kind: 'staticLabel',
+            label,
+            ...opt
+        };
+        this.cursor.push(node as unknown as UINode<T>);
+        return this;
+    }
 
 
     /* ------------ BootVue (label dynamique) ------------ */
