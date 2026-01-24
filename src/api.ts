@@ -95,6 +95,10 @@ export class TauriKargoClient {
   createDirectory(path: string): Promise<T.CreateDirResp> {
     return this.postJson<T.CreateDirResp>("/api/directory/create", { path: path });
   }
+
+  typescriptTranspile(src: string): Promise<T.TypeScriptTranspileResponse> {
+    return this.postJson<T.TypeScriptTranspileResponse>("/api/typescript/transpile", { src: src });
+  }
   /**
    * Lire un fichier texte relatif au répertoire courant.
    * (POST sans corps ⇒ READ ; renvoie text/plain ou octet-stream)

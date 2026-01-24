@@ -104,7 +104,14 @@ export interface StopAllResp {
   ok: boolean;
   message: string;
 }
+export type TypeScriptTranspileInput = { src: string };
 
+export type TypeScriptTranspileSuccess = { ok: true; src: string };
+
+export type TypeScriptTranspileError = { ok: false; message: string };
+
+export type TypeScriptTranspileResponse = TypeScriptTranspileSuccess | TypeScriptTranspileError;
+ 
 export interface ExplorerReq {
   path?: string;
 }

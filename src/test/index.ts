@@ -91,6 +91,14 @@ test.test("Test schema simple avec deux type", async () => {
 
 
 })
+test.test("Test transpile ", async()=> {
+      const client = api.createClient();
+      const src = `  function m( n:number) { return n+1}`
+      const r = await client.typescriptTranspile(src)
+      console.log(JSON.stringify(r))
+
+
+})
 test.test("Test read file", async () => {
 
     const client = api.createClient();
