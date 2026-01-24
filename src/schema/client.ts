@@ -6,8 +6,8 @@ export interface DataModelProp<T extends { [name: string]: Structure<T>; }, K ex
   field: F
   value: ToInterface<T, K>[F]
 }
-export interface SetDataModelProp<T extends { [name: string]: Structure<T>; }, K extends keyof T, F extends keyof ToInterface<T, K>> extends DataModelProp<T, K, F> {
-  type: "setDataModelProp"
+export interface DoAction<T extends { [name: string]: Structure<T>; }, K extends keyof T, F extends keyof ToInterface<T, K>> extends DataModelProp<T, K, F> {
+  type: "doAction"
 }
 
 export class DataModelClient<T extends { [name: string]: Structure<T>; }> {
@@ -15,8 +15,8 @@ export class DataModelClient<T extends { [name: string]: Structure<T>; }> {
   resolveDataModel: (dm: DataModel<T>) => void = () => { };
   resolveRefUnion: (ref: RefUnion<T>) => void = () => { };
 
-  async setProp<K extends keyof T, F extends KeysOfType<ToInterface<T, K>, Value>>(dvp: DataModelProp<T, K, F>): Promise<DataModel<T>> {
-    const setDataModelProp: SetDataModelProp<T, K, F> = { ...dvp, type: "setDataModelProp" }
+  async doAction<K extends keyof T, F extends KeysOfType<ToInterface<T, K>, Value>>(dvp: DataModelProp<T, K, F>): Promise<DataModel<T>> {
+    const setDataModelProp: DoAction<T, K, F> = { ...dvp, type: "doAction" }
     self.postMessage(JSON.parse(JSON.stringify(setDataModelProp)))
 
     const r = new Promise<DataModel<T>>((resolve) => {
@@ -25,8 +25,8 @@ export class DataModelClient<T extends { [name: string]: Structure<T>; }> {
     return r;
 
   }
-  async getDataModel(): Promise<DataModel<T>> {
-    self.postMessage({ type: "getDataModel" })
+  async getObservation(): Promise<DataModel<T>> {
+    self.postMessage({ type: "getObservation" })
     const r = new Promise<DataModel<T>>((resolve) => {
       this.resolveDataModel = resolve;
     })

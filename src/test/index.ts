@@ -1,18 +1,18 @@
 import * as test from "../test"
 import * as api from '../api'
 import * as schema from "../schema/base"
-import { DataModelServer, SetDataModelProp } from "../schema/server"
+import { DataModelServer, DoAction } from "../schema/server"
 import { model } from "./data-model"
 test.test("Test schema client server", async () => {
 
     const server = new DataModelServer(model)
     const state = server.createValue("Cell", { nom: "A", state: false })
     const groupe = server.createValue("Groupe", { membres: [state], state: false })
-    let resolve: (b: SetDataModelProp[]) => void = () => { }
-    const p = new Promise<SetDataModelProp[]>((r) => {
+    let resolve: (b: DoAction[]) => void = () => { }
+    const p = new Promise<DoAction[]>((r) => {
         resolve = r
     })
-    const m: SetDataModelProp[] = []
+    const m: DoAction[] = []
     const worker = new Worker(new URL("./worker.ts", import.meta.url), { type: "module" });
     server.process(worker, (op) => {
         m.push(op)

@@ -6,12 +6,12 @@ const client = new DataModelClient(model);
 
 
 (async () => {
-    const dm = await client.getDataModel();
+    const dm = await client.getObservation();
     for (const o of dm.getValues()) {
         if (dm.is(o, "Groupe")) {
             for (const ref of o.membres) {
                 console.log(dm.map)
-                const tmp = await client.setProp({ ref: ref, field: "state", value: true });
+                const tmp = await client.doAction({ ref: ref, field: "state", value: true });
                 console.log(tmp.map)
             }
 
@@ -20,7 +20,7 @@ const client = new DataModelClient(model);
     }
     const selfRef = await client.getSelf();
     if (dm.isRef(selfRef, "Groupe")) {
-        await client.setProp({ ref: selfRef, field: "state", value: true });
+        await client.doAction({ ref: selfRef, field: "state", value: true });
     }
 
 

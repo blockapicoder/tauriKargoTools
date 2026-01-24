@@ -2,8 +2,8 @@ import { set } from "../container";
 import { Ref, Structure, ToInterface, DataModel, DataModelReponse, RefUnion } from "./base";
 import { Value } from "./client";
 
-export interface SetDataModelProp {
-    type: "setDataModelProp",
+export interface DoAction {
+    type: "doAction",
     ref: { ref: string }
     field: string
     value: Value
@@ -17,17 +17,17 @@ export class DataModelServer<T extends { [name: string]: Structure<T>; }> extend
     constructor(def: T) {
         super(def)
     }
-    process(worker: Worker, check: (setDataModelProp: SetDataModelProp) => boolean, ref:SimpleRef) {
+    process(worker: Worker, check: (setDataModelProp: DoAction) => boolean, ref:SimpleRef) {
         worker.addEventListener("message", async (event) => {
             const data = event.data;
-            if (data.type === "setDataModelProp") {
-                const setDataModelProp = data as SetDataModelProp;
+            if (data.type === "doAction") {
+                const setDataModelProp = data as DoAction;
                 if (check(setDataModelProp)) {
                     this.initField(setDataModelProp.ref.ref, setDataModelProp.field, setDataModelProp.value);
                     worker.postMessage(this.cloneMap());
                 }
             }
-            if (data.type === "getDataModel") {
+            if (data.type === "getObservation") {
                 worker.postMessage(this.cloneMap());
             }
             if (data.type === "getSelf") {
