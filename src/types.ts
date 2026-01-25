@@ -242,3 +242,24 @@ export type Json =
   | string
   | Json[]
   | { [k: string]: Json };
+export type Ast = AstNode;
+
+export type AstNode = {
+  kind: string;
+  start: number;       // offset byte (0..n)
+  end: number;         // offset byte (exclu)
+  startLine: number;   // 1-based
+  startColumn: number; // 1-based (selon deno_ast view)
+  endLine: number;     // 1-based
+  endColumn: number;   // 1-based
+  children: AstNode[];
+};
+
+export type TypescriptAstOk = { ok: true; ast: Ast };
+export type TypescriptAstKo = { ok: false; error: string; position: number };
+
+export type TypescriptAstResp = TypescriptAstOk | TypescriptAstKo;
+export interface ApiTypescriptAstRequest {
+  /** Chemin relatif à `state.root` (ex: "src/main.ts") */
+  path: string;
+}

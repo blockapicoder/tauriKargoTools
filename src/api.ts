@@ -99,6 +99,9 @@ export class TauriKargoClient {
   typescriptTranspile(src: string): Promise<T.TypeScriptTranspileResponse> {
     return this.postJson<T.TypeScriptTranspileResponse>("/api/typescript/transpile", { src: src });
   }
+   typescriptAst(req:T.ApiTypescriptAstRequest): Promise<T.TypescriptAstResp > {
+    return this.postJson<T.TypescriptAstResp>("/api/typescript/ast", req);
+  }
   /**
    * Lire un fichier texte relatif au répertoire courant.
    * (POST sans corps ⇒ READ ; renvoie text/plain ou octet-stream)

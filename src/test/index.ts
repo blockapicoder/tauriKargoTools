@@ -91,17 +91,29 @@ test.test("Test schema simple avec deux type", async () => {
 
 
 })
-test.test("Test transpile ", async()=> {
-      const client = api.createClient();
-      const src = `  function m( n:number) { return n+1}`
-      const r = await client.typescriptTranspile(src)
-      console.log(JSON.stringify(r))
+test.test("Test ast typescript ", async () => {
+    const client = api.createClient();
+    const config = await client.getConfig()
+    const rep = await client.explorer({})
+    await client.setCurrentDirectory({ path: config.code })
+
+    const r = await client.typescriptAst({ path: "src/api.ts" })
+    console.log(JSON.stringify(r))
+
+
+})
+test.test("Test transpile ", async () => {
+    const client = api.createClient();
+    const src = `  function m( n:number) { return n+1}`
+    const r = await client.typescriptTranspile(src)
+    console.log(JSON.stringify(r))
 
 
 })
 test.test("Test read file", async () => {
 
     const client = api.createClient();
+    await client.setCurrentDirectory({ path: "." })
     const txt = "hello.world"
     await client.writeFileText("test.txt", txt)
     let rep = await client.explorer({})
@@ -116,7 +128,7 @@ test.test("Test read file", async () => {
 
         }), true, "pas dans rep")
     }
-
+    await client.setCurrentDirectory({ path: "." })
     const r = await client.readFileText("test.txt")
 
     test.assertEquals(r, txt)
