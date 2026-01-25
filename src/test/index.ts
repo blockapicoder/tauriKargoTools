@@ -94,10 +94,10 @@ test.test("Test schema simple avec deux type", async () => {
 test.test("Test ast typescript ", async () => {
     const client = api.createClient();
     const config = await client.getConfig()
-    const rep = await client.explorer({})
-    await client.setCurrentDirectory({ path: config.code })
 
-    const r = await client.typescriptAst({ path: "src/api.ts" })
+   const rep = config.code+"\\src\\api.ts"
+
+    const r = await client.typescriptAst({ path: rep})
     console.log(JSON.stringify(r))
 
 
