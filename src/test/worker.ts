@@ -2,7 +2,7 @@ import { DataModelClient } from "../schema/client"
 import { model } from "./data-model"
 
 
-const client = new DataModelClient(model);
+const client = new DataModelClient(model, "Groupe");
 
 
 (async () => {
@@ -19,9 +19,9 @@ const client = new DataModelClient(model);
         }
     }
     const selfRef = await client.getSelf();
-    if (dm.isRef(selfRef, "Groupe")) {
-        await client.doAction({ ref: selfRef, field: "state", value: true });
-    }
+
+    await client.doAction({ ref: selfRef, field: "state", value: true });
+
 
 
 })()

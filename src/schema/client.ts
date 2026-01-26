@@ -10,10 +10,10 @@ export interface DoAction<T extends { [name: string]: Structure<T>; }, K extends
   type: "doAction"
 }
 
-export class DataModelClient<T extends { [name: string]: Structure<T>; }> {
+export class DataModelClient<T extends { [name: string]: Structure<T>; },M extends keyof T> {
   def: T;
   resolveDataModel: (dm: DataModel<T>) => void = () => { };
-  resolveRefUnion: (ref: RefUnion<T>) => void = () => { };
+  resolveRefUnion: (ref: Ref<T,M>) => void = () => { };
 
   async doAction<K extends keyof T, F extends KeysOfType<ToInterface<T, K>, Value>>(dvp: DataModelProp<T, K, F>): Promise<DataModel<T>> {
     const setDataModelProp: DoAction<T, K, F> = { ...dvp, type: "doAction" }
@@ -32,22 +32,22 @@ export class DataModelClient<T extends { [name: string]: Structure<T>; }> {
     })
     return r;
   }
-  async getSelf() {
+  async getSelf():Promise<Ref<T,M>> {
     self.postMessage({ type: "getSelf" })
-    const r = new Promise<RefUnion<T>>((resolve) => {
+    const r = new Promise<Ref<T,M>>((resolve) => {
       this.resolveRefUnion = resolve;
     })
     return r;
 
 
   }
-  constructor(def: T) {
+  constructor(def: T, type:M) {
     this.def = def;
     self.addEventListener("message", (event) => {
       const data = event.data;
       if (data.type === "refReponse") {
         const refReponse = data as { type: 'refReponse', ref: string };
-        const r = { ref: refReponse.ref } as RefUnion<T>;
+        const r = { ref: refReponse.ref } as Ref<T,M>;
         this.resolveRefUnion(r);
         return;
       }
