@@ -1,3 +1,7 @@
 {
-    "deno.enable": false
+    "deno.enable": false,
+    "editor.inlineSuggest.enabled": true,
+    "github.copilot.enable": {
+        "*": false
+    }
 }

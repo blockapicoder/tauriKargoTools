@@ -45,7 +45,22 @@ export class DataModel<T extends { [name: string]: Structure<T>; }> {
   getValues(): ModelElement<T>[] {
     return Object.values(this.map)
   }
+  getRefs<K extends keyof T>(type: K) {
+    const refs: Ref<T, K>[] = []
+    for (const [refValue, value] of Object.entries(this.idForModelElement)) {
+      const tmp: any = value
+      if (this.types[refValue] === type) {
+        const ref: Ref<T, K> = { ref: refValue, getValue: () => tmp }
+        refs.push(ref)
+      }
 
+    }
+
+    return refs
+
+
+
+  }
   getValue(ref: string): ModelElement<T> {
     return this.map[ref];
   }
@@ -237,9 +252,7 @@ export class DataModel<T extends { [name: string]: Structure<T>; }> {
 
 }
 
-export type RefUnion<TDefs extends { [name: string]: Structure<TDefs>; }> = {
-  [K in keyof TDefs]: Ref<TDefs, K>;
-}[keyof TDefs];
+
 
 type UnwrapOptional<V> = V extends { optional: infer O; } ? O : V;
 

@@ -1,5 +1,5 @@
 import { set } from "../container";
-import { Ref, Structure, ToInterface, DataModel, DataModelReponse, RefUnion } from "./base";
+import { Ref, Structure, ToInterface, DataModel, DataModelReponse } from "./base";
 import { Value } from "./client";
 
 export interface DoAction {
