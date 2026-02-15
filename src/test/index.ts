@@ -1,29 +1,34 @@
 import * as test from "../test"
 import * as api from '../api'
 import * as schema from "../schema/base"
-import { DataModelServer, DoAction } from "../schema/server"
+import { DataModelServer } from "../schema/server"
 import { model } from "./data-model"
+interface V {
+    ref: schema.Ref<typeof model.def, "Cell">,
+    value: schema.ToInterface<typeof model.def, "Point">
+}
+
 test.test("Test schema client server", async () => {
 
-    const server = new DataModelServer(model)
-    const state = server.createValue("Cell", { nom: "A", state: false })
+    const server = new DataModelServer(model, "Groupe")
+    const state = server.createValue("Cell", { nom: "A", state: false, p: { x: 45, y: 7 } })
     const groupe = server.createValue("Groupe", { membres: [state], state: false })
-    let resolve: (b: DoAction[]) => void = () => { }
-    const p = new Promise<DoAction[]>((r) => {
+    let resolve: (b: V) => void = () => { }
+    const p = new Promise<V>((r) => {
         resolve = r
     })
-    const m: DoAction[] = []
+
     const worker = new Worker(new URL("./worker.ts", import.meta.url), { type: "module" });
-    server.process(worker, (op) => {
-        m.push(op)
-        if (m.length >= 2) {
-            resolve(m)
+    server.process(worker, (action, ref) => {
+        if (action.op === "setCell") {
+            resolve({ ref: action.value.ref, value: action.value.p })
         }
         return true
     }, groupe)
     const v = await p
-    test.assertEquals(v[0].ref.ref === (state.ref as any), true)
-    test.assertEquals(v[1].ref.ref === (groupe.ref as any), true)
+    test.assertEquals(v.ref.ref === (state.ref as any), true)
+    test.assertEquals(v.value.x, 45)
+    test.assertEquals(v.value.y, 7)
     worker.terminate()
 
 })
@@ -95,9 +100,9 @@ test.test("Test ast typescript ", async () => {
     const client = api.createClient();
     const config = await client.getConfig()
 
-   const rep = config.code+"\\src\\api.ts"
+    const rep = config.code + "\\src\\api.ts"
 
-    const r = await client.typescriptAst({ path: rep})
+    const r = await client.typescriptAst({ path: rep })
     console.log(JSON.stringify(r))
 
 

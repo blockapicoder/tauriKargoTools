@@ -10,7 +10,7 @@ export type Type<T> =
 
   | { ref: readonly (keyof T)[]; }
 
-
+  | { struct: (keyof T); }
 
   | { arrayOf: Type<T>; }
 
@@ -19,20 +19,23 @@ export type Type<T> =
 
 
 export type Structure<T> = { [name: string]: Type<T>; };
-export type EntityFieldValue = number | string | boolean | { ref: string } | EntityFieldValue[]
+export type EntityFieldValue = number | string | boolean | { ref: string } | EntityFieldValue[] | { [name: string]: EntityFieldValue }
 export type Entity = { [name: string]: EntityFieldValue }
 export type EntityMap = { [id: string]: Entity }
+export type Api<T extends { [name: string]: Structure<T>; }> = { [action: string]: Structure<T> };
+export interface World<T extends { [name: string]: Structure<T>; }, A extends Api<T>> {
+  def: T
+  api: A
+}
 
-export function createModel<T extends { [name: string]: Structure<T>; }>(def: T): T {
-  return def;
+export function createModel<T extends { [name: string]: Structure<T>; }, A extends Api<T>>(def: T, api: A): World<T, A> {
+  return { def: def, api: api };
 }
 
 
 
 export class DataModel<T extends { [name: string]: Structure<T>; }> {
-
   def: T;
-
   map: { [id: string]: ModelElement<T>; } = {};
   types: { [id: string]: keyof T } = {}
   idx = 0;
@@ -45,9 +48,18 @@ export class DataModel<T extends { [name: string]: Structure<T>; }> {
   getValues(): ModelElement<T>[] {
     return Object.values(this.map)
   }
+  attach<K extends keyof T>(ref: Ref<T, K>) {
+    const value: any = this.getValue(ref.ref)
+    if (ref.ref && this.is(value, this.types[ref.ref] as K)) {
+      ref.getValue = () => value
+      return true
+    }
+    return false
+
+  }
   getRefs<K extends keyof T>(type: K) {
     const refs: Ref<T, K>[] = []
-    for (const [refValue, value] of Object.entries(this.idForModelElement)) {
+    for (const [value, refValue] of this.idForModelElement.entries()) {
       const tmp: any = value
       if (this.types[refValue] === type) {
         const ref: Ref<T, K> = { ref: refValue, getValue: () => tmp }
@@ -196,7 +208,9 @@ export class DataModel<T extends { [name: string]: Structure<T>; }> {
     if (this.isOptionalType(t)) {
       return v === undefined || this.checkType(t.optional, root, v, map);
     }
-
+    if (this.isStructType(t)) {
+      return this.checkStructure(this.def[t.struct], root, v, map)
+    }
     if (this.isRefType(t)) {
       // runtime minimal : { ref: "$0" }
       if (typeof v !== "object" || v === null || Array.isArray(v)) return false;
@@ -224,6 +238,9 @@ export class DataModel<T extends { [name: string]: Structure<T>; }> {
   }
   private isRefType(x: any): x is { ref: readonly (keyof T)[] } {
     return typeof x === "object" && x !== null && Array.isArray(x.ref);
+  }
+  private isStructType(x: any): x is { struct: (keyof T) } {
+    return typeof x === "object" && x !== null && typeof x.struct === "string"
   }
   private isArrayOfType(x: any): x is { arrayOf: Type<T> } {
     return typeof x === "object" && x !== null && "arrayOf" in x;
@@ -281,6 +298,11 @@ type ToTsType<
   ? { [U in K[number]]: Ref<TDefs, U> }[K[number]]
 
   : never
+  : V extends { struct: infer K; }
+
+  ? K extends (keyof TDefs) ? ToInterface<TDefs, K>
+
+  : never
 
   : V extends { arrayOf: infer O; }
 
@@ -303,6 +325,50 @@ type ToTsType<
 
 
 // Matérialise une "entité" (clé de TDefs) en interface concrète
+
+export type ToInterfaceForStructure<
+
+  TDefs extends { [name: string]: Structure<TDefs>; },
+
+  S extends Structure<TDefs>
+
+> =
+
+  // Propriétés requises (pas 'optional')
+
+  {
+    -readonly [P in keyof S as S[P] extends { optional: any; } ? never : P]:
+
+    ToTsType<TDefs, S[P]>;
+
+  }
+
+  &
+
+  // Propriétés optionnelles ('optional')
+
+  {
+
+    -readonly [P in keyof S as S[P] extends { optional: any; } ? P : never]?:
+
+    ToTsType<TDefs, UnwrapOptional<S[P]>>;
+
+  };
+
+export interface WorldAction<T extends { [name: string]: Structure<T>; }, A extends Api<T>, K extends keyof A> {
+  type: 'doAction'
+  op: K
+  value: ToInterfaceForStructure<T, A[K]>
+}
+type Actions<TDefs extends { [name: string]: Structure<TDefs>; }, A extends Api<TDefs>> = {
+
+  [K in keyof A]: WorldAction<TDefs, A, K>;
+
+};
+type UnionActions<TDefs extends { [name: string]: Structure<TDefs>; }, A extends Api<TDefs>> = Actions<TDefs, A>[keyof A]
+export type WorldActionFonction<T extends { [name: string]: Structure<T>; }, A extends Api<T>, M extends keyof T> = (action: UnionActions<T, A>,
+  ref: Ref<T, M>
+) => boolean
 
 export type ToInterface<
 
@@ -502,7 +568,8 @@ export class TypeImplicationChecker<TDefs extends Def<TDefs>> {
 
 export interface DataModelReponse {
   type: 'dataModelReponse';
-  value: any;
+  value: any
+  error: boolean
 }
 export interface RefReponse {
   type: 'refReponse';
