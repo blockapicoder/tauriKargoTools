@@ -12,6 +12,8 @@
 //     }
 //   });
 
+import { Assert, Log, Terminate } from "./types";
+
 type StepFn = () => void | Promise<void>;
 type TestFn = (t: { step: (name: string, fn: StepFn) => Promise<void> }) => void | Promise<void>;
 
@@ -184,7 +186,7 @@ export function deepEqual(a: unknown, b: unknown, seen = new Map<any, any>()): b
   // RegExp
   if (a instanceof RegExp || b instanceof RegExp) {
     return a instanceof RegExp && b instanceof RegExp &&
-           a.source === b.source && a.flags === b.flags;
+      a.source === b.source && a.flags === b.flags;
   }
 
   // Typed arrays
@@ -315,10 +317,35 @@ function safeStringify(v: unknown, maxDepth = 10): string {
 
 // ————— Public assert —————
 export function assertEquals(actual: unknown, expected: unknown, msg?: string): void {
-  if (deepEqual(actual, expected)) return;
+  if (deepEqual(actual, expected)) {
+    const a: Assert = { type: "assert", message: msg ?? "", value: true }
+    if (self) {
+      self.postMessage(a)
+    }
+    return;
+  };
   const aStr = safeStringify(actual);
   const eStr = safeStringify(expected);
   const defaultMsg = `assertEquals failed:\nExpected:\n${eStr}\nActual:\n${aStr}`;
+  const a: Assert = { type: "assert", message: msg ? `${msg}\n${defaultMsg}` : defaultMsg, value: false }
+  if (self) {
+    self.postMessage(a)
+  }
   throw new Error(msg ? `${msg}\n${defaultMsg}` : defaultMsg);
+}
+export function terminate() {
+  if (self) {
+    const t: Terminate = { type: "terminate" }
+    self.postMessage(t)
+  }
+}
+function log(...args: (string | number)[]) {
+  console.log(...args)
+  if (self) {
+    const log: Log = { type: "log", message: args.length == 1 ? args[0] : args }
+    self.postMessage(log)
+  }
+
+
 }
 

@@ -263,3 +263,15 @@ export interface ApiTypescriptAstRequest {
   /** Chemin relatif à `state.root` (ex: "src/main.ts") */
   path: string;
 }
+export interface Assert {
+  type:'assert'
+  value:boolean
+  message:string 
+  }
+export interface Log {
+  type:'log'
+  message:(string|number)[]|string|number
+}
+export interface Terminate {
+  type:'terminate'
+}
