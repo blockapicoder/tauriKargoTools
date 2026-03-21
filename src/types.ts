@@ -275,3 +275,4 @@ export interface Log {
 export interface Terminate {
   type:'terminate'
 }
+export type TestEvent = Assert|Log|Terminate

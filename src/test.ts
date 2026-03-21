@@ -339,7 +339,7 @@ export function terminate() {
     self.postMessage(t)
   }
 }
-function log(...args: (string | number)[]) {
+export function log(...args: (string | number)[]) {
   console.log(...args)
   if (self) {
     const log: Log = { type: "log", message: args.length == 1 ? args[0] : args }
