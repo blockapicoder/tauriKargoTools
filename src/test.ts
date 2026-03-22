@@ -12,7 +12,7 @@
 //     }
 //   });
 
-import { Assert, Log, Terminate } from "./types";
+import { Assert, Log, Terminate, UpdateSnapshot } from "./types";
 
 type StepFn = () => void | Promise<void>;
 type TestFn = (t: { step: (name: string, fn: StepFn) => Promise<void> }) => void | Promise<void>;
@@ -345,6 +345,50 @@ export function log(...args: (string | number)[]) {
     const log: Log = { type: "log", message: args.length == 1 ? args[0] : args }
     self.postMessage(log)
   }
+
+
+}
+
+
+export async function assertEqualsSnapshot(actual: unknown, name: string, msg?: string) {
+  let postMessage = true
+  try {
+    const response = await fetch(`/test/snapshot/${name}.json`)
+    if (response.status === 404) {
+      const updateSnapshot: UpdateSnapshot = { type: "snapshot", value: actual }
+      if (self) {
+        self.postMessage(updateSnapshot)
+        return
+      }
+    }
+    if (response.ok) {
+      const value = await response.json()
+      if (deepEqual(actual, value)) {
+        const a: Assert = { type: "assert", message: msg ?? "", value: true }
+        if (self) {
+          self.postMessage(a)
+        }
+        return;
+      };
+      const aStr = safeStringify(actual);
+
+      const defaultMsg = `assertEquals failed:\nExpected:\nvalue of ${name}\nActual:\n${aStr}`;
+      const a: Assert = { type: "assert", message: msg ? `${msg}\n${defaultMsg}` : defaultMsg, value: false }
+      if (self) {
+        self.postMessage(a)
+      }
+      postMessage = false
+    }
+  } catch (e) {
+
+  }
+  if (postMessage) {
+    const a: Assert = { type: "assert", message: msg ? `${msg} error ` : "error ", value: false }
+    if (self) {
+      self.postMessage(a)
+    }
+  }
+  throw new Error()
 
 
 }
