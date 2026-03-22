@@ -111,7 +111,7 @@ export type TypeScriptTranspileSuccess = { ok: true; src: string };
 export type TypeScriptTranspileError = { ok: false; message: string };
 
 export type TypeScriptTranspileResponse = TypeScriptTranspileSuccess | TypeScriptTranspileError;
- 
+
 export interface ExplorerReq {
   path?: string;
 }
@@ -153,7 +153,7 @@ export type ExplorerFileResponse = {
 };
 
 export type ExplorerArrayFileItem = {
-  type:'file'
+  type: 'file'
   name: string;
   /** chemin absolu du fichier */
   path: string;
@@ -161,33 +161,33 @@ export type ExplorerArrayFileItem = {
 
 export type ExplorerTreeItem =
   | {
-      type: "file";
-      name: string;
-      path: string; // absolu
-    }
+    type: "file";
+    name: string;
+    path: string; // absolu
+  }
   | {
-      type: "directory";
-      name: string;
-      path: string; // absolu
-      /** peut être absent si maxDeep empêche d'expand */
-      content?: ExplorerTreeItem[];
-    };
+    type: "directory";
+    name: string;
+    path: string; // absolu
+    /** peut être absent si maxDeep empêche d'expand */
+    content?: ExplorerTreeItem[];
+  };
 
 export type ExplorerDirectoryResponse =
   | {
-      type: "directory";
-      path: string; // absolu
-      parent: string | null;
-      /** si request.type === "array" */
-      content: ExplorerArrayFileItem[];
-    }
+    type: "directory";
+    path: string; // absolu
+    parent: string | null;
+    /** si request.type === "array" */
+    content: ExplorerArrayFileItem[];
+  }
   | {
-      type: "directory";
-      path: string; // absolu
-      parent: string | null;
-      /** si request.type === "tree" (ou mode absent côté compat) */
-      content: ExplorerTreeItem[];
-    };
+    type: "directory";
+    path: string; // absolu
+    parent: string | null;
+    /** si request.type === "tree" (ou mode absent côté compat) */
+    content: ExplorerTreeItem[];
+  };
 
 export type ExplorerResponse =
   | ExplorerErrorResponse
@@ -264,15 +264,19 @@ export interface ApiTypescriptAstRequest {
   path: string;
 }
 export interface Assert {
-  type:'assert'
-  value:boolean
-  message:string 
-  }
+  type: 'assert'
+  value: boolean
+  message: string
+}
 export interface Log {
-  type:'log'
-  message:(string|number)[]|string|number
+  type: 'log'
+  message: (string | number)[] | string | number
 }
 export interface Terminate {
-  type:'terminate'
+  type: 'terminate'
 }
-export type TestEvent = Assert|Log|Terminate
+export type TestEvent = Assert | Log | Terminate
+export type UpdateSnapshot = {
+  type: "snapshot",
+  value: any
+}
