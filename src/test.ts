@@ -355,7 +355,7 @@ export async function assertEqualsSnapshot(actual: unknown, name: string, msg?: 
   try {
     const response = await fetch(`/test/snapshot/${name}.json`)
     if (response.status === 404) {
-      const updateSnapshot: UpdateSnapshot = { type: "snapshot", value: actual }
+      const updateSnapshot: UpdateSnapshot = { type: "snapshot", value: actual ,name:name}
       if (self) {
         self.postMessage(updateSnapshot)
         return

@@ -278,5 +278,6 @@ export interface Terminate {
 export type TestEvent = Assert | Log | Terminate
 export type UpdateSnapshot = {
   type: "snapshot",
+  name:string,
   value: any
 }
