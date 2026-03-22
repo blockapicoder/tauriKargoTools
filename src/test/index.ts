@@ -152,6 +152,8 @@ test.test("Test read file", async () => {
         }), false, "pas dans rep")
     }
     const repCreateDir = await client.createDirectory("toto/titi");
+    const current = await client.getCurrentDirectory()
+    console.log(current)
     rep = await client.explorer({})
     if (rep.type === "directory") {
         test.assertEquals(rep.content.some((e) => e.name === "toto"), true)

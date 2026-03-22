@@ -91,6 +91,11 @@ export class TauriKargoClient {
   setCurrentDirectory(body: T.CurrentDirReq): Promise<T.CurrentDirResp> {
     return this.postJson<T.CurrentDirResp>("/api/current-directory", body);
   }
+  /** POST /api/current-directory */
+  async getCurrentDirectory(): Promise<T.CurrentDirResp> {
+    const res = await this.req("/api/current-directory", { method: "GET" });
+    return this.parseJsonOrThrow<T.CurrentDirResp>(res);
+  }
   /**POST /api/directory/create*/
   createDirectory(path: string): Promise<T.CreateDirResp> {
     return this.postJson<T.CreateDirResp>("/api/directory/create", { path: path });
@@ -99,7 +104,7 @@ export class TauriKargoClient {
   typescriptTranspile(src: string): Promise<T.TypeScriptTranspileResponse> {
     return this.postJson<T.TypeScriptTranspileResponse>("/api/typescript/transpile", { src: src });
   }
-   typescriptAst(req:T.ApiTypescriptAstRequest): Promise<T.TypescriptAstResp > {
+  typescriptAst(req: T.ApiTypescriptAstRequest): Promise<T.TypescriptAstResp> {
     return this.postJson<T.TypescriptAstResp>("/api/typescript/ast", req);
   }
   /**
