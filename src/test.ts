@@ -353,7 +353,7 @@ export function log(...args: (string | number)[]) {
 export async function assertEqualsSnapshot(actual: unknown, name: string, msg?: string) {
   let postMessage = true
   try {
-    const response = await fetch(`/test/snapshot/${name}.json`)
+    const response = await fetch(`/test/snapshots/${name}.json`)
     if (response.status === 404) {
       const updateSnapshot: UpdateSnapshot = { type: "snapshot", value: actual ,name:name}
       if (self) {
