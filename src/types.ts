@@ -281,3 +281,18 @@ export type UpdateSnapshot = {
   name:string,
   value: any
 }
+export type AllRunStatusItem = {
+  id: number
+  pid: number | null
+  command: string
+  executableName: string
+  arguments: string[]
+  running: boolean
+  status: number | null
+}
+
+export type AllRunStatusResponse = {
+  ok: boolean
+  message: string
+  items: AllRunStatusItem[]
+}

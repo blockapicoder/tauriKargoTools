@@ -79,7 +79,10 @@ export class TauriKargoClient {
   useConfig(body: T.UseConfigReq): Promise<T.UseConfigResp> {
     return this.postJson<T.UseConfigResp>("/api/useConfig", body);
   }
-
+  /** POST /api/get-config */
+  getAllRunStatus(): Promise<T.AllRunStatusResponse> {
+    return this.postJson<T.AllRunStatusResponse>("/api/allRunStatus", {});
+  }
   /** POST /api/get-config */
   getConfig(): Promise<T.GetConfigResp> {
     return this.postJson<T.GetConfigResp>("/api/get-config", {});
