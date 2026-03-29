@@ -362,7 +362,14 @@ export async function assertEqualsSnapshot(actual: unknown, name: string, msg?: 
       }
     }
     if (response.ok) {
-      const value = await response.json()
+      let valueSrc = await response.text()
+      let value = undefined
+      try {
+        value = JSON.parse(valueSrc)
+      } catch (error) {      
+       
+      }
+
       if (deepEqual(actual, value)) {
         const a: Assert = { type: "assert", message: msg ?? "", value: true }
         if (self) {
