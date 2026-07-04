@@ -21,6 +21,7 @@ export interface EmbedResp {
 export interface UseConfigReq {
   code: string;
   executable: string;
+  routes?: { [base: string]: string }
 }
 
 export interface UseConfigResp {
@@ -32,6 +33,7 @@ export interface GetConfigResp {
   ok: boolean;
   code: string;
   executable: string;
+  routes?: { [base: string]: string }
   fileBase: string;
 }
 
@@ -198,6 +200,7 @@ export type ExplorerResponse =
 export interface NewServerReq {
   code: string;
   executable: string;
+  routes?: { [base: string]: string }
   /** 0..65535 (nullable) */
   port?: number | null;
 }
@@ -278,7 +281,7 @@ export interface Terminate {
 export type TestEvent = Assert | Log | Terminate
 export type UpdateSnapshot = {
   type: "snapshot",
-  name:string,
+  name: string,
   value: any
 }
 export type AllRunStatusItem = {
