@@ -13,7 +13,12 @@
 //   });
 
 import { Assert, Log, Terminate, UpdateSnapshot } from "./types";
-
+import { createClient } from "./api"
+ const cfg = await createClient().getConfig()
+    let prefix = ''
+    if (cfg.routes && cfg.routes["/app"]) {
+      prefix = "/app"
+    }
 type StepFn = () => void | Promise<void>;
 type TestFn = (t: { step: (name: string, fn: StepFn) => Promise<void> }) => void | Promise<void>;
 
@@ -353,9 +358,10 @@ export function log(...args: (string | number)[]) {
 export async function assertEqualsSnapshot(actual: unknown, name: string, msg?: string) {
   let postMessage = true
   try {
-    const response = await fetch(`/test/snapshots/${name}.json`)
+   
+    const response = await fetch(`${prefix}/test/snapshots/${name}.json`)
     if (response.status === 404) {
-      const updateSnapshot: UpdateSnapshot = { type: "snapshot", value: actual ,name:name}
+      const updateSnapshot: UpdateSnapshot = { type: "snapshot", value: actual, name: name }
       if (self) {
         self.postMessage(updateSnapshot)
         return
@@ -366,8 +372,8 @@ export async function assertEqualsSnapshot(actual: unknown, name: string, msg?: 
       let value = undefined
       try {
         value = JSON.parse(valueSrc)
-      } catch (error) {      
-       
+      } catch (error) {
+
       }
 
       if (deepEqual(actual, value)) {

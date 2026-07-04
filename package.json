@@ -1,6 +1,6 @@
 {
   "name": "tauri-kargo-tools",
-  "version": "0.3.9",
+  "version": "0.4.0",
   "description": "",
    "files": ["src"],
  "exports": { "./*": "./src/*" },
