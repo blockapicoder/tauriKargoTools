@@ -18,6 +18,7 @@ It helps you:
 - rebuild nested views from model objects;
 - react to field changes through a simple listener system;
 - call TauriKargo endpoints for files, directories, processes, packaging, child servers, TypeScript tools, and explorer operations;
+- configure TauriKargo route mappings to serve extra local folders or proxy HTTP/HTTPS services;
 - write browser/worker tests that can report assertions and snapshots back to the TauriKargo test runner.
 
 ## Installation
@@ -146,7 +147,11 @@ const config = await client.getConfig();
 
 await client.useConfig({
   code: "C:/path/to/code",
-  executable: "C:/path/to/executable"
+  executable: "C:/path/to/executable",
+  routes: {
+    "/assets": "C:/path/to/shared-assets",
+    "/remote-api": "https://example.com/api"
+  }
 });
 
 const file = await client.readFileText("applications.json");
@@ -181,6 +186,46 @@ The client wraps these TauriKargo API areas:
 - TypeScript tools: `typescriptTranspile(...)`, `typescriptAst(...)`.
 
 The request and response types are defined in `src/types.ts`.
+
+### Route Configuration
+
+Configuration requests can include:
+
+```ts
+routes?: { [base: string]: string }
+```
+
+Each key is a local URL base path. Each value is either a local folder path or an HTTP/HTTPS URL.
+
+Local folder routes serve the rest of the request path from the configured directory:
+
+```ts
+await client.useConfig({
+  code: "C:/apps/MyApp/code",
+  executable: "C:/apps/MyApp/executable",
+  routes: {
+    "/assets": "C:/shared/assets"
+  }
+});
+```
+
+With this configuration, `/assets/logo.png` is served from `C:/shared/assets/logo.png`.
+
+HTTP and HTTPS routes act as proxies. TauriKargo forwards the method, query string, body, and useful headers, and returns CORS-enabled responses:
+
+```ts
+await client.useConfig({
+  code: "C:/apps/MyApp/code",
+  executable: "C:/apps/MyApp/executable",
+  routes: {
+    "/remote-api": "https://example.com/api"
+  }
+});
+```
+
+With this configuration, `/remote-api/users?id=1` is proxied to `https://example.com/api/users?id=1`.
+
+The same `routes` option can be passed to `newServer(...)` when starting a child server.
 
 ## Test Helpers
 
